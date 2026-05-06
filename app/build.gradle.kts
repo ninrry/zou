@@ -28,8 +28,8 @@ android {
         applicationId = "luzzr.zou"
         minSdk = 29
         targetSdk = 36
-        versionCode = 2
-        versionName = "0.1.1"
+        versionCode = 3
+        versionName = "0.2.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
     }
@@ -48,6 +48,12 @@ android {
     }
 
     buildTypes {
+        debug {
+            // 统一签名：debug 也用密钥签名，确保无缝升级
+            if (hasReleaseSigning) {
+                signingConfig = signingConfigs.getByName("release")
+            }
+        }
         release {
             isMinifyEnabled = true
             isShrinkResources = true
@@ -61,6 +67,17 @@ android {
         }
     }
 
+    // APK 分离打包：仅 arm64-v8a（适配小米15 Pro 等主流设备）
+    splits {
+        abi {
+            isEnable = true
+            reset()
+            include("arm64-v8a")
+            isUniversalApk = false
+        }
+    }
+
+    // AAB 分离配置
     bundle {
         abi {
             enableSplit = true
@@ -71,6 +88,11 @@ android {
         language {
             enableSplit = true
         }
+    }
+
+    // 资源语言过滤：仅保留中文和英文
+    androidResources {
+        localeFilters += setOf("zh", "en")
     }
 
     compileOptions {
