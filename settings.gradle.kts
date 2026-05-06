@@ -14,5 +14,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "NoteFlow"
+rootProject.name = "zou"
 include(":app")

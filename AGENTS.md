@@ -1,7 +1,7 @@
 # AGENTS.md - 给 Codex 的执行规范
 
 ## 项目目标
-开发一个 **Android 原生 Kotlin + Jetpack Compose** 的个人多功能记事软件 NoteFlow，包含：
+开发一个 **Android 原生 Kotlin + Jetpack Compose** 的个人多功能记事软件 zou，包含：
 - 任务
 - 习惯
 - 笔记

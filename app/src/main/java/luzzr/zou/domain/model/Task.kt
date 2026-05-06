@@ -1,0 +1,28 @@
+package luzzr.zou.domain.model
+
+data class Task(
+    val id: String,
+    val title: String,
+    val contentMarkdown: String? = null,
+    val priority: TaskPriority = TaskPriority.NORMAL,
+    val isUrgent: Boolean = false,
+    val status: TaskStatus = TaskStatus.ACTIVE,
+    val startRemindAt: Long? = null,
+    val remindWindowEndAt: Long? = null,
+    val startReminderMinuteOfDay: Int? = null,
+    val windowEndMinuteOfDay: Int? = null,
+    val dueAt: Long? = null,
+    val repeatIntervalMinutes: Int? = null,
+    val exactReminderTimes: List<Long> = emptyList(),
+    val allDay: Boolean = false,
+    val completionRule: TaskCompletionRule = TaskCompletionRule.MANUAL,
+    val createdAt: Long = 0L,
+    val updatedAt: Long = 0L,
+    val isDeleted: Boolean = false,
+    val deletedAt: Long? = null,
+    val tags: String? = null,
+    val archived: Boolean = false,
+    val subTasks: List<SubTask> = emptyList(),
+    val reminderNotificationTitle: String? = null,
+    val reminderNotificationBody: String? = null,
+)

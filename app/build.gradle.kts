@@ -21,7 +21,7 @@ val keystoreProperties = Properties().apply {
 val hasReleaseSigning = keystorePropertiesFile.exists()
 
 android {
-    namespace = "com.luuzr.jielv"
+    namespace = "luzzr.zou"
     compileSdk = 36
 
     defaultConfig {

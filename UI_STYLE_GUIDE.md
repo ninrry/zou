@@ -1,4 +1,4 @@
-# UI Style Guide - NoteFlow
+# UI Style Guide - zou
 
 ## 1. 风格目标
 视觉方向参考：
