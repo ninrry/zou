@@ -51,13 +51,13 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import luzzr.zou.core.designsystem.theme.NoteFlowDesignTokens
-import luzzr.zou.core.designsystem.theme.NoteFlowHabitAccent
-import luzzr.zou.core.designsystem.theme.NoteFlowHabitAccentSoft
-import luzzr.zou.core.designsystem.theme.NoteFlowTaskAccent
-import luzzr.zou.core.designsystem.theme.NoteFlowTaskAccentSoft
-import luzzr.zou.core.designsystem.theme.NoteFlowTodayAccent
-import luzzr.zou.core.designsystem.theme.NoteFlowTodayAccentSoft
+import luzzr.zou.core.designsystem.theme.ZouDesignTokens
+import luzzr.zou.core.designsystem.theme.ZouHabitAccent
+import luzzr.zou.core.designsystem.theme.ZouHabitAccentSoft
+import luzzr.zou.core.designsystem.theme.ZouTaskAccent
+import luzzr.zou.core.designsystem.theme.ZouTaskAccentSoft
+import luzzr.zou.core.designsystem.theme.ZouTodayAccent
+import luzzr.zou.core.designsystem.theme.ZouTodayAccentSoft
 import luzzr.zou.core.ui.GlassLevel
 import luzzr.zou.core.ui.GlassSurface
 import luzzr.zou.core.ui.LocalRadialExpansionController
@@ -135,7 +135,7 @@ fun TodayHeroCard(
         modifier = modifier
             .fillMaxWidth()
             .testTag("today_summary_card"),
-        accentColor = NoteFlowTodayAccent,
+        accentColor = ZouTodayAccent,
         level = GlassLevel.Normal,
     ) {
         Column(
@@ -237,12 +237,12 @@ internal fun TodayTaskCard(
         title = item.title,
         subtitle = item.remainingTimeText,
         subtitleColor = MaterialTheme.colorScheme.error,
-        accentColor = NoteFlowTaskAccent,
+        accentColor = ZouTaskAccent,
         layoutSpec = layoutSpec,
         action = {
             TodayQuickActionButton(
                 text = item.actionLabel,
-                accentColor = NoteFlowTaskAccent,
+                accentColor = ZouTaskAccent,
                 height = layoutSpec.controlHeight,
                 width = layoutSpec.actionWidth,
                 textStyle = layoutSpec.actionStyle,
@@ -276,13 +276,13 @@ internal fun TodayHabitCard(
         title = item.title,
         subtitle = item.statusHint,
         support = item.progressText,
-        accentColor = NoteFlowHabitAccent,
+        accentColor = ZouHabitAccent,
         layoutSpec = layoutSpec,
         action = {
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 TodayQuickActionButton(
                     text = item.primaryActionLabel,
-                    accentColor = NoteFlowHabitAccent,
+                    accentColor = ZouHabitAccent,
                     height = layoutSpec.controlHeight,
                     width = layoutSpec.actionWidth,
                     textStyle = layoutSpec.actionStyle,
@@ -293,7 +293,7 @@ internal fun TodayHabitCard(
                 if (!item.secondaryActionLabel.isNullOrBlank()) {
                     TodayQuickActionButton(
                         text = item.secondaryActionLabel,
-                        accentColor = NoteFlowHabitAccentSoft,
+                        accentColor = ZouHabitAccentSoft,
                         height = layoutSpec.controlHeight,
                         width = layoutSpec.actionWidth,
                         textStyle = layoutSpec.actionStyle,
@@ -501,7 +501,7 @@ fun TodayGlobalEmptyCard(
         modifier = Modifier
             .fillMaxWidth()
             .testTag("today_empty_state"),
-        accentColor = NoteFlowTodayAccent,
+        accentColor = ZouTodayAccent,
         level = GlassLevel.Normal,
     ) {
         Column(
@@ -563,19 +563,19 @@ private fun TodayStatusPills(summary: TodaySummaryUiModel) {
             modifier = Modifier.weight(1f),
             label = "待办",
             value = summary.pendingTaskCount.toString(),
-            accentColor = NoteFlowTaskAccent,
+            accentColor = ZouTaskAccent,
         )
         TodayStatusPill(
             modifier = Modifier.weight(1f),
             label = "习惯",
             value = summary.dueHabitCount.toString(),
-            accentColor = NoteFlowHabitAccent,
+            accentColor = ZouHabitAccent,
         )
         TodayStatusPill(
             modifier = Modifier.weight(1f),
             label = "完成",
             value = summary.completedCount.toString(),
-            accentColor = NoteFlowTodayAccent,
+            accentColor = ZouTodayAccent,
         )
     }
 }
@@ -587,7 +587,7 @@ private fun TodayStatusPill(
     accentColor: Color,
     modifier: Modifier = Modifier,
 ) {
-    val designTokens = NoteFlowDesignTokens.colors
+    val designTokens = ZouDesignTokens.colors
     GlassSurface(
         modifier = modifier,
         accentColor = accentColor,
@@ -631,7 +631,7 @@ private fun TodayStatusPill(
 
 @Composable
 private fun TodayCompletionBar(summary: TodaySummaryUiModel) {
-    val designTokens = NoteFlowDesignTokens.colors
+    val designTokens = ZouDesignTokens.colors
     val progress = remember(summary) {
         val total = summary.pendingTaskCount + summary.dueHabitCount + summary.completedCount
         if (total == 0) 0f else summary.completedCount / total.toFloat()
@@ -670,7 +670,7 @@ private fun TodayCompletionBar(summary: TodaySummaryUiModel) {
                     .fillMaxWidth(if (clampedProgress == 0f) 0f else clampedProgress.coerceAtLeast(0.06f))
                     .height(6.dp)
                     .background(
-                        color = NoteFlowTodayAccent.copy(alpha = 0.86f),
+                        color = ZouTodayAccent.copy(alpha = 0.86f),
                         shape = RoundedCornerShape(999.dp),
                     ),
             )
@@ -680,7 +680,7 @@ private fun TodayCompletionBar(summary: TodaySummaryUiModel) {
 
 @Composable
 private fun TodaySectionCountPill(count: Int) {
-    val designTokens = NoteFlowDesignTokens.colors
+    val designTokens = ZouDesignTokens.colors
     Box(
         modifier = Modifier
             .background(
@@ -727,7 +727,7 @@ fun TodayQuickCreateFab(
             delayMillis = 0,
             testTag = "today_quick_create_task",
             text = "新建任务",
-            accentColor = NoteFlowTaskAccentSoft,
+            accentColor = ZouTaskAccentSoft,
             onClick = onCreateTask,
         )
         StaggeredQuickCreateAction(
@@ -735,12 +735,12 @@ fun TodayQuickCreateFab(
             delayMillis = 45,
             testTag = "today_quick_create_habit",
             text = "新建习惯",
-            accentColor = NoteFlowHabitAccentSoft,
+            accentColor = ZouHabitAccentSoft,
             onClick = onCreateHabit,
         )
 
         ModuleFab(
-            accentColor = NoteFlowTodayAccent,
+            accentColor = ZouTodayAccent,
             contentDescription = if (expanded) "收起快速新建" else "展开快速新建",
             icon = if (expanded) Icons.Default.Check else Icons.Default.Add,
             testTag = "today_quick_create_main",

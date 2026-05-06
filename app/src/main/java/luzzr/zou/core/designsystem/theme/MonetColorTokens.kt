@@ -13,40 +13,40 @@ data class MonetModulePalette(
 
 object MonetColorTokens {
     val canvas: Color
-        @Composable get() = NoteFlowDesignTokens.colors.canvas
+        @Composable get() = ZouDesignTokens.colors.canvas
     val canvasRaised: Color
-        @Composable get() = NoteFlowDesignTokens.colors.canvasRaised
+        @Composable get() = ZouDesignTokens.colors.canvasRaised
     val background: Color
-        @Composable get() = NoteFlowDesignTokens.colors.background
+        @Composable get() = ZouDesignTokens.colors.background
     val surface: Color
-        @Composable get() = NoteFlowDesignTokens.colors.surface
+        @Composable get() = ZouDesignTokens.colors.surface
     val surfaceFloating: Color
-        @Composable get() = NoteFlowDesignTokens.colors.surfaceFloating
+        @Composable get() = ZouDesignTokens.colors.surfaceFloating
     val textPrimary: Color
-        @Composable get() = NoteFlowDesignTokens.colors.textPrimary
+        @Composable get() = ZouDesignTokens.colors.textPrimary
     val textSecondary: Color
-        @Composable get() = NoteFlowDesignTokens.colors.textSecondary
+        @Composable get() = ZouDesignTokens.colors.textSecondary
     val textTertiary: Color
-        @Composable get() = NoteFlowDesignTokens.colors.textTertiary
+        @Composable get() = ZouDesignTokens.colors.textTertiary
 
     val today = MonetModulePalette(
-        accent = NoteFlowTodayAccent,
-        accentSoft = NoteFlowTodayAccentSoft,
-        accentGlow = NoteFlowTodayAccentGlow,
+        accent = ZouTodayAccent,
+        accentSoft = ZouTodayAccentSoft,
+        accentGlow = ZouTodayAccentGlow,
     )
     val task = MonetModulePalette(
-        accent = NoteFlowTaskAccent,
-        accentSoft = NoteFlowTaskAccentSoft,
-        accentGlow = NoteFlowTaskAccentGlow,
+        accent = ZouTaskAccent,
+        accentSoft = ZouTaskAccentSoft,
+        accentGlow = ZouTaskAccentGlow,
     )
     val habit = MonetModulePalette(
-        accent = NoteFlowHabitAccent,
-        accentSoft = NoteFlowHabitAccentSoft,
-        accentGlow = NoteFlowHabitAccentGlow,
+        accent = ZouHabitAccent,
+        accentSoft = ZouHabitAccentSoft,
+        accentGlow = ZouHabitAccentGlow,
     )
     val note = MonetModulePalette(
-        accent = NoteFlowNoteAccent,
-        accentSoft = NoteFlowNoteAccentSoft,
-        accentGlow = NoteFlowNoteAccentGlow,
+        accent = ZouNoteAccent,
+        accentSoft = ZouNoteAccentSoft,
+        accentGlow = ZouNoteAccentGlow,
     )
 }

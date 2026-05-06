@@ -21,7 +21,7 @@ fun StandardSectionCard(
     level: GlassLevel = GlassLevel.Normal,
     content: @Composable ColumnScope.() -> Unit,
 ) {
-    NoteFlowSectionCard(
+    ZouSectionCard(
         title = title,
         modifier = modifier,
         subtitle = subtitle,

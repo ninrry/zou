@@ -30,7 +30,7 @@ import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import luzzr.zou.app.navigation.TopLevelDestination
-import luzzr.zou.core.designsystem.theme.NoteFlowDesignTokens
+import luzzr.zou.core.designsystem.theme.ZouDesignTokens
 import kotlin.math.abs
 
 @Composable
@@ -42,7 +42,7 @@ fun TopModuleTabBar(
     motionStyle: ModuleVisualStyle = selectedDestination.visualStyle,
     modifier: Modifier = Modifier,
 ) {
-    val designTokens = NoteFlowDesignTokens.colors
+    val designTokens = ZouDesignTokens.colors
     BoxWithConstraints(
         modifier = modifier
             .fillMaxWidth()
@@ -157,7 +157,7 @@ private fun TopTabHighlight(
     style: ModuleVisualStyle,
     modifier: Modifier = Modifier,
 ) {
-    val designTokens = NoteFlowDesignTokens.colors
+    val designTokens = ZouDesignTokens.colors
     Box(
         modifier = modifier
             .width(width)

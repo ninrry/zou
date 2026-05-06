@@ -28,9 +28,9 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import luzzr.zou.core.designsystem.theme.NoteFlowHabitAccent
-import luzzr.zou.core.designsystem.theme.NoteFlowTaskAccent
-import luzzr.zou.core.ui.NoteFlowStaggeredReveal
+import luzzr.zou.core.designsystem.theme.ZouHabitAccent
+import luzzr.zou.core.designsystem.theme.ZouTaskAccent
+import luzzr.zou.core.ui.ZouStaggeredReveal
 import luzzr.zou.domain.usecase.HabitQuickActionType
 import luzzr.zou.domain.usecase.TaskQuickActionType
 import kotlinx.coroutines.flow.Flow
@@ -145,7 +145,7 @@ fun TodayScreen(
                 )
             }
             item {
-                NoteFlowStaggeredReveal(revealKey = "today_dual_area", index = 0) {
+                ZouStaggeredReveal(revealKey = "today_dual_area", index = 0) {
                     TodayDualColumnQuickArea(
                         uiState = uiState,
                         onOpenTask = onOpenTask,
@@ -253,7 +253,7 @@ private fun TodayTasksSection(
                 description = "创建一条任务。",
                 actionLabel = "新建任务",
                 actionTestTag = "today_empty_create_task",
-                accentColor = NoteFlowTaskAccent,
+                accentColor = ZouTaskAccent,
                 layoutSpec = layoutSpec,
                 onActionClick = onCreateTask,
             )
@@ -301,7 +301,7 @@ private fun TodayHabitsSection(
                 description = "创建一个习惯。",
                 actionLabel = "新建习惯",
                 actionTestTag = "today_empty_create_habit",
-                accentColor = NoteFlowHabitAccent,
+                accentColor = ZouHabitAccent,
                 layoutSpec = layoutSpec,
                 onActionClick = onCreateHabit,
             )

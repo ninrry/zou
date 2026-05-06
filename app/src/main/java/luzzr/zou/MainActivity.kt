@@ -25,8 +25,8 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.core.content.ContextCompat
-import luzzr.zou.app.NoteFlowApp
-import luzzr.zou.core.designsystem.theme.NoteFlowTheme
+import luzzr.zou.app.ZouApp
+import luzzr.zou.core.designsystem.theme.ZouTheme
 import luzzr.zou.core.reminder.ReminderConstants
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
@@ -55,9 +55,9 @@ class MainActivity : ComponentActivity() {
         }
         handleReminderIntent(intent)
         setContent {
-            NoteFlowTheme {
+            ZouTheme {
                 StartupPermissionCoordinator()
-                NoteFlowApp(
+                ZouApp(
                     pendingTaskDetailId = pendingTaskDetailId,
                     pendingHabitDetailId = pendingHabitDetailId,
                     onPendingTaskDetailConsumed = { pendingTaskDetailId = null },

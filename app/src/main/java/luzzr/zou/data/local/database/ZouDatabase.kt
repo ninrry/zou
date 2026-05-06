@@ -27,7 +27,7 @@ import luzzr.zou.data.local.database.entity.TaskEntity
     version = 4,
     exportSchema = true,
 )
-abstract class NoteFlowDatabase : RoomDatabase() {
+abstract class ZouDatabase : RoomDatabase() {
     abstract fun taskDao(): TaskDao
     abstract fun habitDao(): HabitDao
     abstract fun noteDao(): NoteDao

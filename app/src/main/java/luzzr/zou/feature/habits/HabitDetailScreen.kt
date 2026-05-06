@@ -23,10 +23,10 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import luzzr.zou.core.designsystem.theme.NoteFlowHabitAccent
-import luzzr.zou.core.ui.NoteFlowEmptyStateCard
-import luzzr.zou.core.ui.NoteFlowPageHeader
-import luzzr.zou.core.ui.NoteFlowSectionCard
+import luzzr.zou.core.designsystem.theme.ZouHabitAccent
+import luzzr.zou.core.ui.ZouEmptyStateCard
+import luzzr.zou.core.ui.ZouPageHeader
+import luzzr.zou.core.ui.ZouSectionCard
 
 @Composable
 fun HabitDetailRoute(
@@ -60,11 +60,11 @@ fun HabitDetailScreen(
     onDeleteClicked: () -> Unit,
 ) {
     ScaffoldBody(uiState, onNavigateBack) {
-        NoteFlowPageHeader(
+        ZouPageHeader(
             title = uiState.title,
             subtitle = "按模式完成打卡：勾选型一键完成，步骤型完成全部步骤，时长型先计时再结束。",
         )
-        NoteFlowSectionCard(title = "当前状态") {
+        ZouSectionCard(title = "当前状态") {
             DetailLine("今日状态", uiState.todayStatusText)
             DetailLine("频率规则", uiState.frequencyText)
             DetailLine("打卡模式", uiState.modeText)
@@ -83,7 +83,7 @@ fun HabitDetailScreen(
         }
 
         if (uiState.showStepsSection) {
-            NoteFlowSectionCard(title = "步骤") {
+            ZouSectionCard(title = "步骤") {
                 if (uiState.steps.isEmpty()) {
                     Text(
                         text = "步骤为空，无法完成步骤型打卡。",
@@ -112,7 +112,7 @@ fun HabitDetailScreen(
                             text = if (step.checked) "已完成" else "未完成",
                             style = MaterialTheme.typography.labelLarge,
                             color = if (step.checked) {
-                                NoteFlowHabitAccent
+                                ZouHabitAccent
                             } else {
                                 MaterialTheme.colorScheme.onSurfaceVariant
                             },
@@ -123,7 +123,7 @@ fun HabitDetailScreen(
         }
 
         if (uiState.showDurationSection) {
-            NoteFlowSectionCard(title = "时长打卡") {
+            ZouSectionCard(title = "时长打卡") {
                 Text(
                     text = uiState.durationTargetText,
                     style = MaterialTheme.typography.bodyMedium,
@@ -173,7 +173,7 @@ fun HabitDetailScreen(
         }
 
         if (uiState.canShowContent) {
-            NoteFlowSectionCard(title = "详情") {
+            ZouSectionCard(title = "详情") {
                 Text(
                     text = uiState.contentMarkdown,
                     style = MaterialTheme.typography.bodyMedium,
@@ -238,10 +238,10 @@ private fun ScaffoldBody(
                     TextButton(onClick = onNavigateBack) {
                         Text("返回")
                     }
-                    NoteFlowEmptyStateCard(
+                    ZouEmptyStateCard(
                         title = "习惯不存在或已删除",
                         description = uiState.emptyMessage,
-                        accentColor = NoteFlowHabitAccent,
+                        accentColor = ZouHabitAccent,
                         actionLabel = "返回列表",
                         actionTestTag = "habit_detail_go_back",
                         onActionClick = onNavigateBack,

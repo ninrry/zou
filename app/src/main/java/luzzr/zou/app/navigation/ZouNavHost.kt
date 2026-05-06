@@ -36,7 +36,7 @@ import luzzr.zou.feature.trash.TrashRoute
 import luzzr.zou.feature.today.TodayRoute
 
 @Composable
-fun NoteFlowNavHost(
+fun ZouNavHost(
     navController: NavHostController,
     selectedTopLevelDestination: TopLevelDestination,
     onSelectedTopLevelDestinationChange: (TopLevelDestination) -> Unit,

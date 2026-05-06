@@ -33,11 +33,11 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import luzzr.zou.core.designsystem.theme.NoteFlowTodayAccent
+import luzzr.zou.core.designsystem.theme.ZouTodayAccent
 import luzzr.zou.core.ui.GlassLevel
 import luzzr.zou.core.ui.GlassSurface
 import luzzr.zou.core.ui.LayoutTokens
-import luzzr.zou.core.ui.NoteFlowPageHeader
+import luzzr.zou.core.ui.ZouPageHeader
 import luzzr.zou.core.ui.StandardFieldRow
 import luzzr.zou.core.ui.StandardSectionCard
 import luzzr.zou.core.ui.StandardSwitchRow
@@ -121,7 +121,7 @@ fun SettingsScreen(
                 Icon(imageVector = Icons.AutoMirrored.Outlined.ArrowBack, contentDescription = null)
                 Text("返回", modifier = Modifier.padding(start = LayoutTokens.Space8))
             }
-            NoteFlowPageHeader(
+            ZouPageHeader(
                 title = uiState.title,
                 subtitle = "统一管理提醒节奏、列表显示和数据工具。",
             )
@@ -133,7 +133,7 @@ fun SettingsScreen(
             StandardSectionCard(
                 title = "提醒偏好",
                 subtitle = "这些配置会同时作用于任务、习惯和今日页的提醒节奏。",
-                accentColor = NoteFlowTodayAccent,
+                accentColor = ZouTodayAccent,
             ) {
                 StandardFieldRow(label = "任务默认重复提醒间隔（分钟）") {
                     OutlinedTextField(
@@ -182,7 +182,7 @@ fun SettingsScreen(
             StandardSectionCard(
                 title = "显示偏好",
                 subtitle = "列表筛选统一收拢到这里，不再占用待办区和习惯区顶部空间。",
-                accentColor = NoteFlowTodayAccent,
+                accentColor = ZouTodayAccent,
             ) {
                 StandardSwitchRow(
                     title = "待办显示已完成任务",
@@ -213,7 +213,7 @@ fun SettingsScreen(
             StandardSectionCard(
                 title = "配置同步",
                 subtitle = "只在有变更时保存，避免重复操作。",
-                accentColor = NoteFlowTodayAccent,
+                accentColor = ZouTodayAccent,
             ) {
                 Text(
                     text = saveHint,
@@ -234,7 +234,7 @@ fun SettingsScreen(
                         .testTag("settings_save_defaults"),
                     enabled = uiState.hasPendingChanges && !uiState.isSaving && !uiState.isLoading,
                     onClick = onSaveDefaults,
-                    colors = noteFlowButtonColors(NoteFlowTodayAccent),
+                    colors = noteFlowButtonColors(ZouTodayAccent),
                 ) {
                     Text(saveButtonLabel)
                 }
@@ -258,7 +258,7 @@ fun SettingsScreen(
 
             StandardSectionCard(
                 title = "数据管理",
-                accentColor = NoteFlowTodayAccent,
+                accentColor = ZouTodayAccent,
             ) {
                 OutlinedButton(
                     modifier = Modifier
@@ -293,14 +293,14 @@ fun TopLevelSettingsButton(
     GlassSurface(
         modifier = modifier.testTag("open_settings"),
         shape = RoundedCornerShape(20.dp),
-        accentColor = NoteFlowTodayAccent,
+        accentColor = ZouTodayAccent,
         level = GlassLevel.Weak,
     ) {
         IconButton(onClick = onClick) {
             Icon(
                 imageVector = Icons.Outlined.Settings,
                 contentDescription = "设置",
-                tint = NoteFlowTodayAccent.copy(alpha = 0.94f),
+                tint = ZouTodayAccent.copy(alpha = 0.94f),
             )
         }
     }

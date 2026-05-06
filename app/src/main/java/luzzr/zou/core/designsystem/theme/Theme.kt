@@ -13,37 +13,37 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 
 private val LightColorScheme = lightColorScheme(
-    primary = NoteFlowTodayAccent,
-    onPrimary = LightNoteFlowUiColors.onAccent,
-    secondary = NoteFlowTaskAccent,
-    tertiary = NoteFlowHabitAccent,
-    background = LightNoteFlowUiColors.background,
-    onBackground = LightNoteFlowUiColors.textPrimary,
-    surface = LightNoteFlowUiColors.surface,
-    onSurface = LightNoteFlowUiColors.textPrimary,
-    surfaceVariant = LightNoteFlowUiColors.surfaceVariant,
-    onSurfaceVariant = LightNoteFlowUiColors.textSecondary,
-    outline = LightNoteFlowUiColors.outlineSoft,
-    outlineVariant = LightNoteFlowUiColors.outlineSoft.copy(alpha = 0.72f),
-    primaryContainer = NoteFlowTodayAccentSoft,
-    secondaryContainer = NoteFlowTaskAccentSoft,
-    tertiaryContainer = NoteFlowHabitAccentSoft,
-    error = NoteFlowDanger,
+    primary = ZouTodayAccent,
+    onPrimary = LightZouUiColors.onAccent,
+    secondary = ZouTaskAccent,
+    tertiary = ZouHabitAccent,
+    background = LightZouUiColors.background,
+    onBackground = LightZouUiColors.textPrimary,
+    surface = LightZouUiColors.surface,
+    onSurface = LightZouUiColors.textPrimary,
+    surfaceVariant = LightZouUiColors.surfaceVariant,
+    onSurfaceVariant = LightZouUiColors.textSecondary,
+    outline = LightZouUiColors.outlineSoft,
+    outlineVariant = LightZouUiColors.outlineSoft.copy(alpha = 0.72f),
+    primaryContainer = ZouTodayAccentSoft,
+    secondaryContainer = ZouTaskAccentSoft,
+    tertiaryContainer = ZouHabitAccentSoft,
+    error = ZouDanger,
 )
 
 private val DarkColorScheme = darkColorScheme(
-    primary = NoteFlowTaskAccent,
-    onPrimary = DarkNoteFlowUiColors.onAccent,
-    secondary = NoteFlowHabitAccent,
-    tertiary = NoteFlowNoteAccent,
-    background = DarkNoteFlowUiColors.background,
-    onBackground = DarkNoteFlowUiColors.textPrimary,
-    surface = DarkNoteFlowUiColors.surface,
-    onSurface = DarkNoteFlowUiColors.textPrimary,
-    surfaceVariant = DarkNoteFlowUiColors.surfaceVariant,
-    onSurfaceVariant = DarkNoteFlowUiColors.textSecondary,
-    outline = DarkNoteFlowUiColors.outlineSoft,
-    outlineVariant = DarkNoteFlowUiColors.outlineSoft.copy(alpha = 0.82f),
+    primary = ZouTaskAccent,
+    onPrimary = DarkZouUiColors.onAccent,
+    secondary = ZouHabitAccent,
+    tertiary = ZouNoteAccent,
+    background = DarkZouUiColors.background,
+    onBackground = DarkZouUiColors.textPrimary,
+    surface = DarkZouUiColors.surface,
+    onSurface = DarkZouUiColors.textPrimary,
+    surfaceVariant = DarkZouUiColors.surfaceVariant,
+    onSurfaceVariant = DarkZouUiColors.textSecondary,
+    outline = DarkZouUiColors.outlineSoft,
+    outlineVariant = DarkZouUiColors.outlineSoft.copy(alpha = 0.82f),
     primaryContainer = Color(0xFF37315A),
     secondaryContainer = Color(0xFF2D433B),
     tertiaryContainer = Color(0xFF4A4126),
@@ -51,7 +51,7 @@ private val DarkColorScheme = darkColorScheme(
 )
 
 @Composable
-fun NoteFlowTheme(
+fun ZouTheme(
     useDarkTheme: Boolean = isSystemInDarkTheme(),
     dynamicColor: Boolean = false,
     content: @Composable () -> Unit,
@@ -68,11 +68,11 @@ fun NoteFlowTheme(
         else -> LightColorScheme
     }
 
-    CompositionLocalProvider(LocalNoteFlowUiColors provides noteFlowUiColors) {
+    CompositionLocalProvider(LocalZouUiColors provides noteFlowUiColors) {
         MaterialTheme(
             colorScheme = colorScheme,
-            typography = NoteFlowTypography,
-            shapes = NoteFlowShapes,
+            typography = ZouTypography,
+            shapes = ZouShapes,
             content = content,
         )
     }

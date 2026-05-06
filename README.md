@@ -52,12 +52,12 @@ app/src/main/java/luzzr/zou
 
 ## 设计与文档
 
-- `PRD.md` — 产品需求
-- `TECH_SPEC_安卓原生技术方案.md` — 技术方案
-- `DB_SCHEMA_数据模型与数据库设计.md` — 数据模型
-- `IA_信息架构.md` — 信息架构
-- `UI_STYLE_GUIDE.md` — UI 风格指南
-- `AGENTS.md` — AI 开发规范
+- `docs/prd.md` — 产品需求
+- `docs/tech-spec.md` — 技术方案
+- `docs/db-schema.md` — 数据模型
+- `docs/information-architecture.md` — 信息架构
+- `docs/ui-style-guide.md` — UI 风格指南
+- `docs/agents.md` — AI 开发规范
 
 ## 注意
 

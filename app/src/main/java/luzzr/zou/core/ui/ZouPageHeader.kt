@@ -11,16 +11,16 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.ui.unit.dp
-import luzzr.zou.core.designsystem.theme.NoteFlowDesignTokens
+import luzzr.zou.core.designsystem.theme.ZouDesignTokens
 
 @Composable
-fun NoteFlowPageHeader(
+fun ZouPageHeader(
     title: String,
     subtitle: String? = null,
     modifier: Modifier = Modifier,
     trailingContent: @Composable (() -> Unit)? = null,
 ) {
-    val designTokens = NoteFlowDesignTokens.colors
+    val designTokens = ZouDesignTokens.colors
     Row(
         modifier = modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween,

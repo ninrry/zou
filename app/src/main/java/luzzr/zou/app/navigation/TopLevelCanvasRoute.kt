@@ -20,7 +20,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.lerp
-import luzzr.zou.core.designsystem.theme.NoteFlowDesignTokens
+import luzzr.zou.core.designsystem.theme.ZouDesignTokens
 import luzzr.zou.core.ui.ModuleVisualStyle
 import luzzr.zou.core.ui.MotionTokens
 import luzzr.zou.core.ui.TopModuleTabBar
@@ -58,7 +58,7 @@ fun TopLevelCanvasRoute(
     onOpenNotes: () -> Unit,
     onOpenSettings: () -> Unit,
 ) {
-    val designTokens = NoteFlowDesignTokens.colors
+    val designTokens = ZouDesignTokens.colors
     val destinations = TopLevelDestination.entries
     val selectedIndex = destinations.indexOf(selectedDestination).coerceAtLeast(0)
     val latestSelectedDestination by rememberUpdatedState(selectedDestination)

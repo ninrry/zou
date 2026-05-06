@@ -6,7 +6,7 @@ import androidx.room.withTransaction
 import luzzr.zou.core.markdown.MarkdownImageReferenceParser
 import luzzr.zou.core.reminder.ReminderScheduler
 import luzzr.zou.core.time.TimeProvider
-import luzzr.zou.data.local.database.NoteFlowDatabase
+import luzzr.zou.data.local.database.ZouDatabase
 import luzzr.zou.data.local.database.dao.HabitDao
 import luzzr.zou.data.local.database.dao.MediaDao
 import luzzr.zou.data.local.database.dao.NoteDao
@@ -37,7 +37,7 @@ import kotlinx.serialization.json.Json
 @Singleton
 class BackupRepositoryImpl @Inject constructor(
     @ApplicationContext private val context: Context,
-    private val database: NoteFlowDatabase,
+    private val database: ZouDatabase,
     private val taskDao: TaskDao,
     private val habitDao: HabitDao,
     private val noteDao: NoteDao,

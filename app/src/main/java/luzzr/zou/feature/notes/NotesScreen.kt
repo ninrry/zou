@@ -22,12 +22,12 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import luzzr.zou.core.designsystem.theme.NoteFlowNoteAccent
+import luzzr.zou.core.designsystem.theme.ZouNoteAccent
 import luzzr.zou.core.ui.GlassSurface
 import luzzr.zou.core.ui.ModuleFab
-import luzzr.zou.core.ui.NoteFlowEmptyStateCard
-import luzzr.zou.core.ui.NoteFlowMetaChip
-import luzzr.zou.core.ui.NoteFlowStaggeredReveal
+import luzzr.zou.core.ui.ZouEmptyStateCard
+import luzzr.zou.core.ui.ZouMetaChip
+import luzzr.zou.core.ui.ZouStaggeredReveal
 import luzzr.zou.core.ui.noteFlowPressScale
 import luzzr.zou.core.ui.rememberPressInteractionSource
 
@@ -59,7 +59,7 @@ fun NotesScreen(
         containerColor = Color.Transparent,
         floatingActionButton = {
             ModuleFab(
-                accentColor = NoteFlowNoteAccent,
+                accentColor = ZouNoteAccent,
                 contentDescription = "新建笔记",
                 icon = Icons.Default.Add,
                 testTag = "notes_fab",
@@ -76,11 +76,11 @@ fun NotesScreen(
         ) {
             if (uiState.notes.isEmpty()) {
                 item {
-                    NoteFlowStaggeredReveal(revealKey = "notes_empty", index = 0) {
-                        NoteFlowEmptyStateCard(
+                    ZouStaggeredReveal(revealKey = "notes_empty", index = 0) {
+                        ZouEmptyStateCard(
                             title = uiState.emptyTitle,
                             description = uiState.emptyDescription,
-                            accentColor = NoteFlowNoteAccent,
+                            accentColor = ZouNoteAccent,
                         )
                     }
                 }
@@ -98,7 +98,7 @@ fun NotesScreen(
                                 onClick = { onOpenNote(note.id) },
                                 onLongClick = { onEditNote(note.id) },
                             ),
-                        accentColor = NoteFlowNoteAccent,
+                        accentColor = ZouNoteAccent,
                     ) {
                         Column(
                             modifier = Modifier.padding(18.dp),
@@ -114,9 +114,9 @@ fun NotesScreen(
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                             )
-                            NoteFlowMetaChip(
+                            ZouMetaChip(
                                 text = "最近编辑：${note.updatedAtText}",
-                                accentColor = NoteFlowNoteAccent,
+                                accentColor = ZouNoteAccent,
                             )
                         }
                     }

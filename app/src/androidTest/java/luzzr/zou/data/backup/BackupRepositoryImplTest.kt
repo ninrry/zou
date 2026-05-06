@@ -7,7 +7,7 @@ import androidx.test.platform.app.InstrumentationRegistry
 import luzzr.zou.core.markdown.MarkdownImageReferenceParser
 import luzzr.zou.core.reminder.ReminderScheduler
 import luzzr.zou.core.time.TimeProvider
-import luzzr.zou.data.local.database.NoteFlowDatabase
+import luzzr.zou.data.local.database.ZouDatabase
 import luzzr.zou.data.local.database.entity.TaskEntity
 import luzzr.zou.data.settings.ReminderPreferences
 import luzzr.zou.domain.repository.SettingsRepository
@@ -29,7 +29,7 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 class BackupRepositoryImplTest {
 
-    private lateinit var database: NoteFlowDatabase
+    private lateinit var database: ZouDatabase
     private lateinit var repository: BackupRepositoryImpl
     private lateinit var settingsRepository: FakeSettingsRepository
     private lateinit var exportedZip: File
@@ -40,7 +40,7 @@ class BackupRepositoryImplTest {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
         database = Room.inMemoryDatabaseBuilder(
             context,
-            NoteFlowDatabase::class.java,
+            ZouDatabase::class.java,
         ).allowMainThreadQueries().build()
         settingsRepository = FakeSettingsRepository()
         repository = BackupRepositoryImpl(

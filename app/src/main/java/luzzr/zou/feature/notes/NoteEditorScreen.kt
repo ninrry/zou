@@ -35,13 +35,13 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import luzzr.zou.core.designsystem.theme.NoteFlowNoteAccent
+import luzzr.zou.core.designsystem.theme.ZouNoteAccent
 import luzzr.zou.core.markdown.MarkdownRenderer
-import luzzr.zou.core.ui.NoteFlowEditorSection
-import luzzr.zou.core.ui.NoteFlowEmptyStateCard
-import luzzr.zou.core.ui.NoteFlowPageHeader
-import luzzr.zou.core.ui.NoteFlowSectionCard
-import luzzr.zou.core.ui.NoteFlowStepBottomBar
+import luzzr.zou.core.ui.ZouEditorSection
+import luzzr.zou.core.ui.ZouEmptyStateCard
+import luzzr.zou.core.ui.ZouPageHeader
+import luzzr.zou.core.ui.ZouSectionCard
+import luzzr.zou.core.ui.ZouStepBottomBar
 import luzzr.zou.core.ui.noteFlowButtonColors
 import luzzr.zou.core.ui.noteFlowOutlinedButtonColors
 import luzzr.zou.core.ui.noteFlowOutlinedTextFieldColors
@@ -105,9 +105,9 @@ fun NoteEditorScreen(
         containerColor = Color.Transparent,
         bottomBar = {
             if (!uiState.isLoading && !uiState.hasMissingContent) {
-                NoteFlowStepBottomBar(
+                ZouStepBottomBar(
                     primaryLabel = if (uiState.isSaving) "保存中" else uiState.saveButtonLabel,
-                    primaryAccentColor = NoteFlowNoteAccent,
+                    primaryAccentColor = ZouNoteAccent,
                     previousVisible = true,
                     previousLabel = "放弃",
                     previousEnabled = !uiState.isSaving,
@@ -140,10 +140,10 @@ fun NoteEditorScreen(
                 TextButton(onClick = onNavigateBack) {
                     Text("返回")
                 }
-                NoteFlowEmptyStateCard(
+                ZouEmptyStateCard(
                     title = "笔记不存在",
                     description = uiState.loadErrorMessage ?: "这条笔记可能已经被删除。",
-                    accentColor = NoteFlowNoteAccent,
+                    accentColor = ZouNoteAccent,
                     actionLabel = "返回列表",
                     actionTestTag = "note_editor_go_back",
                     onActionClick = onNavigateBack,
@@ -161,12 +161,12 @@ fun NoteEditorScreen(
                 TextButton(onClick = onNavigateBack, enabled = !uiState.isSaving) {
                     Text("返回")
                 }
-                NoteFlowPageHeader(
+                ZouPageHeader(
                     title = uiState.screenTitle,
                     subtitle = "编辑优先，预览按需展开。",
                 )
 
-                NoteFlowEditorSection(
+                ZouEditorSection(
                     title = "正文",
                     subtitle = "先写内容，需要时再展开预览。",
                 ) {
@@ -207,7 +207,7 @@ fun NoteEditorScreen(
                                 .testTag("note_editor_insert_image"),
                             onClick = onPickImage,
                             enabled = !uiState.isSaving,
-                            colors = noteFlowButtonColors(NoteFlowNoteAccent),
+                            colors = noteFlowButtonColors(ZouNoteAccent),
                         ) {
                             Icon(imageVector = Icons.Default.Image, contentDescription = null)
                             Text(text = "插入图片", modifier = Modifier.padding(start = 8.dp))
@@ -224,7 +224,7 @@ fun NoteEditorScreen(
                 }
 
                 if (previewVisible) {
-                    NoteFlowSectionCard(
+                    ZouSectionCard(
                         title = "实时预览",
                         subtitle = "只读渲染，不影响原文。",
                         modifier = Modifier.testTag("note_markdown_preview"),
@@ -245,7 +245,7 @@ fun NoteEditorScreen(
                 }
 
                 if (uiState.canDelete) {
-                    NoteFlowEditorSection(
+                    ZouEditorSection(
                         title = "危险操作",
                         subtitle = "删除后会进入回收站，不影响底部主动作区。",
                     ) {

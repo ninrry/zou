@@ -19,11 +19,11 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import luzzr.zou.app.navigation.NoteFlowNavHost
+import luzzr.zou.app.navigation.ZouNavHost
 import luzzr.zou.app.navigation.RootRoutes
 import luzzr.zou.app.navigation.TopLevelDestination
 import luzzr.zou.core.designsystem.theme.MonetColorTokens
-import luzzr.zou.core.designsystem.theme.NoteFlowDesignTokens
+import luzzr.zou.core.designsystem.theme.ZouDesignTokens
 import luzzr.zou.core.ui.ModuleVisualStyle
 import luzzr.zou.core.ui.MotionTokens
 import luzzr.zou.core.ui.ProvideRadialExpansionController
@@ -36,14 +36,14 @@ import luzzr.zou.feature.settings.SettingsRoutes
 import luzzr.zou.feature.tasks.TaskRoutes
 
 @Composable
-fun NoteFlowApp(
+fun ZouApp(
     pendingTaskDetailId: String? = null,
     pendingHabitDetailId: String? = null,
     onPendingTaskDetailConsumed: () -> Unit = {},
     onPendingHabitDetailConsumed: () -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
-    val designTokens = NoteFlowDesignTokens.colors
+    val designTokens = ZouDesignTokens.colors
     val navController = rememberNavController()
     val radialExpansionController = rememberRadialExpansionController()
     var selectedTopLevelRoute by rememberSaveable { mutableStateOf(TopLevelDestination.TODAY.route) }
@@ -148,7 +148,7 @@ fun NoteFlowApp(
                     }
                 },
         ) {
-            NoteFlowNavHost(
+            ZouNavHost(
                 navController = navController,
                 selectedTopLevelDestination = currentTopLevel,
                 onSelectedTopLevelDestinationChange = { destination ->

@@ -16,7 +16,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.Alignment
 
 @Composable
-fun NoteFlowEmptyStateCard(
+fun ZouEmptyStateCard(
     title: String,
     description: String,
     accentColor: Color,

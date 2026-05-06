@@ -51,14 +51,14 @@ import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import luzzr.zou.core.designsystem.theme.NoteFlowTaskAccent
-import luzzr.zou.core.ui.NoteFlowDateTimeSheet
-import luzzr.zou.core.ui.NoteFlowDateTimeSheetMode
-import luzzr.zou.core.ui.NoteFlowEditorSection
-import luzzr.zou.core.ui.NoteFlowEmptyStateCard
-import luzzr.zou.core.ui.NoteFlowPageHeader
-import luzzr.zou.core.ui.NoteFlowStepBar
-import luzzr.zou.core.ui.NoteFlowStepBottomBar
+import luzzr.zou.core.designsystem.theme.ZouTaskAccent
+import luzzr.zou.core.ui.ZouDateTimeSheet
+import luzzr.zou.core.ui.ZouDateTimeSheetMode
+import luzzr.zou.core.ui.ZouEditorSection
+import luzzr.zou.core.ui.ZouEmptyStateCard
+import luzzr.zou.core.ui.ZouPageHeader
+import luzzr.zou.core.ui.ZouStepBar
+import luzzr.zou.core.ui.ZouStepBottomBar
 import luzzr.zou.core.ui.StandardFieldRow
 import luzzr.zou.core.ui.StandardSwitchRow
 import luzzr.zou.core.ui.noteFlowButtonColors
@@ -190,7 +190,7 @@ fun TaskEditorScreen(
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         bottomBar = {
             if (!uiState.isLoading && !uiState.hasMissingContent) {
-                NoteFlowStepBottomBar(
+                ZouStepBottomBar(
                     primaryLabel = if (uiState.isSaving) {
                         "保存中"
                     } else if (currentStep == taskEditorSteps.lastIndex) {
@@ -198,7 +198,7 @@ fun TaskEditorScreen(
                     } else {
                         "下一步"
                     },
-                    primaryAccentColor = NoteFlowTaskAccent,
+                    primaryAccentColor = ZouTaskAccent,
                     previousVisible = currentStep > 0,
                     previousEnabled = !uiState.isSaving,
                     primaryEnabled = !uiState.isSaving,
@@ -243,10 +243,10 @@ fun TaskEditorScreen(
                     verticalArrangement = Arrangement.spacedBy(16.dp),
                 ) {
                     TextButton(onClick = onNavigateBack) { Text("返回") }
-                    NoteFlowEmptyStateCard(
+                    ZouEmptyStateCard(
                         title = "任务不存在",
                         description = uiState.loadErrorMessage ?: "这条任务可能已经被删除。",
-                        accentColor = NoteFlowTaskAccent,
+                        accentColor = ZouTaskAccent,
                         actionLabel = "返回列表",
                         actionTestTag = "task_editor_go_back",
                         onActionClick = onNavigateBack,
@@ -263,14 +263,14 @@ fun TaskEditorScreen(
                     verticalArrangement = Arrangement.spacedBy(18.dp),
                 ) {
                     TextButton(onClick = onNavigateBack, enabled = !uiState.isSaving) { Text("返回") }
-                    NoteFlowPageHeader(
+                    ZouPageHeader(
                         title = uiState.screenTitle,
                         subtitle = "先完成主信息，再补充时间和完成方式。",
                     )
-                    NoteFlowStepBar(
+                    ZouStepBar(
                         steps = taskEditorSteps,
                         currentStep = currentStep,
-                        accentColor = NoteFlowTaskAccent,
+                        accentColor = ZouTaskAccent,
                         onStepSelected = { step ->
                             if (!uiState.isSaving) {
                                 scope.launch { pagerState.animateScrollToPage(step) }
@@ -336,13 +336,13 @@ fun TaskEditorScreen(
         }
 
         pickerRequest?.let { request ->
-            NoteFlowDateTimeSheet(
+            ZouDateTimeSheet(
                 visible = true,
                 title = request.title,
                 mode = request.mode,
                 initialDateTime = request.initialDateTime,
                 minimumDateTime = request.minimumDateTime,
-                accentColor = NoteFlowTaskAccent,
+                accentColor = ZouTaskAccent,
                 onDismissRequest = { pickerRequest = null },
                 onConfirm = { date, time, _ ->
                     request.onConfirm(LocalDateTime.of(date, time))
@@ -362,7 +362,7 @@ private fun TaskBasicStep(
     onUrgentChanged: (Boolean) -> Unit,
 ) {
     Column(verticalArrangement = Arrangement.spacedBy(20.dp)) {
-        NoteFlowEditorSection(
+        ZouEditorSection(
             title = "任务标题与说明",
             subtitle = "标题负责辨识，正文只补充必要上下文。",
         ) {
@@ -388,7 +388,7 @@ private fun TaskBasicStep(
             )
         }
 
-        NoteFlowEditorSection(
+        ZouEditorSection(
             title = "优先级与状态",
             subtitle = "只保留会影响排序和处理节奏的配置。",
         ) {
@@ -407,7 +407,7 @@ private fun TaskBasicStep(
                                     },
                                 )
                             },
-                            colors = noteFlowFilterChipColors(NoteFlowTaskAccent),
+                            colors = noteFlowFilterChipColors(ZouTaskAccent),
                         )
                     }
                 }
@@ -418,7 +418,7 @@ private fun TaskBasicStep(
                 description = "打开后会在列表和今日页中更靠前。",
                 checked = uiState.isUrgent,
                 onCheckedChange = onUrgentChanged,
-                accentColor = NoteFlowTaskAccent,
+                accentColor = ZouTaskAccent,
             )
         }
     }
@@ -451,7 +451,7 @@ private fun TaskScheduleStep(
     }
 
     Column(verticalArrangement = Arrangement.spacedBy(20.dp)) {
-        NoteFlowEditorSection(
+        ZouEditorSection(
             title = "截止时间",
             subtitle = "先确定完成时点，再决定提醒强度。",
         ) {
@@ -468,7 +468,7 @@ private fun TaskScheduleStep(
                         onShowPicker(
                             TaskDateTimePickerRequest(
                                 title = "选择截止日期",
-                                mode = NoteFlowDateTimeSheetMode.DATE_ONLY,
+                                mode = ZouDateTimeSheetMode.DATE_ONLY,
                                 initialDateTime = initialDateTime,
                                 minimumDateTime = now,
                                 onConfirm = { selected -> onDueDateSelected(selected.year, selected.monthValue, selected.dayOfMonth) },
@@ -484,7 +484,7 @@ private fun TaskScheduleStep(
                         onShowPicker(
                             TaskDateTimePickerRequest(
                                 title = "选择截止时间",
-                                mode = NoteFlowDateTimeSheetMode.TIME_ONLY,
+                                mode = ZouDateTimeSheetMode.TIME_ONLY,
                                 initialDateTime = initialDateTime,
                                 minimumDateTime = now,
                                 onConfirm = { selected -> onDueTimeSelected(selected.hour, selected.minute) },
@@ -498,7 +498,7 @@ private fun TaskScheduleStep(
             }
         }
 
-        NoteFlowEditorSection(
+        ZouEditorSection(
             title = "提醒窗口",
             subtitle = "只保留当天有效的提醒时间范围。",
         ) {
@@ -512,7 +512,7 @@ private fun TaskScheduleStep(
                             onShowPicker(
                                 TaskDateTimePickerRequest(
                                     title = "设置开始提醒",
-                                    mode = NoteFlowDateTimeSheetMode.TIME_ONLY,
+                                    mode = ZouDateTimeSheetMode.TIME_ONLY,
                                     initialDateTime = LocalDate.now(zoneId).atTime(initial / 60, initial % 60),
                                     onConfirm = { selected -> onStartReminderMinuteChanged(selected.hour * 60 + selected.minute) },
                                 ),
@@ -538,7 +538,7 @@ private fun TaskScheduleStep(
                             onShowPicker(
                                 TaskDateTimePickerRequest(
                                     title = "设置窗口结束",
-                                    mode = NoteFlowDateTimeSheetMode.TIME_ONLY,
+                                    mode = ZouDateTimeSheetMode.TIME_ONLY,
                                     initialDateTime = LocalDate.now(zoneId).atTime(initial / 60, initial % 60),
                                     onConfirm = { selected -> onWindowEndMinuteChanged(selected.hour * 60 + selected.minute) },
                                 ),
@@ -555,7 +555,7 @@ private fun TaskScheduleStep(
             }
         }
 
-        NoteFlowEditorSection(
+        ZouEditorSection(
             title = "高级提醒",
             subtitle = if (showAdvancedReminder) {
                 "收起后只保留摘要，适合不常改的提醒配置。"
@@ -587,7 +587,7 @@ private fun TaskScheduleStep(
                             onShowPicker(
                                 TaskDateTimePickerRequest(
                                     title = "添加特别提醒",
-                                    mode = NoteFlowDateTimeSheetMode.DATE_TIME,
+                                    mode = ZouDateTimeSheetMode.DATE_TIME,
                                     initialDateTime = uiState.dueAt.toLocalDateTime() ?: now,
                                     minimumDateTime = now,
                                     onConfirm = { selected -> onAddExactReminder(selected.toEpochMillis(zoneId)) },
@@ -665,7 +665,7 @@ private fun TaskCompletionStep(
     onDeleteClicked: () -> Boolean,
 ) {
     Column(verticalArrangement = Arrangement.spacedBy(20.dp)) {
-        NoteFlowEditorSection(
+        ZouEditorSection(
             title = "完成规则",
             subtitle = "决定任务是手动结束，还是跟随子任务自动完成。",
         ) {
@@ -682,7 +682,7 @@ private fun TaskCompletionStep(
                                 },
                             )
                         },
-                        colors = noteFlowFilterChipColors(NoteFlowTaskAccent),
+                        colors = noteFlowFilterChipColors(ZouTaskAccent),
                     )
                 }
             }
@@ -693,7 +693,7 @@ private fun TaskCompletionStep(
                     description = "可以直接切换完成或恢复完成。",
                     checked = uiState.isCompleted,
                     onCheckedChange = onTaskCompletedChanged,
-                    accentColor = NoteFlowTaskAccent,
+                    accentColor = ZouTaskAccent,
                 )
             } else {
                 Text(
@@ -704,7 +704,7 @@ private fun TaskCompletionStep(
             }
         }
 
-        NoteFlowEditorSection(
+        ZouEditorSection(
             title = "子任务拆解",
             subtitle = "只添加真正会影响完成判断的步骤。",
         ) {
@@ -740,7 +740,7 @@ private fun TaskCompletionStep(
         }
 
         if (uiState.canDelete) {
-            NoteFlowEditorSection(
+            ZouEditorSection(
                 title = "危险操作",
                 subtitle = "删除后会进入回收站，不影响底部主动作区。",
             ) {
@@ -806,7 +806,7 @@ private fun SubTaskEditorRow(
             modifier = Modifier.testTag("subtask_completion_toggle"),
             checked = subTask.isCompleted,
             onCheckedChange = onCompletedChanged,
-            colors = noteFlowCheckboxColors(NoteFlowTaskAccent),
+            colors = noteFlowCheckboxColors(ZouTaskAccent),
         )
         OutlinedTextField(
             modifier = Modifier.weight(1f).testTag("subtask_title_input"),
@@ -822,7 +822,7 @@ private fun SubTaskEditorRow(
 
 private data class TaskDateTimePickerRequest(
     val title: String,
-    val mode: NoteFlowDateTimeSheetMode,
+    val mode: ZouDateTimeSheetMode,
     val initialDateTime: LocalDateTime,
     val minimumDateTime: LocalDateTime? = null,
     val onConfirm: (LocalDateTime) -> Unit,

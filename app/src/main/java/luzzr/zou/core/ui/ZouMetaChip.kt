@@ -9,15 +9,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.BorderStroke
-import luzzr.zou.core.designsystem.theme.NoteFlowDesignTokens
+import luzzr.zou.core.designsystem.theme.ZouDesignTokens
 
 @Composable
-fun NoteFlowMetaChip(
+fun ZouMetaChip(
     text: String,
     modifier: Modifier = Modifier,
     accentColor: Color? = null,
 ) {
-    val designTokens = NoteFlowDesignTokens.colors
+    val designTokens = ZouDesignTokens.colors
     val containerColor = accentColor?.copy(alpha = 0.14f) ?: designTokens.glassSurface.copy(alpha = 0.72f)
     val contentColor = accentColor ?: MaterialTheme.colorScheme.onSurfaceVariant
     Surface(

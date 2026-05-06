@@ -24,11 +24,11 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import luzzr.zou.core.designsystem.theme.NoteFlowNoteAccent
+import luzzr.zou.core.designsystem.theme.ZouNoteAccent
 import luzzr.zou.core.markdown.MarkdownRenderer
-import luzzr.zou.core.ui.NoteFlowEmptyStateCard
-import luzzr.zou.core.ui.NoteFlowMetaChip
-import luzzr.zou.core.ui.NoteFlowSectionCard
+import luzzr.zou.core.ui.ZouEmptyStateCard
+import luzzr.zou.core.ui.ZouMetaChip
+import luzzr.zou.core.ui.ZouSectionCard
 
 @Composable
 fun NoteDetailRoute(
@@ -86,10 +86,10 @@ fun NoteDetailScreen(
                     TextButton(onClick = onNavigateBack) {
                         Text("返回")
                     }
-                    NoteFlowEmptyStateCard(
+                    ZouEmptyStateCard(
                         title = "笔记不存在或已删除",
                         description = uiState.emptyMessage,
-                        accentColor = NoteFlowNoteAccent,
+                        accentColor = ZouNoteAccent,
                         actionLabel = "返回列表",
                         actionTestTag = "note_detail_go_back",
                         onActionClick = onNavigateBack,
@@ -115,12 +115,12 @@ fun NoteDetailScreen(
                         style = MaterialTheme.typography.headlineMedium,
                         color = MaterialTheme.colorScheme.onSurface,
                     )
-                    NoteFlowMetaChip(
+                    ZouMetaChip(
                         text = "最近编辑：${uiState.updatedAtText}",
-                        accentColor = NoteFlowNoteAccent,
+                        accentColor = ZouNoteAccent,
                     )
 
-                    NoteFlowSectionCard(
+                    ZouSectionCard(
                         title = "正文",
                         subtitle = null,
                     ) {

@@ -25,9 +25,9 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import luzzr.zou.core.designsystem.theme.NoteFlowTodayAccent
-import luzzr.zou.core.ui.NoteFlowPageHeader
-import luzzr.zou.core.ui.NoteFlowSectionCard
+import luzzr.zou.core.designsystem.theme.ZouTodayAccent
+import luzzr.zou.core.ui.ZouPageHeader
+import luzzr.zou.core.ui.ZouSectionCard
 import luzzr.zou.core.ui.noteFlowButtonColors
 import luzzr.zou.core.ui.noteFlowOutlinedButtonColors
 
@@ -80,14 +80,14 @@ fun BackupRestoreScreen(
                 Icon(imageVector = Icons.AutoMirrored.Outlined.ArrowBack, contentDescription = null)
                 Text("返回", modifier = Modifier.padding(start = 8.dp))
             }
-            NoteFlowPageHeader(
+            ZouPageHeader(
                 title = uiState.title,
                 subtitle = "导出和导入本地备份文件。",
             )
 
-            NoteFlowSectionCard(
+            ZouSectionCard(
                 title = "备份兼容策略",
-                accentColor = NoteFlowTodayAccent,
+                accentColor = ZouTodayAccent,
             ) {
                 Text(
                     text = uiState.compatibilityText,
@@ -100,7 +100,7 @@ fun BackupRestoreScreen(
                         .testTag("backup_export"),
                     enabled = !uiState.isSaving,
                     onClick = onExportBackup,
-                    colors = noteFlowButtonColors(NoteFlowTodayAccent),
+                    colors = noteFlowButtonColors(ZouTodayAccent),
                 ) {
                     Text(if (uiState.isSaving) "处理中" else "导出备份 zip")
                 }
@@ -110,7 +110,7 @@ fun BackupRestoreScreen(
                         .testTag("backup_import"),
                     enabled = !uiState.isSaving,
                     onClick = onImportBackup,
-                    colors = noteFlowButtonColors(NoteFlowTodayAccent),
+                    colors = noteFlowButtonColors(ZouTodayAccent),
                 ) {
                     Text(if (uiState.isSaving) "处理中" else "导入备份 zip")
                 }
@@ -140,7 +140,7 @@ fun BackupRestoreScreen(
                     text = "警告",
                     modifier = Modifier.testTag("backup_warning_title"),
                     style = MaterialTheme.typography.titleMedium,
-                    color = NoteFlowTodayAccent,
+                    color = ZouTodayAccent,
                 )
                 uiState.warningMessages.forEachIndexed { index, warning ->
                     Text(

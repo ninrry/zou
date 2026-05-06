@@ -4,11 +4,11 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.TextFieldColors
 import androidx.compose.runtime.Composable
-import luzzr.zou.core.designsystem.theme.NoteFlowDesignTokens
+import luzzr.zou.core.designsystem.theme.ZouDesignTokens
 
 @Composable
 fun noteFlowOutlinedTextFieldColors(): TextFieldColors {
-    val designTokens = NoteFlowDesignTokens.colors
+    val designTokens = ZouDesignTokens.colors
     return OutlinedTextFieldDefaults.colors(
         focusedContainerColor = designTokens.backgroundRaised,
         unfocusedContainerColor = designTokens.backgroundRaised,

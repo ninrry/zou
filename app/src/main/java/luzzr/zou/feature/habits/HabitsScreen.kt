@@ -24,12 +24,12 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import luzzr.zou.core.designsystem.theme.NoteFlowHabitAccent
+import luzzr.zou.core.designsystem.theme.ZouHabitAccent
 import luzzr.zou.core.ui.GlassSurface
 import luzzr.zou.core.ui.ModuleFab
-import luzzr.zou.core.ui.NoteFlowEmptyStateCard
-import luzzr.zou.core.ui.NoteFlowMetaChip
-import luzzr.zou.core.ui.NoteFlowStaggeredReveal
+import luzzr.zou.core.ui.ZouEmptyStateCard
+import luzzr.zou.core.ui.ZouMetaChip
+import luzzr.zou.core.ui.ZouStaggeredReveal
 import luzzr.zou.core.ui.noteFlowButtonColors
 import luzzr.zou.core.ui.noteFlowPressScale
 import luzzr.zou.core.ui.rememberPressInteractionSource
@@ -66,7 +66,7 @@ fun HabitsScreen(
         containerColor = Color.Transparent,
         floatingActionButton = {
             ModuleFab(
-                accentColor = NoteFlowHabitAccent,
+                accentColor = ZouHabitAccent,
                 contentDescription = "新建习惯",
                 icon = Icons.Default.Add,
                 testTag = "habits_fab",
@@ -83,11 +83,11 @@ fun HabitsScreen(
         ) {
             if (uiState.activeHabits.isEmpty() && uiState.deletedHabits.isEmpty()) {
                 item {
-                    NoteFlowStaggeredReveal(revealKey = "habits_empty", index = 0) {
-                        NoteFlowEmptyStateCard(
+                    ZouStaggeredReveal(revealKey = "habits_empty", index = 0) {
+                        ZouEmptyStateCard(
                             title = uiState.emptyTitle,
                             description = uiState.emptyDescription,
-                            accentColor = NoteFlowHabitAccent,
+                            accentColor = ZouHabitAccent,
                         )
                     }
                 }
@@ -103,7 +103,7 @@ fun HabitsScreen(
                 }
                 if (uiState.deletedHabits.isNotEmpty()) {
                     item {
-                        NoteFlowStaggeredReveal(revealKey = "habits_deleted_header", index = 0) {
+                        ZouStaggeredReveal(revealKey = "habits_deleted_header", index = 0) {
                             Text(
                                 text = "已删除习惯",
                                 style = MaterialTheme.typography.titleMedium,
@@ -152,7 +152,7 @@ private fun HabitCard(
                 onClick = { onOpenHabit(item.id) },
                 onLongClick = { onEditHabit(item.id) },
             ),
-        accentColor = NoteFlowHabitAccent,
+        accentColor = ZouHabitAccent,
     ) {
         Column(
             modifier = Modifier.padding(18.dp),
@@ -168,9 +168,9 @@ private fun HabitCard(
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp),
             ) {
-                NoteFlowMetaChip(text = item.frequencyText)
-                NoteFlowMetaChip(text = item.modeText, accentColor = NoteFlowHabitAccent)
-                NoteFlowMetaChip(text = item.statusText)
+                ZouMetaChip(text = item.frequencyText)
+                ZouMetaChip(text = item.modeText, accentColor = ZouHabitAccent)
+                ZouMetaChip(text = item.statusText)
             }
             Text(
                 text = item.supportingText,
@@ -188,7 +188,7 @@ private fun HabitCard(
                             onOpenHabit(item.id)
                         }
                     },
-                    colors = noteFlowButtonColors(NoteFlowHabitAccent),
+                    colors = noteFlowButtonColors(ZouHabitAccent),
                 ) {
                     Text(item.quickActionLabel)
                 }
@@ -197,7 +197,7 @@ private fun HabitCard(
                 Button(
                     modifier = Modifier.testTag("habit_restore_${item.title}"),
                     onClick = { onRestoreHabit(item.id) },
-                    colors = noteFlowButtonColors(NoteFlowHabitAccent),
+                    colors = noteFlowButtonColors(ZouHabitAccent),
                 ) {
                     Text("恢复习惯")
                 }

@@ -10,7 +10,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 
 @Composable
-fun NoteFlowEditorSection(
+fun ZouEditorSection(
     title: String,
     modifier: Modifier = Modifier,
     subtitle: String? = null,

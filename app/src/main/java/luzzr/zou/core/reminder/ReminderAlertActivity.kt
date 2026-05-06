@@ -34,8 +34,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import luzzr.zou.core.designsystem.theme.NoteFlowTheme
-import luzzr.zou.core.designsystem.theme.NoteFlowDesignTokens
+import luzzr.zou.core.designsystem.theme.ZouTheme
+import luzzr.zou.core.designsystem.theme.ZouDesignTokens
 import luzzr.zou.MainActivity
 import luzzr.zou.core.ui.GlassLevel
 import luzzr.zou.core.ui.GlassSurface
@@ -58,8 +58,8 @@ class ReminderAlertActivity : ComponentActivity() {
         uiState = intent.toUiState()
 
         setContent {
-            NoteFlowTheme {
-                val designTokens = NoteFlowDesignTokens.colors
+            ZouTheme {
+                val designTokens = ZouDesignTokens.colors
                 Box(
                     modifier = Modifier
                         .fillMaxSize()

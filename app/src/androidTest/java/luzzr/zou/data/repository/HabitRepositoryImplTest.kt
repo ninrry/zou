@@ -6,7 +6,7 @@ import androidx.test.platform.app.InstrumentationRegistry
 import luzzr.zou.core.reminder.HabitReminderTimeCodec
 import luzzr.zou.core.reminder.ReminderDispatchQueue
 import luzzr.zou.core.time.TimeProvider
-import luzzr.zou.data.local.database.NoteFlowDatabase
+import luzzr.zou.data.local.database.ZouDatabase
 import luzzr.zou.domain.model.Habit
 import luzzr.zou.domain.model.HabitCheckInMode
 import luzzr.zou.domain.model.HabitFrequencyType
@@ -30,7 +30,7 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 class HabitRepositoryImplTest {
 
-    private lateinit var database: NoteFlowDatabase
+    private lateinit var database: ZouDatabase
     private lateinit var repository: HabitRepositoryImpl
     private lateinit var reminderDispatchQueue: FakeReminderDispatchQueue
     private val timeProvider = FixedTimeProvider()
@@ -40,7 +40,7 @@ class HabitRepositoryImplTest {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
         database = Room.inMemoryDatabaseBuilder(
             context,
-            NoteFlowDatabase::class.java,
+            ZouDatabase::class.java,
         )
             .allowMainThreadQueries()
             .build()

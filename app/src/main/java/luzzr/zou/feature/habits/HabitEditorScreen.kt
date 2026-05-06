@@ -50,14 +50,14 @@ import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import luzzr.zou.core.designsystem.theme.NoteFlowHabitAccent
-import luzzr.zou.core.ui.NoteFlowDateTimeSheet
-import luzzr.zou.core.ui.NoteFlowDateTimeSheetMode
-import luzzr.zou.core.ui.NoteFlowEditorSection
-import luzzr.zou.core.ui.NoteFlowEmptyStateCard
-import luzzr.zou.core.ui.NoteFlowPageHeader
-import luzzr.zou.core.ui.NoteFlowStepBar
-import luzzr.zou.core.ui.NoteFlowStepBottomBar
+import luzzr.zou.core.designsystem.theme.ZouHabitAccent
+import luzzr.zou.core.ui.ZouDateTimeSheet
+import luzzr.zou.core.ui.ZouDateTimeSheetMode
+import luzzr.zou.core.ui.ZouEditorSection
+import luzzr.zou.core.ui.ZouEmptyStateCard
+import luzzr.zou.core.ui.ZouPageHeader
+import luzzr.zou.core.ui.ZouStepBar
+import luzzr.zou.core.ui.ZouStepBottomBar
 import luzzr.zou.core.ui.StandardFieldRow
 import luzzr.zou.core.ui.noteFlowButtonColors
 import luzzr.zou.core.ui.noteFlowFilterChipColors
@@ -186,7 +186,7 @@ fun HabitEditorScreen(
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         bottomBar = {
             if (!uiState.isLoading && !uiState.hasMissingContent) {
-                NoteFlowStepBottomBar(
+                ZouStepBottomBar(
                     primaryLabel = if (uiState.isSaving) {
                         "保存中"
                     } else if (currentStep == habitEditorSteps.lastIndex) {
@@ -194,7 +194,7 @@ fun HabitEditorScreen(
                     } else {
                         "下一步"
                     },
-                    primaryAccentColor = NoteFlowHabitAccent,
+                    primaryAccentColor = ZouHabitAccent,
                     previousVisible = currentStep > 0,
                     previousEnabled = !uiState.isSaving,
                     primaryEnabled = !uiState.isSaving,
@@ -234,10 +234,10 @@ fun HabitEditorScreen(
                 verticalArrangement = Arrangement.spacedBy(16.dp),
             ) {
                 TextButton(onClick = onNavigateBack) { Text("返回") }
-                NoteFlowEmptyStateCard(
+                ZouEmptyStateCard(
                     title = "习惯不存在",
                     description = uiState.loadErrorMessage ?: "这条习惯可能已经被删除。",
-                    accentColor = NoteFlowHabitAccent,
+                    accentColor = ZouHabitAccent,
                     actionLabel = "返回列表",
                     actionTestTag = "habit_editor_go_back",
                     onActionClick = onNavigateBack,
@@ -252,14 +252,14 @@ fun HabitEditorScreen(
                 verticalArrangement = Arrangement.spacedBy(18.dp),
             ) {
                 TextButton(onClick = onNavigateBack, enabled = !uiState.isSaving) { Text("返回") }
-                NoteFlowPageHeader(
+                ZouPageHeader(
                     title = uiState.screenTitle,
                     subtitle = "先定义执行方式，再设置频率和提醒。",
                 )
-                NoteFlowStepBar(
+                ZouStepBar(
                     steps = habitEditorSteps,
                     currentStep = currentStep,
-                    accentColor = NoteFlowHabitAccent,
+                    accentColor = ZouHabitAccent,
                     onStepSelected = { step ->
                         if (!uiState.isSaving) {
                             scope.launch { pagerState.animateScrollToPage(step) }
@@ -326,13 +326,13 @@ fun HabitEditorScreen(
         }
 
         pickerRequest?.let { request ->
-            NoteFlowDateTimeSheet(
+            ZouDateTimeSheet(
                 visible = true,
                 title = request.title,
                 mode = request.mode,
                 initialDateTime = request.initialDateTime,
                 minimumDateTime = request.minimumDateTime,
-                accentColor = NoteFlowHabitAccent,
+                accentColor = ZouHabitAccent,
                 onDismissRequest = { pickerRequest = null },
                 onConfirm = { date, time, _ ->
                     request.onConfirm(LocalDateTime.of(date, time))
@@ -351,7 +351,7 @@ private fun HabitBasicStep(
     onCheckInModeSelected: (HabitCheckInMode) -> Unit,
 ) {
     Column(verticalArrangement = Arrangement.spacedBy(20.dp)) {
-        NoteFlowEditorSection(
+        ZouEditorSection(
             title = "习惯标题与说明",
             subtitle = "标题说明要做什么，正文只保留执行提示。",
         ) {
@@ -377,7 +377,7 @@ private fun HabitBasicStep(
             )
         }
 
-        NoteFlowEditorSection(
+        ZouEditorSection(
             title = "执行方式",
             subtitle = "决定今天如何算完成，后续字段会跟随这个模式变化。",
         ) {
@@ -396,7 +396,7 @@ private fun HabitBasicStep(
                                     },
                                 )
                             },
-                            colors = noteFlowFilterChipColors(NoteFlowHabitAccent),
+                            colors = noteFlowFilterChipColors(ZouHabitAccent),
                         )
                     }
                 }
@@ -418,7 +418,7 @@ private fun HabitFrequencyStep(
     onShowPicker: (HabitDateTimePickerRequest) -> Unit,
 ) {
     Column(verticalArrangement = Arrangement.spacedBy(20.dp)) {
-        NoteFlowEditorSection(
+        ZouEditorSection(
             title = "频率类型",
             subtitle = uiState.frequencySummary(),
         ) {
@@ -437,13 +437,13 @@ private fun HabitFrequencyStep(
                                 },
                             )
                         },
-                        colors = noteFlowFilterChipColors(NoteFlowHabitAccent),
+                        colors = noteFlowFilterChipColors(ZouHabitAccent),
                     )
                 }
             }
         }
 
-        NoteFlowEditorSection(
+        ZouEditorSection(
             title = "频率细节",
             subtitle = "只展示当前频率类型需要的字段。",
         ) {
@@ -462,7 +462,7 @@ private fun HabitFrequencyStep(
                                 selected = uiState.selectedWeekdays.contains(dayOfWeek),
                                 onClick = { onWeekdayToggled(dayOfWeek) },
                                 label = { Text(dayOfWeekLabel(dayOfWeek)) },
-                                colors = noteFlowFilterChipColors(NoteFlowHabitAccent),
+                                colors = noteFlowFilterChipColors(ZouHabitAccent),
                             )
                         }
                     }
@@ -490,7 +490,7 @@ private fun HabitFrequencyStep(
                             onShowPicker(
                                 HabitDateTimePickerRequest(
                                     title = "选择起始日期",
-                                    mode = NoteFlowDateTimeSheetMode.DATE_ONLY,
+                                    mode = ZouDateTimeSheetMode.DATE_ONLY,
                                     initialDateTime = uiState.intervalAnchorDate?.atTime(9, 0) ?: LocalDateTime.now(zoneId),
                                     onConfirm = { selected -> onIntervalAnchorDateChanged(selected.toLocalDate()) },
                                 ),
@@ -543,7 +543,7 @@ private fun HabitReminderStep(
     }
 
     Column(verticalArrangement = Arrangement.spacedBy(20.dp)) {
-        NoteFlowEditorSection(
+        ZouEditorSection(
             title = "执行目标",
             subtitle = "先决定今天如何完成，再补充提醒细节。",
         ) {
@@ -595,7 +595,7 @@ private fun HabitReminderStep(
             }
         }
 
-        NoteFlowEditorSection(
+        ZouEditorSection(
             title = "提醒策略",
             subtitle = if (showAdvancedReminder) {
                 "默认显示常用提醒，特别提醒和通知文案放进高级区。"
@@ -612,7 +612,7 @@ private fun HabitReminderStep(
                             onShowPicker(
                                 HabitDateTimePickerRequest(
                                     title = "设置开始时间",
-                                    mode = NoteFlowDateTimeSheetMode.TIME_ONLY,
+                                    mode = ZouDateTimeSheetMode.TIME_ONLY,
                                     initialDateTime = LocalDate.now(zoneId).atTime(uiState.remindWindowStart ?: LocalTime.of(8, 0)),
                                     onConfirm = { selected -> onRemindWindowStartChanged(selected.toLocalTime()) },
                                 ),
@@ -633,7 +633,7 @@ private fun HabitReminderStep(
                             onShowPicker(
                                 HabitDateTimePickerRequest(
                                     title = "设置结束时间",
-                                    mode = NoteFlowDateTimeSheetMode.TIME_ONLY,
+                                    mode = ZouDateTimeSheetMode.TIME_ONLY,
                                     initialDateTime = LocalDate.now(zoneId).atTime(uiState.remindWindowEnd ?: LocalTime.of(21, 0)),
                                     onConfirm = { selected -> onRemindWindowEndChanged(selected.toLocalTime()) },
                                 ),
@@ -668,7 +668,7 @@ private fun HabitReminderStep(
                             onShowPicker(
                                 HabitDateTimePickerRequest(
                                     title = "添加特别提醒",
-                                    mode = NoteFlowDateTimeSheetMode.TIME_ONLY,
+                                    mode = ZouDateTimeSheetMode.TIME_ONLY,
                                     initialDateTime = LocalDate.now(zoneId).atTime(uiState.exactReminderTimes.lastOrNull() ?: now.toLocalTime()),
                                     minimumDateTime = if (uiState.isDueToday(LocalDate.now(zoneId))) now else null,
                                     onConfirm = { selected -> onAddExactReminder(selected.toLocalTime()) },
@@ -724,7 +724,7 @@ private fun HabitReminderStep(
         }
 
         if (uiState.canDelete) {
-            NoteFlowEditorSection(
+            ZouEditorSection(
                 title = "危险操作",
                 subtitle = "删除后会进入回收站，不影响底部主动作区。",
             ) {
@@ -784,7 +784,7 @@ private fun dayOfWeekLabel(dayOfWeek: DayOfWeek): String =
 
 private data class HabitDateTimePickerRequest(
     val title: String,
-    val mode: NoteFlowDateTimeSheetMode,
+    val mode: ZouDateTimeSheetMode,
     val initialDateTime: LocalDateTime,
     val minimumDateTime: LocalDateTime? = null,
     val onConfirm: (LocalDateTime) -> Unit,

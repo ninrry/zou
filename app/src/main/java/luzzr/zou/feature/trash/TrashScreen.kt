@@ -24,10 +24,10 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import luzzr.zou.core.designsystem.theme.NoteFlowTodayAccent
+import luzzr.zou.core.designsystem.theme.ZouTodayAccent
 import luzzr.zou.core.ui.GlassSurface
-import luzzr.zou.core.ui.NoteFlowEmptyStateCard
-import luzzr.zou.core.ui.NoteFlowPageHeader
+import luzzr.zou.core.ui.ZouEmptyStateCard
+import luzzr.zou.core.ui.ZouPageHeader
 import luzzr.zou.core.ui.noteFlowOutlinedButtonColors
 
 @Composable
@@ -70,7 +70,7 @@ fun TrashScreen(
                     Icon(imageVector = Icons.AutoMirrored.Outlined.ArrowBack, contentDescription = null)
                     Text("返回", modifier = Modifier.padding(start = 8.dp))
                 }
-                NoteFlowPageHeader(
+                ZouPageHeader(
                     title = uiState.title,
                     subtitle = "软删除内容会集中显示在这里。",
                 )
@@ -91,10 +91,10 @@ fun TrashScreen(
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 }
-                NoteFlowEmptyStateCard(
+                ZouEmptyStateCard(
                     title = "回收站为空",
                     description = "软删除的任务、习惯和笔记会显示在这里。",
-                    accentColor = NoteFlowTodayAccent,
+                    accentColor = ZouTodayAccent,
                 )
             }
         } else {
@@ -115,7 +115,7 @@ fun TrashScreen(
                         Icon(imageVector = Icons.AutoMirrored.Outlined.ArrowBack, contentDescription = null)
                         Text("返回", modifier = Modifier.padding(start = 8.dp))
                     }
-                    NoteFlowPageHeader(
+                    ZouPageHeader(
                         title = uiState.title,
                         subtitle = "可以恢复，也可以彻底删除。",
                     )
@@ -142,7 +142,7 @@ fun TrashScreen(
                         modifier = Modifier
                             .fillMaxWidth()
                             .testTag("trash_item_${item.type}_${item.id}"),
-                        accentColor = NoteFlowTodayAccent,
+                        accentColor = ZouTodayAccent,
                     ) {
                         Column(
                             modifier = Modifier.padding(18.dp),

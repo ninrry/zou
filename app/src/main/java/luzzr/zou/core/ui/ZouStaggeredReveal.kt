@@ -15,7 +15,7 @@ import androidx.compose.runtime.setValue
 import kotlinx.coroutines.delay
 
 @Composable
-fun NoteFlowStaggeredReveal(
+fun ZouStaggeredReveal(
     revealKey: Any,
     index: Int,
     content: @Composable () -> Unit,
@@ -31,13 +31,13 @@ fun NoteFlowStaggeredReveal(
 
     AnimatedVisibility(
         visible = visible,
-        enter = defaultNoteFlowEnterTransition(index),
+        enter = defaultZouEnterTransition(index),
     ) {
         content()
     }
 }
 
-private fun defaultNoteFlowEnterTransition(index: Int): EnterTransition {
+private fun defaultZouEnterTransition(index: Int): EnterTransition {
     val delayMillis = index * MotionTokens.DurationSectionStagger
     return fadeIn(
         animationSpec = tween(

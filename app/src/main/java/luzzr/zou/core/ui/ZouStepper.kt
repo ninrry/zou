@@ -27,7 +27,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun NoteFlowStepBar(
+fun ZouStepBar(
     steps: List<String>,
     currentStep: Int,
     accentColor: Color,
@@ -88,7 +88,7 @@ fun NoteFlowStepBar(
 }
 
 @Composable
-fun NoteFlowStepBottomBar(
+fun ZouStepBottomBar(
     primaryLabel: String,
     primaryAccentColor: Color,
     modifier: Modifier = Modifier,

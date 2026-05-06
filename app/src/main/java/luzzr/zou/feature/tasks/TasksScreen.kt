@@ -24,12 +24,12 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import luzzr.zou.core.designsystem.theme.NoteFlowTaskAccent
+import luzzr.zou.core.designsystem.theme.ZouTaskAccent
 import luzzr.zou.core.ui.GlassSurface
 import luzzr.zou.core.ui.ModuleFab
-import luzzr.zou.core.ui.NoteFlowEmptyStateCard
-import luzzr.zou.core.ui.NoteFlowMetaChip
-import luzzr.zou.core.ui.NoteFlowStaggeredReveal
+import luzzr.zou.core.ui.ZouEmptyStateCard
+import luzzr.zou.core.ui.ZouMetaChip
+import luzzr.zou.core.ui.ZouStaggeredReveal
 import luzzr.zou.core.ui.noteFlowPressScale
 import luzzr.zou.core.ui.rememberPressInteractionSource
 
@@ -63,7 +63,7 @@ fun TasksScreen(
         containerColor = Color.Transparent,
         floatingActionButton = {
             ModuleFab(
-                accentColor = NoteFlowTaskAccent,
+                accentColor = ZouTaskAccent,
                 contentDescription = "新建任务",
                 icon = Icons.Default.Add,
                 testTag = "tasks_fab",
@@ -80,11 +80,11 @@ fun TasksScreen(
         ) {
             if (uiState.tasks.isEmpty()) {
                 item {
-                    NoteFlowStaggeredReveal(revealKey = "tasks_empty", index = 0) {
-                        NoteFlowEmptyStateCard(
+                    ZouStaggeredReveal(revealKey = "tasks_empty", index = 0) {
+                        ZouEmptyStateCard(
                             title = uiState.emptyTitle,
                             description = uiState.emptyDescription,
-                            accentColor = NoteFlowTaskAccent,
+                            accentColor = ZouTaskAccent,
                         )
                     }
                 }
@@ -124,7 +124,7 @@ private fun TaskCard(
                 onClick = onClick,
                 onLongClick = onLongClick,
             ),
-        accentColor = NoteFlowTaskAccent,
+        accentColor = ZouTaskAccent,
     ) {
         Column(
             modifier = Modifier.padding(18.dp),
@@ -146,11 +146,11 @@ private fun TaskCard(
                         color = MaterialTheme.colorScheme.onSurface,
                     )
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        NoteFlowMetaChip(text = item.priorityLabel)
+                        ZouMetaChip(text = item.priorityLabel)
                         if (item.showUrgentBadge) {
-                            NoteFlowMetaChip(
+                            ZouMetaChip(
                                 text = "紧急",
-                                accentColor = NoteFlowTaskAccent,
+                                accentColor = ZouTaskAccent,
                             )
                         }
                     }
@@ -171,7 +171,7 @@ private fun TaskCard(
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
             if (item.progressText.isNotBlank()) {
-                NoteFlowMetaChip(text = item.progressText, accentColor = NoteFlowTaskAccent)
+                ZouMetaChip(text = item.progressText, accentColor = ZouTaskAccent)
             }
         }
     }

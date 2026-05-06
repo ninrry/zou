@@ -12,7 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 
 @Composable
-fun NoteFlowSectionCard(
+fun ZouSectionCard(
     title: String,
     modifier: Modifier = Modifier,
     subtitle: String? = null,

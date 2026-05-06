@@ -5,8 +5,8 @@ import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import luzzr.zou.core.designsystem.theme.NoteFlowTaskAccent
-import luzzr.zou.core.designsystem.theme.NoteFlowTheme
+import luzzr.zou.core.designsystem.theme.ZouTaskAccent
+import luzzr.zou.core.designsystem.theme.ZouTheme
 import java.time.LocalDateTime
 import org.junit.Assert.assertTrue
 import org.junit.Rule
@@ -14,7 +14,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
-class NoteFlowDateTimeSheetTest {
+class ZouDateTimeSheetTest {
 
     @get:Rule
     val composeRule = createComposeRule()
@@ -22,13 +22,13 @@ class NoteFlowDateTimeSheetTest {
     @Test
     fun quickDateAndConfirmActionsAreClickable() {
         composeRule.setContent {
-            NoteFlowTheme {
-                NoteFlowDateTimeSheet(
+            ZouTheme {
+                ZouDateTimeSheet(
                     visible = true,
                     title = "Select",
-                    mode = NoteFlowDateTimeSheetMode.DATE_TIME,
+                    mode = ZouDateTimeSheetMode.DATE_TIME,
                     initialDateTime = LocalDateTime.of(2026, 3, 11, 9, 7),
-                    accentColor = NoteFlowTaskAccent,
+                    accentColor = ZouTaskAccent,
                     onDismissRequest = {},
                     onConfirm = { _, _, _ -> },
                 )
@@ -48,13 +48,13 @@ class NoteFlowDateTimeSheetTest {
     @Test
     fun precisionToggleAndCancelActionAreVisible() {
         composeRule.setContent {
-            NoteFlowTheme {
-                NoteFlowDateTimeSheet(
+            ZouTheme {
+                ZouDateTimeSheet(
                     visible = true,
                     title = "Select",
-                    mode = NoteFlowDateTimeSheetMode.TIME_ONLY,
+                    mode = ZouDateTimeSheetMode.TIME_ONLY,
                     initialDateTime = LocalDateTime.of(2026, 3, 11, 9, 7),
-                    accentColor = NoteFlowTaskAccent,
+                    accentColor = ZouTaskAccent,
                     onDismissRequest = {},
                     onConfirm = { _, _, _ -> },
                 )

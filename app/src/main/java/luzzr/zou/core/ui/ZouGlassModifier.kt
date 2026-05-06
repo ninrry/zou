@@ -10,7 +10,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.unit.dp
-import luzzr.zou.core.designsystem.theme.NoteFlowDesignTokens
+import luzzr.zou.core.designsystem.theme.ZouDesignTokens
 
 @Composable
 fun Modifier.noteFlowGlassBackground(
@@ -18,7 +18,7 @@ fun Modifier.noteFlowGlassBackground(
     accentColor: Color = Color.Transparent,
     shape: Shape = RoundedCornerShape(24.dp),
 ): Modifier {
-    val designTokens = NoteFlowDesignTokens.colors
+    val designTokens = ZouDesignTokens.colors
     val containerColor = when (level) {
         GlassLevel.Weak -> designTokens.backgroundRaised
         GlassLevel.Normal -> designTokens.surface

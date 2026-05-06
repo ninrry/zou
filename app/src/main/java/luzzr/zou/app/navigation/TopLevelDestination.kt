@@ -10,18 +10,18 @@ import androidx.compose.material.icons.outlined.Description
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Refresh
 import androidx.compose.ui.graphics.vector.ImageVector
-import luzzr.zou.core.designsystem.theme.NoteFlowHabitAccent
-import luzzr.zou.core.designsystem.theme.NoteFlowHabitAccentGlow
-import luzzr.zou.core.designsystem.theme.NoteFlowHabitAccentSoft
-import luzzr.zou.core.designsystem.theme.NoteFlowNoteAccent
-import luzzr.zou.core.designsystem.theme.NoteFlowNoteAccentGlow
-import luzzr.zou.core.designsystem.theme.NoteFlowNoteAccentSoft
-import luzzr.zou.core.designsystem.theme.NoteFlowTaskAccent
-import luzzr.zou.core.designsystem.theme.NoteFlowTaskAccentGlow
-import luzzr.zou.core.designsystem.theme.NoteFlowTaskAccentSoft
-import luzzr.zou.core.designsystem.theme.NoteFlowTodayAccent
-import luzzr.zou.core.designsystem.theme.NoteFlowTodayAccentGlow
-import luzzr.zou.core.designsystem.theme.NoteFlowTodayAccentSoft
+import luzzr.zou.core.designsystem.theme.ZouHabitAccent
+import luzzr.zou.core.designsystem.theme.ZouHabitAccentGlow
+import luzzr.zou.core.designsystem.theme.ZouHabitAccentSoft
+import luzzr.zou.core.designsystem.theme.ZouNoteAccent
+import luzzr.zou.core.designsystem.theme.ZouNoteAccentGlow
+import luzzr.zou.core.designsystem.theme.ZouNoteAccentSoft
+import luzzr.zou.core.designsystem.theme.ZouTaskAccent
+import luzzr.zou.core.designsystem.theme.ZouTaskAccentGlow
+import luzzr.zou.core.designsystem.theme.ZouTaskAccentSoft
+import luzzr.zou.core.designsystem.theme.ZouTodayAccent
+import luzzr.zou.core.designsystem.theme.ZouTodayAccentGlow
+import luzzr.zou.core.designsystem.theme.ZouTodayAccentSoft
 import luzzr.zou.core.ui.ModuleVisualStyle
 import luzzr.zou.feature.tasks.TaskRoutes
 
@@ -38,12 +38,12 @@ enum class TopLevelDestination(
         selectedIcon = Icons.Filled.Home,
         unselectedIcon = Icons.Outlined.Home,
         visualStyle = ModuleVisualStyle(
-            accentColor = NoteFlowTodayAccent,
-            accentSoftColor = NoteFlowTodayAccentSoft,
-            accentGlowColor = NoteFlowTodayAccentGlow,
-            ambientColor = NoteFlowTodayAccentSoft.copy(alpha = 0.72f),
-            overlayColor = NoteFlowTodayAccentGlow.copy(alpha = 0.28f),
-            glassTintColor = NoteFlowTodayAccentSoft.copy(alpha = 0.68f),
+            accentColor = ZouTodayAccent,
+            accentSoftColor = ZouTodayAccentSoft,
+            accentGlowColor = ZouTodayAccentGlow,
+            ambientColor = ZouTodayAccentSoft.copy(alpha = 0.72f),
+            overlayColor = ZouTodayAccentGlow.copy(alpha = 0.28f),
+            glassTintColor = ZouTodayAccentSoft.copy(alpha = 0.68f),
         ),
     ),
     TASKS(
@@ -52,12 +52,12 @@ enum class TopLevelDestination(
         selectedIcon = Icons.Filled.CheckCircle,
         unselectedIcon = Icons.Outlined.CheckCircle,
         visualStyle = ModuleVisualStyle(
-            accentColor = NoteFlowTaskAccent,
-            accentSoftColor = NoteFlowTaskAccentSoft,
-            accentGlowColor = NoteFlowTaskAccentGlow,
-            ambientColor = NoteFlowTaskAccentSoft.copy(alpha = 0.72f),
-            overlayColor = NoteFlowTaskAccentGlow.copy(alpha = 0.28f),
-            glassTintColor = NoteFlowTaskAccentSoft.copy(alpha = 0.68f),
+            accentColor = ZouTaskAccent,
+            accentSoftColor = ZouTaskAccentSoft,
+            accentGlowColor = ZouTaskAccentGlow,
+            ambientColor = ZouTaskAccentSoft.copy(alpha = 0.72f),
+            overlayColor = ZouTaskAccentGlow.copy(alpha = 0.28f),
+            glassTintColor = ZouTaskAccentSoft.copy(alpha = 0.68f),
         ),
     ),
     HABITS(
@@ -66,12 +66,12 @@ enum class TopLevelDestination(
         selectedIcon = Icons.Filled.Refresh,
         unselectedIcon = Icons.Outlined.Refresh,
         visualStyle = ModuleVisualStyle(
-            accentColor = NoteFlowHabitAccent,
-            accentSoftColor = NoteFlowHabitAccentSoft,
-            accentGlowColor = NoteFlowHabitAccentGlow,
-            ambientColor = NoteFlowHabitAccentSoft.copy(alpha = 0.72f),
-            overlayColor = NoteFlowHabitAccentGlow.copy(alpha = 0.28f),
-            glassTintColor = NoteFlowHabitAccentSoft.copy(alpha = 0.68f),
+            accentColor = ZouHabitAccent,
+            accentSoftColor = ZouHabitAccentSoft,
+            accentGlowColor = ZouHabitAccentGlow,
+            ambientColor = ZouHabitAccentSoft.copy(alpha = 0.72f),
+            overlayColor = ZouHabitAccentGlow.copy(alpha = 0.28f),
+            glassTintColor = ZouHabitAccentSoft.copy(alpha = 0.68f),
         ),
     ),
     NOTES(
@@ -80,12 +80,12 @@ enum class TopLevelDestination(
         selectedIcon = Icons.Filled.Description,
         unselectedIcon = Icons.Outlined.Description,
         visualStyle = ModuleVisualStyle(
-            accentColor = NoteFlowNoteAccent,
-            accentSoftColor = NoteFlowNoteAccentSoft,
-            accentGlowColor = NoteFlowNoteAccentGlow,
-            ambientColor = NoteFlowNoteAccentSoft.copy(alpha = 0.72f),
-            overlayColor = NoteFlowNoteAccentGlow.copy(alpha = 0.28f),
-            glassTintColor = NoteFlowNoteAccentSoft.copy(alpha = 0.68f),
+            accentColor = ZouNoteAccent,
+            accentSoftColor = ZouNoteAccentSoft,
+            accentGlowColor = ZouNoteAccentGlow,
+            ambientColor = ZouNoteAccentSoft.copy(alpha = 0.72f),
+            overlayColor = ZouNoteAccentGlow.copy(alpha = 0.28f),
+            glassTintColor = ZouNoteAccentSoft.copy(alpha = 0.68f),
         ),
     ),
 }

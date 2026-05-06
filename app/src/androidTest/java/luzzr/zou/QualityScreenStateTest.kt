@@ -6,7 +6,7 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.test.swipeUp
-import luzzr.zou.core.designsystem.theme.NoteFlowTheme
+import luzzr.zou.core.designsystem.theme.ZouTheme
 import luzzr.zou.domain.model.TrashItemType
 import luzzr.zou.feature.backup.BackupRestoreScreen
 import luzzr.zou.feature.backup.BackupRestoreUiState
@@ -39,7 +39,7 @@ class QualityScreenStateTest {
         var habitClicked = false
 
         composeRule.setContent {
-            NoteFlowTheme {
+            ZouTheme {
                 TodayScreen(
                     uiState = TodayUiState(
                         dateLine = "2026-03-09",
@@ -82,7 +82,7 @@ class QualityScreenStateTest {
     @Test
     fun todayScreenShowsDualColumnsWhenTasksOrHabitsExist() {
         composeRule.setContent {
-            NoteFlowTheme {
+            ZouTheme {
                 TodayScreen(
                     uiState = TodayUiState(
                         dateLine = "2026-03-09",
@@ -142,7 +142,7 @@ class QualityScreenStateTest {
     @Test
     fun todayScreenKeepsTwoColumnsWhenOneSideIsEmpty() {
         composeRule.setContent {
-            NoteFlowTheme {
+            ZouTheme {
                 TodayScreen(
                     uiState = TodayUiState(
                         dateLine = "2026-03-09",
@@ -189,7 +189,7 @@ class QualityScreenStateTest {
     @Test
     fun settingsScreenShowsActionsAndMessages() {
         composeRule.setContent {
-            NoteFlowTheme {
+            ZouTheme {
                 SettingsScreen(
                     uiState = SettingsUiState(
                         errorMessage = "保存失败",
@@ -225,7 +225,7 @@ class QualityScreenStateTest {
         var deleted = false
 
         composeRule.setContent {
-            NoteFlowTheme {
+            ZouTheme {
                 TrashScreen(
                     uiState = TrashUiState(
                         items = listOf(
@@ -259,7 +259,7 @@ class QualityScreenStateTest {
         var imported = false
 
         composeRule.setContent {
-            NoteFlowTheme {
+            ZouTheme {
                 BackupRestoreScreen(
                     uiState = BackupRestoreUiState(
                         resultMessage = "导入成功",

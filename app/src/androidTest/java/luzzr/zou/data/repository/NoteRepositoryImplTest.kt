@@ -6,7 +6,7 @@ import androidx.test.platform.app.InstrumentationRegistry
 import luzzr.zou.core.markdown.MarkdownImageReferenceParser
 import luzzr.zou.core.markdown.MarkdownPreviewTextExtractor
 import luzzr.zou.core.time.TimeProvider
-import luzzr.zou.data.local.database.NoteFlowDatabase
+import luzzr.zou.data.local.database.ZouDatabase
 import luzzr.zou.data.local.media.NoteImageStorage
 import luzzr.zou.data.local.media.StoredNoteImage
 import luzzr.zou.domain.model.Note
@@ -26,7 +26,7 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 class NoteRepositoryImplTest {
 
-    private lateinit var database: NoteFlowDatabase
+    private lateinit var database: ZouDatabase
     private lateinit var repository: NoteRepositoryImpl
     private lateinit var fakeStorage: FakeNoteImageStorage
     private val timeProvider = MutableTimeProvider()
@@ -36,7 +36,7 @@ class NoteRepositoryImplTest {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
         database = Room.inMemoryDatabaseBuilder(
             context,
-            NoteFlowDatabase::class.java,
+            ZouDatabase::class.java,
         )
             .allowMainThreadQueries()
             .build()

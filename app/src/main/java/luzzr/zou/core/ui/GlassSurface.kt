@@ -10,7 +10,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.dp
-import luzzr.zou.core.designsystem.theme.NoteFlowDesignTokens
+import luzzr.zou.core.designsystem.theme.ZouDesignTokens
 
 enum class GlassLevel {
     Weak,
@@ -27,7 +27,7 @@ fun GlassSurface(
     strong: Boolean = false,
     content: @Composable BoxScope.() -> Unit,
 ) {
-    val designTokens = NoteFlowDesignTokens.colors
+    val designTokens = ZouDesignTokens.colors
     val resolvedLevel = if (strong) GlassLevel.Strong else level
     val containerColor = when (resolvedLevel) {
         GlassLevel.Weak -> designTokens.backgroundRaised

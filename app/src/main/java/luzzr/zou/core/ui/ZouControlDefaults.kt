@@ -11,13 +11,13 @@ import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.SwitchColors
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
-import luzzr.zou.core.designsystem.theme.NoteFlowDesignTokens
+import luzzr.zou.core.designsystem.theme.ZouDesignTokens
 
 @Composable
 fun noteFlowSwitchColors(
     accentColor: Color = MaterialTheme.colorScheme.primary,
 ): SwitchColors {
-    val designTokens = NoteFlowDesignTokens.colors
+    val designTokens = ZouDesignTokens.colors
     return SwitchDefaults.colors(
         checkedThumbColor = designTokens.backgroundRaised,
         checkedTrackColor = accentColor.copy(alpha = 0.82f),
@@ -50,7 +50,7 @@ fun noteFlowButtonColors(
 
 @Composable
 fun noteFlowOutlinedButtonColors(): ButtonColors {
-    val designTokens = NoteFlowDesignTokens.colors
+    val designTokens = ZouDesignTokens.colors
     return ButtonDefaults.outlinedButtonColors(
         containerColor = designTokens.backgroundRaised,
         contentColor = MaterialTheme.colorScheme.onSurface,
@@ -63,7 +63,7 @@ fun noteFlowOutlinedButtonColors(): ButtonColors {
 fun noteFlowFilterChipColors(
     accentColor: Color = MaterialTheme.colorScheme.primary,
 ): SelectableChipColors {
-    val designTokens = NoteFlowDesignTokens.colors
+    val designTokens = ZouDesignTokens.colors
     return FilterChipDefaults.filterChipColors(
         selectedContainerColor = accentColor.copy(alpha = 0.18f),
         selectedLabelColor = MaterialTheme.colorScheme.onSurface,
@@ -81,7 +81,7 @@ fun noteFlowFilterChipColors(
 fun noteFlowCheckboxColors(
     accentColor: Color = MaterialTheme.colorScheme.primary,
 ): CheckboxColors {
-    val designTokens = NoteFlowDesignTokens.colors
+    val designTokens = ZouDesignTokens.colors
     return CheckboxDefaults.colors(
         checkedColor = accentColor.copy(alpha = 0.86f),
         checkmarkColor = designTokens.onAccent,

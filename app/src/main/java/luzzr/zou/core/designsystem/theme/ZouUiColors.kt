@@ -6,7 +6,7 @@ import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
 
 @Immutable
-data class NoteFlowUiColors(
+data class ZouUiColors(
     val background: Color,
     val backgroundRaised: Color,
     val surface: Color,
@@ -30,31 +30,31 @@ data class NoteFlowUiColors(
     val onAccent: Color,
 )
 
-internal val LightNoteFlowUiColors = NoteFlowUiColors(
-    background = NoteFlowBackground,
-    backgroundRaised = NoteFlowBackgroundRaised,
-    surface = NoteFlowSurface,
-    surfaceFloating = NoteFlowSurfaceFloating,
-    surfaceVariant = NoteFlowSurfaceVariant,
-    canvas = NoteFlowCanvasLayer,
-    canvasRaised = NoteFlowCanvasLayerRaised,
-    glassSurface = NoteFlowGlassSurface,
-    glassSurfaceStrong = NoteFlowGlassSurfaceStrong,
-    glassInput = NoteFlowGlassInput,
-    overlayAmbient = NoteFlowOverlayAmbient,
-    overlayDeep = NoteFlowOverlayDeep,
-    glassBorder = NoteFlowGlassBorder,
-    glassBorderSoft = NoteFlowGlassBorderSoft,
-    glassInnerGlow = NoteFlowGlassInnerGlow,
-    glassShadow = NoteFlowGlassShadow,
-    outlineSoft = NoteFlowOutlineSoft,
-    textPrimary = NoteFlowTextPrimary,
-    textSecondary = NoteFlowTextSecondary,
-    textTertiary = NoteFlowTextTertiary,
-    onAccent = NoteFlowOnAccent,
+internal val LightZouUiColors = ZouUiColors(
+    background = ZouBackground,
+    backgroundRaised = ZouBackgroundRaised,
+    surface = ZouSurface,
+    surfaceFloating = ZouSurfaceFloating,
+    surfaceVariant = ZouSurfaceVariant,
+    canvas = ZouCanvasLayer,
+    canvasRaised = ZouCanvasLayerRaised,
+    glassSurface = ZouGlassSurface,
+    glassSurfaceStrong = ZouGlassSurfaceStrong,
+    glassInput = ZouGlassInput,
+    overlayAmbient = ZouOverlayAmbient,
+    overlayDeep = ZouOverlayDeep,
+    glassBorder = ZouGlassBorder,
+    glassBorderSoft = ZouGlassBorderSoft,
+    glassInnerGlow = ZouGlassInnerGlow,
+    glassShadow = ZouGlassShadow,
+    outlineSoft = ZouOutlineSoft,
+    textPrimary = ZouTextPrimary,
+    textSecondary = ZouTextSecondary,
+    textTertiary = ZouTextTertiary,
+    onAccent = ZouOnAccent,
 )
 
-internal val DarkNoteFlowUiColors = NoteFlowUiColors(
+internal val DarkZouUiColors = ZouUiColors(
     background = Color(0xFF161514),
     backgroundRaised = Color(0xFF1B1917),
     surface = Color(0xFF1D1B19),
@@ -78,13 +78,13 @@ internal val DarkNoteFlowUiColors = NoteFlowUiColors(
     onAccent = Color(0xFF171513),
 )
 
-internal fun noteFlowUiColors(useDarkTheme: Boolean): NoteFlowUiColors {
-    return if (useDarkTheme) DarkNoteFlowUiColors else LightNoteFlowUiColors
+internal fun noteFlowUiColors(useDarkTheme: Boolean): ZouUiColors {
+    return if (useDarkTheme) DarkZouUiColors else LightZouUiColors
 }
 
-internal val LocalNoteFlowUiColors = staticCompositionLocalOf { LightNoteFlowUiColors }
+internal val LocalZouUiColors = staticCompositionLocalOf { LightZouUiColors }
 
-object NoteFlowDesignTokens {
-    val colors: NoteFlowUiColors
-        @Composable get() = LocalNoteFlowUiColors.current
+object ZouDesignTokens {
+    val colors: ZouUiColors
+        @Composable get() = LocalZouUiColors.current
 }

@@ -20,10 +20,10 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import luzzr.zou.core.designsystem.theme.NoteFlowTaskAccent
-import luzzr.zou.core.ui.NoteFlowEmptyStateCard
-import luzzr.zou.core.ui.NoteFlowPageHeader
-import luzzr.zou.core.ui.NoteFlowSectionCard
+import luzzr.zou.core.designsystem.theme.ZouTaskAccent
+import luzzr.zou.core.ui.ZouEmptyStateCard
+import luzzr.zou.core.ui.ZouPageHeader
+import luzzr.zou.core.ui.ZouSectionCard
 
 @Composable
 fun TaskDetailRoute(
@@ -69,10 +69,10 @@ fun TaskDetailScreen(
                     TextButton(onClick = onNavigateBack) {
                         Text("返回")
                     }
-                    NoteFlowEmptyStateCard(
+                    ZouEmptyStateCard(
                         title = "任务不存在或已删除",
                         description = uiState.emptyMessage,
-                        accentColor = NoteFlowTaskAccent,
+                        accentColor = ZouTaskAccent,
                         actionLabel = "返回列表",
                         actionTestTag = "task_detail_go_back",
                         onActionClick = onNavigateBack,
@@ -92,16 +92,16 @@ fun TaskDetailScreen(
                     TextButton(onClick = onNavigateBack) {
                         Text("返回")
                     }
-                    NoteFlowPageHeader(
+                    ZouPageHeader(
                         title = uiState.title,
                         subtitle = "详情只读展示，编辑与删除请进入编辑页。",
                     )
-                    NoteFlowSectionCard(title = "当前状态") {
+                    ZouSectionCard(title = "当前状态") {
                         DetailLine("状态", uiState.statusText)
                         DetailLine("截止时间", uiState.dueText)
                         DetailLine("子任务进度", uiState.progressText)
                     }
-                    NoteFlowSectionCard(title = "提醒设置") {
+                    ZouSectionCard(title = "提醒设置") {
                         uiState.reminderSummary.forEach { line ->
                             Text(
                                 text = line,
@@ -110,7 +110,7 @@ fun TaskDetailScreen(
                             )
                         }
                     }
-                    NoteFlowSectionCard(title = "详情") {
+                    ZouSectionCard(title = "详情") {
                         Text(
                             text = if (uiState.contentMarkdown.isBlank()) "暂无详情内容" else uiState.contentMarkdown,
                             style = MaterialTheme.typography.bodyMedium,
