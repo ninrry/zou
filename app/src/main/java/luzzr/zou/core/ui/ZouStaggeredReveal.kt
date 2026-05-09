@@ -5,7 +5,8 @@ import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.core.tween
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -38,26 +39,22 @@ fun ZouStaggeredReveal(
 }
 
 private fun defaultZouEnterTransition(index: Int): EnterTransition {
-    val delayMillis = index * MotionTokens.DurationSectionStagger
     return fadeIn(
-        animationSpec = tween(
-            durationMillis = MotionTokens.DurationSectionEnter,
-            delayMillis = delayMillis,
-            easing = MotionTokens.EasingEmphasized,
+        animationSpec = spring(
+            dampingRatio = Spring.DampingRatioNoBouncy,
+            stiffness = Spring.StiffnessLow,
         ),
     ) + slideInVertically(
-        animationSpec = tween(
-            durationMillis = MotionTokens.DurationSectionEnter,
-            delayMillis = delayMillis,
-            easing = MotionTokens.EasingEmphasized,
+        animationSpec = spring(
+            dampingRatio = Spring.DampingRatioNoBouncy,
+            stiffness = Spring.StiffnessLow,
         ),
-        initialOffsetY = { it / 8 },
+        initialOffsetY = { it / 6 },
     ) + scaleIn(
-        animationSpec = tween(
-            durationMillis = MotionTokens.DurationSectionEnter,
-            delayMillis = delayMillis,
-            easing = MotionTokens.EasingEmphasized,
+        animationSpec = spring(
+            dampingRatio = 0.6f,
+            stiffness = Spring.StiffnessMediumLow,
         ),
-        initialScale = 0.985f,
+        initialScale = 0.94f,
     )
 }

@@ -161,9 +161,15 @@ class BackupRepositoryImpl @Inject constructor(
                         if (entry.name == BACKUP_JSON_NAME) {
                             payload = json.decodeFromString<BackupPayload>(zip.readBytes().toString(Charsets.UTF_8))
                         } else {
-                            val target = File(tempDirectory, entry.name).apply {
-                                parentFile?.mkdirs()
+                            // Zip Slip 防护：规范化路径，确保不逃逸出 tempDirectory
+                            val target = tempDirectory.toPath()
+                                .resolve(entry.name)
+                                .normalize()
+                                .toFile()
+                            require(target.toPath().startsWith(tempDirectory.toPath())) {
+                                "非法的压缩包条目路径: ${entry.name}"
                             }
+                            target.parentFile?.mkdirs()
                             target.outputStream().use { output -> zip.copyTo(output) }
                         }
                     }

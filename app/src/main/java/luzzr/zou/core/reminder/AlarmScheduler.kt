@@ -27,7 +27,7 @@ class AlarmScheduler @Inject constructor(
             putExtra(EXTRA_TRIGGER_AT, triggerAtMillis)
             putExtra(EXTRA_ALARM_TYPE, type.name)
         }
-        val requestCode = if (habitId != null) habitId.hashCode() else taskId.hashCode()
+        val requestCode = if (habitId != null) ("habit_" + habitId).hashCode() else ("task_" + taskId).hashCode()
         val pendingIntent = PendingIntent.getBroadcast(
             context,
             requestCode,
@@ -60,7 +60,7 @@ class AlarmScheduler @Inject constructor(
     }
 
     fun cancelAlarm(taskId: String, habitId: String?) {
-        val requestCode = if (habitId != null) habitId.hashCode() else taskId.hashCode()
+        val requestCode = if (habitId != null) ("habit_" + habitId).hashCode() else ("task_" + taskId).hashCode()
         val intent = Intent(context, AlarmReminderReceiver::class.java)
         val pendingIntent = PendingIntent.getBroadcast(
             context,

@@ -5,7 +5,7 @@ data class TasksUiState(
     val showCompleted: Boolean = false,
     val tasks: List<TaskListItemUiModel> = emptyList(),
     val emptyTitle: String = "还没有待办",
-    val emptyDescription: String = "点击右下角开始创建你的第一条任务。",
+    val emptyDescription: String = "点击右下角 + 创建第一条任务，设置截止时间与提醒。",
 )
 
 data class TaskListItemUiModel(

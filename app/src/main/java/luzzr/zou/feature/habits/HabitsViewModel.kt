@@ -75,7 +75,7 @@ class HabitsViewModel @Inject constructor(
                     emptyDescription = if (onlyToday) {
                         "今天的习惯已完成，或今天没有命中执行频率。"
                     } else {
-                        "点击右下角创建你的第一个习惯。"
+                        "点击右下角 + 创建一个习惯，设定频率和打卡方式。"
                     },
                 )
             }

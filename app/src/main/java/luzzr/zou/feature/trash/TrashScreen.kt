@@ -10,6 +10,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
+import androidx.compose.material.icons.outlined.DeleteOutline
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -95,6 +96,10 @@ fun TrashScreen(
                     title = "回收站为空",
                     description = "软删除的任务、习惯和笔记会显示在这里。",
                     accentColor = ZouTodayAccent,
+                    icon = Icons.Outlined.DeleteOutline,
+                    actionLabel = "返回设置",
+                    actionTestTag = "trash_empty_back",
+                    onActionClick = onNavigateBack,
                 )
             }
         } else {
@@ -141,6 +146,7 @@ fun TrashScreen(
                     GlassSurface(
                         modifier = Modifier
                             .fillMaxWidth()
+                            .animateItem()
                             .testTag("trash_item_${item.type}_${item.id}"),
                         accentColor = ZouTodayAccent,
                     ) {

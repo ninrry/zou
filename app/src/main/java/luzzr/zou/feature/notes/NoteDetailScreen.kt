@@ -29,6 +29,7 @@ import luzzr.zou.core.markdown.MarkdownRenderer
 import luzzr.zou.core.ui.ZouEmptyStateCard
 import luzzr.zou.core.ui.ZouMetaChip
 import luzzr.zou.core.ui.ZouSectionCard
+import luzzr.zou.core.ui.ZouShimmerList
 
 @Composable
 fun NoteDetailRoute(
@@ -69,9 +70,9 @@ fun NoteDetailScreen(
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(innerPadding),
-                    verticalArrangement = Arrangement.Center,
+                    verticalArrangement = Arrangement.Top,
                 ) {
-                    CircularProgressIndicator(modifier = Modifier.padding(horizontal = 24.dp))
+                    ZouShimmerList()
                 }
             }
 

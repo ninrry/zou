@@ -1,6 +1,7 @@
 ﻿package luzzr.zou.feature.today
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -14,6 +15,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -46,6 +48,8 @@ fun TodayRoute(
     onEditHabit: (String) -> Unit,
     onOpenHabits: () -> Unit,
     onOpenSettings: () -> Unit,
+    isRefreshing: Boolean = false,
+    onRefresh: () -> Unit = {},
     viewModel: TodayViewModel = hiltViewModel(),
 ) {
     val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
@@ -67,6 +71,8 @@ fun TodayRoute(
         onUndo = viewModel::onUndo,
         onUndoExpired = viewModel::onUndoExpired,
         onOpenSettings = onOpenSettings,
+        isRefreshing = isRefreshing,
+        onRefresh = onRefresh,
     )
 }
 
@@ -88,6 +94,8 @@ fun TodayScreen(
     onUndo: (String) -> Unit,
     onUndoExpired: (String) -> Unit,
     onOpenSettings: () -> Unit,
+    isRefreshing: Boolean = false,
+    onRefresh: () -> Unit = {},
 ) {
     var isQuickCreateExpanded by rememberSaveable { mutableStateOf(false) }
     val snackbarHostState = remember { SnackbarHostState() }
@@ -129,13 +137,19 @@ fun TodayScreen(
             )
         },
     ) { innerPadding ->
-        LazyColumn(
+        PullToRefreshBox(
+            isRefreshing = isRefreshing,
+            onRefresh = onRefresh,
             modifier = Modifier
                 .fillMaxSize()
-                .padding(innerPadding)
-                .padding(horizontal = 16.dp, vertical = 12.dp),
-            verticalArrangement = Arrangement.spacedBy(10.dp),
+                .padding(innerPadding),
         ) {
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 16.dp, vertical = 12.dp),
+                verticalArrangement = Arrangement.spacedBy(10.dp),
+            ) {
             item {
                 TodayHeroCard(
                     title = uiState.title,
@@ -164,6 +178,7 @@ fun TodayScreen(
             }
             item {
                 Spacer(modifier = Modifier.height(148.dp))
+            }
             }
         }
     }

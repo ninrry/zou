@@ -61,9 +61,10 @@ fun ZouStepBar(
                 modifier = Modifier
                     .weight(1f)
                     .graphicsLayer {
-                        val scale = 0.985f + (selectionProgress * 0.015f)
+                        val scale = if (selected) 1f else 0.975f
                         scaleX = scale
                         scaleY = scale
+                        alpha = if (selected) 1f else 0.92f
                     },
                 accentColor = if (selected) accentColor else null,
                 level = if (selected) GlassLevel.Normal else GlassLevel.Weak,
@@ -75,12 +76,21 @@ fun ZouStepBar(
                         .clickable(enabled = onStepSelected != null) {
                             onStepSelected?.invoke(index)
                         }
-                        .padding(horizontal = LayoutTokens.Space8, vertical = 10.dp),
-                    style = MaterialTheme.typography.labelMedium,
+                        .padding(horizontal = LayoutTokens.Space8, vertical = 12.dp),
+                    style = if (selected) {
+                        MaterialTheme.typography.labelLarge
+                    } else {
+                        MaterialTheme.typography.labelMedium
+                    },
                     color = textColor,
                     textAlign = TextAlign.Center,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
+                    fontWeight = if (selected) {
+                        androidx.compose.ui.text.font.FontWeight.SemiBold
+                    } else {
+                        null
+                    },
                 )
             }
         }
@@ -97,13 +107,16 @@ fun ZouStepBottomBar(
     primaryEnabled: Boolean = true,
     primaryLoading: Boolean = false,
     previousLabel: String = "上一步",
+    cancelLabel: String = "取消",
+    cancelEnabled: Boolean = true,
+    onCancelClick: () -> Unit = {},
     onPreviousClick: () -> Unit = {},
     onPrimaryClick: () -> Unit,
     primaryTestTag: String,
 ) {
     GlassSurface(
         modifier = modifier.fillMaxWidth(),
-        level = GlassLevel.Strong,
+        level = GlassLevel.Normal,
     ) {
         Row(
             modifier = Modifier
@@ -124,12 +137,21 @@ fun ZouStepBottomBar(
                     Text(previousLabel, maxLines = 1)
                 }
             } else {
-                Spacer(modifier = Modifier.weight(1f))
+                OutlinedButton(
+                    modifier = Modifier
+                        .weight(1f)
+                        .height(LayoutTokens.Space28 + LayoutTokens.Space20),
+                    onClick = onCancelClick,
+                    enabled = cancelEnabled,
+                    colors = noteFlowOutlinedButtonColors(),
+                ) {
+                    Text(cancelLabel, maxLines = 1)
+                }
             }
             Button(
                 modifier = Modifier
                     .weight(1f)
-                    .height(LayoutTokens.Space24 + LayoutTokens.Space20)
+                    .height(LayoutTokens.Space28 + LayoutTokens.Space20)
                     .testTag(primaryTestTag),
                 onClick = onPrimaryClick,
                 enabled = primaryEnabled,

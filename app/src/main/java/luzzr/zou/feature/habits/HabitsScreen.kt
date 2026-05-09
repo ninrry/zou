@@ -13,10 +13,12 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.outlined.Loop
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -39,6 +41,8 @@ fun HabitsRoute(
     onCreateHabit: () -> Unit,
     onOpenHabit: (String) -> Unit,
     onEditHabit: (String) -> Unit,
+    isRefreshing: Boolean = false,
+    onRefresh: () -> Unit = {},
     viewModel: HabitsViewModel = hiltViewModel(),
 ) {
     val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
@@ -50,6 +54,8 @@ fun HabitsRoute(
         onEditHabit = onEditHabit,
         onQuickCheckHabit = viewModel::onQuickCheckHabit,
         onRestoreHabit = viewModel::onRestoreHabit,
+        isRefreshing = isRefreshing,
+        onRefresh = onRefresh,
     )
 }
 
@@ -61,6 +67,8 @@ fun HabitsScreen(
     onEditHabit: (String) -> Unit,
     onQuickCheckHabit: (String) -> Unit,
     onRestoreHabit: (String) -> Unit,
+    isRefreshing: Boolean = false,
+    onRefresh: () -> Unit = {},
 ) {
     Scaffold(
         containerColor = Color.Transparent,
@@ -74,13 +82,19 @@ fun HabitsScreen(
             )
         },
     ) { innerPadding ->
-        LazyColumn(
+        PullToRefreshBox(
+            isRefreshing = isRefreshing,
+            onRefresh = onRefresh,
             modifier = Modifier
                 .fillMaxSize()
-                .padding(innerPadding)
-                .padding(horizontal = 20.dp, vertical = 12.dp),
-            verticalArrangement = Arrangement.spacedBy(14.dp),
+                .padding(innerPadding),
         ) {
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 20.dp, vertical = 12.dp),
+                verticalArrangement = Arrangement.spacedBy(14.dp),
+            ) {
             if (uiState.activeHabits.isEmpty() && uiState.deletedHabits.isEmpty()) {
                 item {
                     ZouStaggeredReveal(revealKey = "habits_empty", index = 0) {
@@ -88,12 +102,14 @@ fun HabitsScreen(
                             title = uiState.emptyTitle,
                             description = uiState.emptyDescription,
                             accentColor = ZouHabitAccent,
+                            icon = Icons.Outlined.Loop,
                         )
                     }
                 }
             } else {
                 items(uiState.activeHabits, key = { it.id }) { habit ->
                     HabitCard(
+                        modifier = Modifier.animateItem(),
                         item = habit,
                         onOpenHabit = onOpenHabit,
                         onEditHabit = onEditHabit,
@@ -114,6 +130,7 @@ fun HabitsScreen(
                     }
                     items(uiState.deletedHabits, key = { it.id }) { habit ->
                         HabitCard(
+                            modifier = Modifier.animateItem(),
                             item = habit,
                             onOpenHabit = onOpenHabit,
                             onEditHabit = onEditHabit,
@@ -127,6 +144,7 @@ fun HabitsScreen(
             item {
                 Spacer(modifier = Modifier.height(112.dp))
             }
+            }
         }
     }
 }
@@ -138,16 +156,16 @@ private fun HabitCard(
     onEditHabit: (String) -> Unit,
     onQuickCheckHabit: (String) -> Unit,
     onRestoreHabit: (String) -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     val interactionSource = rememberPressInteractionSource()
     GlassSurface(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .testTag("habit_card_${item.id}")
             .noteFlowPressScale(interactionSource = interactionSource)
             .combinedClickable(
                 interactionSource = interactionSource,
-                indication = null,
                 enabled = item.canOpenDetail,
                 onClick = { onOpenHabit(item.id) },
                 onLongClick = { onEditHabit(item.id) },

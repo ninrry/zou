@@ -1,6 +1,11 @@
 ﻿package luzzr.zou.feature.today
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.spring
+import androidx.compose.runtime.getValue
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -230,7 +235,6 @@ internal fun TodayTaskCard(
             .testTag("today_task_${item.id}")
             .combinedClickable(
                 interactionSource = interactionSource,
-                indication = null,
                 onClick = onClick,
                 onLongClick = onLongClick,
             ),
@@ -269,7 +273,6 @@ internal fun TodayHabitCard(
             .testTag("today_habit_${item.id}")
             .combinedClickable(
                 interactionSource = interactionSource,
-                indication = null,
                 onClick = onClick,
                 onLongClick = onLongClick,
             ),
@@ -322,6 +325,7 @@ private fun TodayQuickCard(
     GlassSurface(
         modifier = modifier
             .fillMaxWidth()
+            .animateContentSize()
             .noteFlowPressScale(interactionSource = interactionSource),
         accentColor = accentColor,
         level = GlassLevel.Normal,
@@ -637,8 +641,16 @@ private fun TodayCompletionBar(summary: TodaySummaryUiModel) {
         if (total == 0) 0f else summary.completedCount / total.toFloat()
     }
     val clampedProgress = progress.coerceIn(0f, 1f)
+    val animatedProgress by animateFloatAsState(
+        targetValue = clampedProgress.coerceAtLeast(0.06f),
+        animationSpec = MotionTokens.SpringSmooth,
+        label = "today_progress_bar",
+    )
     val completedPercent = (clampedProgress * 100).toInt()
     val remainingItems = todayActiveItemCount(summary)
+    val hasItems = remainingItems > 0 || summary.completedCount > 0
+    val showFill = clampedProgress > 0f
+
     Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -646,34 +658,40 @@ private fun TodayCompletionBar(summary: TodaySummaryUiModel) {
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(
-                text = "完成 $completedPercent%",
+                text = if (hasItems) "完成 $completedPercent%" else "进度",
                 style = MaterialTheme.typography.labelLarge,
                 color = MaterialTheme.colorScheme.onSurface,
             )
             Text(
-                text = if (remainingItems == 0) "当前已清空" else "剩余 $remainingItems 项",
+                text = if (remainingItems == 0 && summary.completedCount > 0) "当前已清空"
+                       else if (!hasItems) "暂无待办"
+                       else "剩余 $remainingItems 项",
                 style = MaterialTheme.typography.labelLarge,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(6.dp)
-                .background(
-                    color = designTokens.surfaceVariant,
-                    shape = RoundedCornerShape(999.dp),
-                ),
-        ) {
+        if (hasItems || clampedProgress > 0f) {
             Box(
                 modifier = Modifier
-                    .fillMaxWidth(if (clampedProgress == 0f) 0f else clampedProgress.coerceAtLeast(0.06f))
-                    .height(6.dp)
+                    .fillMaxWidth()
+                    .height(10.dp)
                     .background(
-                        color = ZouTodayAccent.copy(alpha = 0.86f),
+                        color = ZouTodayAccent.copy(alpha = 0.20f),
                         shape = RoundedCornerShape(999.dp),
                     ),
-            )
+            ) {
+                if (showFill) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth(animatedProgress)
+                            .height(10.dp)
+                            .background(
+                                color = ZouTodayAccent,
+                                shape = RoundedCornerShape(999.dp),
+                            ),
+                    )
+                }
+            }
         }
     }
 }
@@ -732,7 +750,7 @@ fun TodayQuickCreateFab(
         )
         StaggeredQuickCreateAction(
             visible = expanded,
-            delayMillis = 45,
+            delayMillis = 80,
             testTag = "today_quick_create_habit",
             text = "新建习惯",
             accentColor = ZouHabitAccentSoft,
@@ -765,32 +783,40 @@ private fun StaggeredQuickCreateAction(
     AnimatedVisibility(
         visible = visible,
         enter = fadeIn(
-            animationSpec = tween(
-                durationMillis = 220,
-                delayMillis = delayMillis,
-                easing = MotionTokens.EasingEmphasized,
+            animationSpec = spring(
+                dampingRatio = Spring.DampingRatioNoBouncy,
+                stiffness = Spring.StiffnessMedium,
             ),
         ) + slideInVertically(
-            animationSpec = tween(
-                durationMillis = 300,
-                delayMillis = delayMillis,
-                easing = MotionTokens.EasingEmphasized,
+            animationSpec = spring(
+                dampingRatio = 0.30f,
+                stiffness = Spring.StiffnessMediumLow,
             ),
-            initialOffsetY = { it / 2 },
+            initialOffsetY = { it },
         ) + scaleIn(
-            animationSpec = tween(
-                durationMillis = 280,
-                delayMillis = delayMillis,
-                easing = MotionTokens.EasingEmphasized,
+            animationSpec = spring(
+                dampingRatio = 0.30f,
+                stiffness = Spring.StiffnessMedium,
             ),
-            initialScale = 0.92f,
+            initialScale = 0.80f,
         ),
-        exit = fadeOut(animationSpec = tween(120)) + slideOutVertically(
-            animationSpec = tween(160),
-            targetOffsetY = { it / 3 },
+        exit = fadeOut(
+            animationSpec = spring(
+                dampingRatio = Spring.DampingRatioNoBouncy,
+                stiffness = Spring.StiffnessMedium,
+            ),
+        ) + slideOutVertically(
+            animationSpec = spring(
+                dampingRatio = 0.30f,
+                stiffness = Spring.StiffnessMediumLow,
+            ),
+            targetOffsetY = { it },
         ) + scaleOut(
-            animationSpec = tween(140),
-            targetScale = 0.92f,
+            animationSpec = spring(
+                dampingRatio = 0.30f,
+                stiffness = Spring.StiffnessMedium,
+            ),
+            targetScale = 0.80f,
         ),
     ) {
         TodayQuickCreateActionSurface(
@@ -834,7 +860,6 @@ private fun TodayQuickCreateActionSurface(
             }
             .clickable(
                 interactionSource = interactionSource,
-                indication = null,
                 onClick = onClick,
             ),
         accentColor = accentColor,

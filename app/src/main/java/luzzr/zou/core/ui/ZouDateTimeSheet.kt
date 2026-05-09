@@ -465,7 +465,6 @@ private fun MonthCalendar(
                                 .background(if (selected) accentColor.copy(alpha = 0.24f) else Color.Transparent)
                                 .clickable(
                                     interactionSource = MutableInteractionSource(),
-                                    indication = null,
                                     enabled = enabled,
                                 ) { onDateSelected(cellDate) },
                             contentAlignment = Alignment.Center,
@@ -658,10 +657,10 @@ private fun WheelPicker(
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
+                        .animateItem()
                         .height(itemHeight)
                         .clickable(
                             interactionSource = MutableInteractionSource(),
-                            indication = null,
                         ) { onValueChanged(value) },
                     contentAlignment = Alignment.Center,
                 ) {

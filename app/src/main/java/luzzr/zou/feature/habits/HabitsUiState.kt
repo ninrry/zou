@@ -10,7 +10,7 @@ data class HabitsUiState(
     val activeHabits: List<HabitCardUiModel> = emptyList(),
     val deletedHabits: List<HabitCardUiModel> = emptyList(),
     val emptyTitle: String = "还没有习惯",
-    val emptyDescription: String = "点击右下角创建你的第一个习惯。",
+    val emptyDescription: String = "点击右下角 + 创建一个习惯，设定频率和打卡方式。",
 )
 
 data class HabitCardUiModel(

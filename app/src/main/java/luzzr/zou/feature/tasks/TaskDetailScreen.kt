@@ -24,6 +24,7 @@ import luzzr.zou.core.designsystem.theme.ZouTaskAccent
 import luzzr.zou.core.ui.ZouEmptyStateCard
 import luzzr.zou.core.ui.ZouPageHeader
 import luzzr.zou.core.ui.ZouSectionCard
+import luzzr.zou.core.ui.ZouShimmerList
 
 @Composable
 fun TaskDetailRoute(
@@ -52,9 +53,9 @@ fun TaskDetailScreen(
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(innerPadding),
-                    verticalArrangement = Arrangement.Center,
+                    verticalArrangement = Arrangement.Top,
                 ) {
-                    CircularProgressIndicator(modifier = Modifier.padding(horizontal = 24.dp))
+                    ZouShimmerList()
                 }
             }
 

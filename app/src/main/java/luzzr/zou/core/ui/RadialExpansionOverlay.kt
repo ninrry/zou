@@ -9,6 +9,7 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -79,9 +80,11 @@ class RadialExpansionController {
     ) {
         val anchor = lastAnchor
         if (anchor == null) {
+            println("[RadialExpansion] collapse skipped: lastAnchor is null")
             onCollapsed()
             return
         }
+        println("[RadialExpansion] collapse triggered: origin=${anchor.origin}")
         request = RadialExpansionRequest.Collapse(
             token = ++nextToken,
             color = color ?: anchor.color,
@@ -118,79 +121,88 @@ fun RadialExpansionOverlay(
     modifier: Modifier = Modifier,
 ) {
     val request = controller.request
-    val radiusProgress = remember { Animatable(0f) }
-    val alpha = remember { Animatable(0f) }
 
-    LaunchedEffect(request?.token) {
-        val activeRequest = request ?: return@LaunchedEffect
-        when (activeRequest) {
-            is RadialExpansionRequest.Expand -> {
-                radiusProgress.snapTo(0f)
-                alpha.snapTo(1f)
+    key(request?.token) {
+        val radiusProgress = remember { Animatable(0f) }
+        val alpha = remember { Animatable(0f) }
 
-                val navigateJob = launch {
-                    delay(MotionTokens.DurationFabNavigateDelay.toLong())
-                    activeRequest.onExpanded()
+        LaunchedEffect(Unit) {
+            val activeRequest = request ?: return@LaunchedEffect
+            when (activeRequest) {
+                is RadialExpansionRequest.Expand -> {
+                    radiusProgress.snapTo(0f)
+                    alpha.snapTo(0.9f)
+
+                    val navigateJob = launch {
+                        delay(MotionTokens.DurationFabNavigateDelay.toLong())
+                        activeRequest.onExpanded()
+                    }
+
+                    radiusProgress.animateTo(
+                        targetValue = 1f,
+                        animationSpec = tween(
+                            durationMillis = MotionTokens.DurationFabRadial,
+                            easing = MotionTokens.EasingEmphasizedDecelerate,
+                        ),
+                    )
+                    navigateJob.join()
+                    delay(MotionTokens.DurationFabOverlayHold.toLong())
+                    alpha.animateTo(
+                        targetValue = 0f,
+                        animationSpec = tween(
+                            durationMillis = MotionTokens.DurationFabOverlayFade,
+                            easing = MotionTokens.EasingEmphasizedDecelerate,
+                        ),
+                    )
                 }
 
-                radiusProgress.animateTo(
-                    targetValue = 1f,
-                    animationSpec = tween(
-                        durationMillis = MotionTokens.DurationFabRadial,
-                        easing = MotionTokens.EasingEmphasized,
-                    ),
-                )
-                navigateJob.join()
-                delay(MotionTokens.DurationFabOverlayHold.toLong())
-                alpha.animateTo(
-                    targetValue = 0f,
-                    animationSpec = tween(
-                        durationMillis = MotionTokens.DurationFabOverlayFade,
-                        easing = MotionTokens.EasingEmphasized,
-                    ),
-                )
-            }
+                is RadialExpansionRequest.Collapse -> {
+                    println("[RadialExpansion] Collapse animation START: radius=${radiusProgress.value}, alpha=${alpha.value}")
+                    // 先恢复可见，确保下一帧 Canvas 绘制
+                    radiusProgress.snapTo(1f)
+                    alpha.snapTo(0.9f)
+                    delay(100) // 等 ~6 帧确保 Canvas 重绘完成
 
-            is RadialExpansionRequest.Collapse -> {
-                radiusProgress.snapTo(1f)
-                alpha.snapTo(1f)
-                activeRequest.onCollapsed()
-
-                radiusProgress.animateTo(
-                    targetValue = 0f,
-                    animationSpec = tween(
-                        durationMillis = MotionTokens.DurationFabRadial,
-                        easing = MotionTokens.EasingEmphasized,
-                    ),
-                )
-                alpha.animateTo(
-                    targetValue = 0f,
-                    animationSpec = tween(
-                        durationMillis = MotionTokens.DurationFabOverlayFade,
-                        easing = MotionTokens.EasingEmphasized,
-                    ),
-                )
+                    radiusProgress.animateTo(
+                        targetValue = 0f,
+                        animationSpec = tween(
+                            durationMillis = MotionTokens.DurationFabRadial + 200,
+                            easing = MotionTokens.EasingAccelerate,
+                        ),
+                    )
+                    println("[RadialExpansion] Collapse radius done")
+                    delay(MotionTokens.DurationFabCollapseDelay.toLong())
+                    alpha.animateTo(
+                        targetValue = 0f,
+                        animationSpec = tween(
+                            durationMillis = MotionTokens.DurationFabOverlayFade,
+                            easing = MotionTokens.EasingEmphasizedDecelerate,
+                        ),
+                    )
+                    println("[RadialExpansion] Collapse alpha done, calling onCollapsed")
+                    activeRequest.onCollapsed()
+                }
             }
+            controller.clear(activeRequest.token)
         }
-        controller.clear(activeRequest.token)
-    }
 
-    if (request != null && alpha.value > 0f) {
-        Canvas(
-            modifier = modifier.fillMaxSize(),
-        ) {
-            val maxRadius = listOf(
-                hypot(request.origin.x.toDouble(), request.origin.y.toDouble()),
-                hypot((size.width - request.origin.x).toDouble(), request.origin.y.toDouble()),
-                hypot(request.origin.x.toDouble(), (size.height - request.origin.y).toDouble()),
-                hypot((size.width - request.origin.x).toDouble(), (size.height - request.origin.y).toDouble()),
-            ).maxOrNull()?.toFloat() ?: 0f
+        if (request != null) {
+            Canvas(
+                modifier = modifier.fillMaxSize(),
+            ) {
+                val maxRadius = listOf(
+                    hypot(request.origin.x.toDouble(), request.origin.y.toDouble()),
+                    hypot((size.width - request.origin.x).toDouble(), request.origin.y.toDouble()),
+                    hypot(request.origin.x.toDouble(), (size.height - request.origin.y).toDouble()),
+                    hypot((size.width - request.origin.x).toDouble(), (size.height - request.origin.y).toDouble()),
+                ).maxOrNull()?.toFloat() ?: 0f
 
-            drawCircle(
-                color = request.color.copy(alpha = alpha.value),
-                radius = maxRadius * radiusProgress.value,
-                center = request.origin,
-            )
+                drawCircle(
+                    color = request.color.copy(alpha = alpha.value),
+                    radius = maxRadius * radiusProgress.value,
+                    center = request.origin,
+                )
+            }
         }
     }
 }

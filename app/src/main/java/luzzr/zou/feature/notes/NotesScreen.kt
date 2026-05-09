@@ -12,9 +12,11 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.outlined.EditNote
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -36,6 +38,8 @@ fun NotesRoute(
     onCreateNote: () -> Unit,
     onOpenNote: (String) -> Unit,
     onEditNote: (String) -> Unit,
+    isRefreshing: Boolean = false,
+    onRefresh: () -> Unit = {},
     viewModel: NotesViewModel = hiltViewModel(),
 ) {
     val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
@@ -45,6 +49,8 @@ fun NotesRoute(
         onCreateNote = onCreateNote,
         onOpenNote = onOpenNote,
         onEditNote = onEditNote,
+        isRefreshing = isRefreshing,
+        onRefresh = onRefresh,
     )
 }
 
@@ -54,6 +60,8 @@ fun NotesScreen(
     onCreateNote: () -> Unit,
     onOpenNote: (String) -> Unit,
     onEditNote: (String) -> Unit,
+    isRefreshing: Boolean = false,
+    onRefresh: () -> Unit = {},
 ) {
     Scaffold(
         containerColor = Color.Transparent,
@@ -67,13 +75,19 @@ fun NotesScreen(
             )
         },
     ) { innerPadding ->
-        LazyColumn(
+        PullToRefreshBox(
+            isRefreshing = isRefreshing,
+            onRefresh = onRefresh,
             modifier = Modifier
                 .fillMaxSize()
-                .padding(innerPadding)
-                .padding(horizontal = 20.dp, vertical = 12.dp),
-            verticalArrangement = Arrangement.spacedBy(14.dp),
+                .padding(innerPadding),
         ) {
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 20.dp, vertical = 12.dp),
+                verticalArrangement = Arrangement.spacedBy(14.dp),
+            ) {
             if (uiState.notes.isEmpty()) {
                 item {
                     ZouStaggeredReveal(revealKey = "notes_empty", index = 0) {
@@ -81,6 +95,7 @@ fun NotesScreen(
                             title = uiState.emptyTitle,
                             description = uiState.emptyDescription,
                             accentColor = ZouNoteAccent,
+                            icon = Icons.Outlined.EditNote,
                         )
                     }
                 }
@@ -90,11 +105,11 @@ fun NotesScreen(
                     GlassSurface(
                         modifier = Modifier
                             .fillMaxWidth()
+                            .animateItem()
                             .testTag("note_card_${note.id}")
                             .noteFlowPressScale(interactionSource = interactionSource)
                             .combinedClickable(
                                 interactionSource = interactionSource,
-                                indication = null,
                                 onClick = { onOpenNote(note.id) },
                                 onLongClick = { onEditNote(note.id) },
                             ),
@@ -124,6 +139,7 @@ fun NotesScreen(
             }
             item {
                 Spacer(modifier = Modifier.height(112.dp))
+            }
             }
         }
     }

@@ -4,14 +4,18 @@ import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.filled.Image
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
@@ -28,6 +32,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
@@ -41,7 +46,7 @@ import luzzr.zou.core.ui.ZouEditorSection
 import luzzr.zou.core.ui.ZouEmptyStateCard
 import luzzr.zou.core.ui.ZouPageHeader
 import luzzr.zou.core.ui.ZouSectionCard
-import luzzr.zou.core.ui.ZouStepBottomBar
+import luzzr.zou.core.ui.LayoutTokens
 import luzzr.zou.core.ui.noteFlowButtonColors
 import luzzr.zou.core.ui.noteFlowOutlinedButtonColors
 import luzzr.zou.core.ui.noteFlowOutlinedTextFieldColors
@@ -105,18 +110,43 @@ fun NoteEditorScreen(
         containerColor = Color.Transparent,
         bottomBar = {
             if (!uiState.isLoading && !uiState.hasMissingContent) {
-                ZouStepBottomBar(
-                    primaryLabel = if (uiState.isSaving) "保存中" else uiState.saveButtonLabel,
-                    primaryAccentColor = ZouNoteAccent,
-                    previousVisible = true,
-                    previousLabel = "放弃",
-                    previousEnabled = !uiState.isSaving,
-                    primaryEnabled = !uiState.isSaving,
-                    primaryLoading = uiState.isSaving,
-                    onPreviousClick = onNavigateBack,
-                    onPrimaryClick = onSaveClicked,
-                    primaryTestTag = "note_editor_save",
-                )
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(MaterialTheme.colorScheme.surface)
+                        .padding(horizontal = 20.dp, vertical = 12.dp),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    OutlinedButton(
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(48.dp),
+                        onClick = onNavigateBack,
+                        enabled = !uiState.isSaving,
+                        colors = noteFlowOutlinedButtonColors(),
+                    ) {
+                        Text("放弃", maxLines = 1)
+                    }
+                    Button(
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(48.dp)
+                            .testTag("note_editor_save"),
+                        onClick = onSaveClicked,
+                        enabled = !uiState.isSaving,
+                        colors = noteFlowButtonColors(ZouNoteAccent),
+                    ) {
+                        if (uiState.isSaving) {
+                            CircularProgressIndicator(
+                                color = MaterialTheme.colorScheme.onPrimary,
+                                strokeWidth = 2.dp,
+                            )
+                        } else {
+                            Text(uiState.saveButtonLabel, maxLines = 1)
+                        }
+                    }
+                }
             }
         },
     ) { innerPadding ->
@@ -159,7 +189,8 @@ fun NoteEditorScreen(
                 verticalArrangement = Arrangement.spacedBy(16.dp),
             ) {
                 TextButton(onClick = onNavigateBack, enabled = !uiState.isSaving) {
-                    Text("返回")
+                    Icon(imageVector = Icons.AutoMirrored.Outlined.ArrowBack, contentDescription = null)
+                    Text("返回", modifier = Modifier.padding(start = LayoutTokens.Space8))
                 }
                 ZouPageHeader(
                     title = uiState.screenTitle,

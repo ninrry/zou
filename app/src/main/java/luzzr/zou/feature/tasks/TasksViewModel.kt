@@ -49,7 +49,7 @@ class TasksViewModel @Inject constructor(
                         emptyDescription = if (includeCompleted) {
                             "完成任务后会在这里显示，方便你随时恢复。"
                         } else {
-                            "点击右下角开始创建你的第一条任务。"
+                            "点击右下角 + 创建第一条任务，设置截止时间与提醒。"
                         },
                     )
                 }
@@ -95,7 +95,7 @@ class TasksViewModel @Inject constructor(
             showUrgentBadge = task.isUrgent || task.priority == TaskPriority.URGENT,
             dueText = dueText,
             progressText = if (task.subTasks.isEmpty()) {
-                "无子任务"
+                ""
             } else {
                 "$completedSubTasks/${task.subTasks.size} 子任务"
             },

@@ -1,5 +1,6 @@
 package luzzr.zou.core.ui
 
+import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -18,6 +19,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -54,6 +56,11 @@ fun TopModuleTabBar(
         val slotWidth = maxWidth / tabCount
         val highlightWidth = slotWidth - 12.dp
         val highlightOffset = slotWidth * normalizedSelectionPosition + 6.dp
+        val animatedHighlightOffset by animateDpAsState(
+            targetValue = highlightOffset,
+            animationSpec = MotionTokens.SpringSmoothDp,
+            label = "tab_highlight_offset",
+        )
 
         Box(
             modifier = Modifier
@@ -84,7 +91,7 @@ fun TopModuleTabBar(
         ) {
             TopTabHighlight(
                 modifier = Modifier
-                    .offset(x = highlightOffset, y = 8.dp)
+                    .offset(x = animatedHighlightOffset, y = 8.dp)
                     .height(58.dp),
                 width = highlightWidth,
                 style = motionStyle,
@@ -112,7 +119,6 @@ fun TopModuleTabBar(
                             .clip(RoundedCornerShape(28.dp))
                             .clickable(
                                 interactionSource = interactionSource,
-                                indication = null,
                             ) { onDestinationSelected(destination) }
                             .testTag("nav_${destination.route}"),
                         contentAlignment = Alignment.Center,
@@ -127,7 +133,7 @@ fun TopModuleTabBar(
                                 } else {
                                     destination.unselectedIcon
                                 },
-                                contentDescription = null,
+                                contentDescription = destination.label,
                                 tint = lerp(
                                     start = designTokens.textSecondary,
                                     stop = MaterialTheme.colorScheme.onPrimary,

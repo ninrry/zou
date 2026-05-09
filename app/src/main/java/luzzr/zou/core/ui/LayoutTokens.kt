@@ -8,6 +8,7 @@ object LayoutTokens {
     val Space16 = 16.dp
     val Space20 = 20.dp
     val Space24 = 24.dp
+    val Space28 = 28.dp
 
     val ScreenHorizontalPadding = Space20
     val ScreenVerticalPadding = Space16

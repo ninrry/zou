@@ -21,9 +21,12 @@ import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FilterChip
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
@@ -59,6 +62,7 @@ import luzzr.zou.core.ui.ZouEmptyStateCard
 import luzzr.zou.core.ui.ZouPageHeader
 import luzzr.zou.core.ui.ZouStepBar
 import luzzr.zou.core.ui.ZouStepBottomBar
+import luzzr.zou.core.ui.LayoutTokens
 import luzzr.zou.core.ui.StandardFieldRow
 import luzzr.zou.core.ui.StandardSwitchRow
 import luzzr.zou.core.ui.noteFlowButtonColors
@@ -203,6 +207,7 @@ fun TaskEditorScreen(
                     previousEnabled = !uiState.isSaving,
                     primaryEnabled = !uiState.isSaving,
                     primaryLoading = uiState.isSaving,
+                    onCancelClick = onNavigateBack,
                     onPreviousClick = {
                         if (!uiState.isSaving) {
                             scope.launch { pagerState.animateScrollToPage(currentStep - 1) }
@@ -262,7 +267,10 @@ fun TaskEditorScreen(
                         .padding(horizontal = 20.dp, vertical = 16.dp),
                     verticalArrangement = Arrangement.spacedBy(18.dp),
                 ) {
-                    TextButton(onClick = onNavigateBack, enabled = !uiState.isSaving) { Text("返回") }
+                    TextButton(onClick = onNavigateBack, enabled = !uiState.isSaving) {
+                        Icon(imageVector = Icons.AutoMirrored.Outlined.ArrowBack, contentDescription = null)
+                        Text("返回", modifier = Modifier.padding(start = LayoutTokens.Space8))
+                    }
                     ZouPageHeader(
                         title = uiState.screenTitle,
                         subtitle = "先完成主信息，再补充时间和完成方式。",
@@ -289,7 +297,8 @@ fun TaskEditorScreen(
                         Column(
                             modifier = Modifier
                                 .fillMaxSize()
-                                .verticalScroll(rememberScrollState()),
+                                .verticalScroll(rememberScrollState())
+                                .padding(bottom = LayoutTokens.Space24),
                             verticalArrangement = Arrangement.spacedBy(18.dp),
                         ) {
                             when (step) {

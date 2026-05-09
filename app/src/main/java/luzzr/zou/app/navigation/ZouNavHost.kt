@@ -195,13 +195,25 @@ fun ZouNavHost(
                 }
             }
         }
-        composable(TaskRoutes.createRoute) {
+        composable(
+            route = TaskRoutes.createRoute,
+            popExitTransition = {
+                fadeOut(
+                    animationSpec = tween(
+                        durationMillis = MotionTokens.DurationFabRadial,
+                        easing = MotionTokens.EasingAccelerate,
+                    ),
+                ) + scaleOut(
+                    targetScale = 1.08f,
+                    animationSpec = tween(
+                        durationMillis = MotionTokens.DurationFabRadial,
+                        easing = MotionTokens.EasingAccelerate,
+                    ),
+                )
+            },
+        ) {
             TaskEditorRoute(
-                onNavigateBack = {
-                    radialExpansionController.collapse(
-                        onCollapsed = { navController.navigateUp() },
-                    )
-                },
+                onNavigateBack = { navController.navigateUp() },
             )
         }
         composable(
@@ -242,13 +254,25 @@ fun ZouNavHost(
                 }
             }
         }
-        composable(HabitRoutes.createRoute) {
+        composable(
+            route = HabitRoutes.createRoute,
+            popExitTransition = {
+                fadeOut(
+                    animationSpec = tween(
+                        durationMillis = MotionTokens.DurationFabRadial,
+                        easing = MotionTokens.EasingAccelerate,
+                    ),
+                ) + scaleOut(
+                    targetScale = 1.08f,
+                    animationSpec = tween(
+                        durationMillis = MotionTokens.DurationFabRadial,
+                        easing = MotionTokens.EasingAccelerate,
+                    ),
+                )
+            },
+        ) {
             HabitEditorRoute(
-                onNavigateBack = {
-                    radialExpansionController.collapse(
-                        onCollapsed = { navController.navigateUp() },
-                    )
-                },
+                onNavigateBack = { navController.navigateUp() },
             )
         }
         composable(
@@ -289,13 +313,25 @@ fun ZouNavHost(
                 }
             }
         }
-        composable(NoteRoutes.createRoute) {
+        composable(
+            route = NoteRoutes.createRoute,
+            popExitTransition = {
+                fadeOut(
+                    animationSpec = tween(
+                        durationMillis = MotionTokens.DurationFabRadial,
+                        easing = MotionTokens.EasingAccelerate,
+                    ),
+                ) + scaleOut(
+                    targetScale = 1.08f,
+                    animationSpec = tween(
+                        durationMillis = MotionTokens.DurationFabRadial,
+                        easing = MotionTokens.EasingAccelerate,
+                    ),
+                )
+            },
+        ) {
             NoteEditorRoute(
-                onNavigateBack = {
-                    radialExpansionController.collapse(
-                        onCollapsed = { navController.navigateUp() },
-                    )
-                },
+                onNavigateBack = { navController.navigateUp() },
             )
         }
         composable(

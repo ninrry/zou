@@ -27,6 +27,7 @@ import luzzr.zou.core.designsystem.theme.ZouHabitAccent
 import luzzr.zou.core.ui.ZouEmptyStateCard
 import luzzr.zou.core.ui.ZouPageHeader
 import luzzr.zou.core.ui.ZouSectionCard
+import luzzr.zou.core.ui.ZouShimmerList
 
 @Composable
 fun HabitDetailRoute(
@@ -221,9 +222,9 @@ private fun ScaffoldBody(
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(innerPadding),
-                    verticalArrangement = Arrangement.Center,
+                    verticalArrangement = Arrangement.Top,
                 ) {
-                    CircularProgressIndicator(modifier = Modifier.padding(horizontal = 24.dp))
+                    ZouShimmerList()
                 }
             }
 
