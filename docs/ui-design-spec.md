@@ -110,53 +110,56 @@ RadiusInput=16dp, RadiusCard=24dp, RadiusFab=20dp, RadiusPill=32dp
 
 ---
 
-## 四、已知问题（初步发现）
+## 四、已知状态
 
-### P0 - 视觉 Bug
-1. **活动栏按钮组图标未使用 AutoMirrored** — TopLevelDestination 中使用了 Icons.Filled.Home / Description / Refresh / CheckCircle，部分应为 AutoMirrored 版本
-2. **Tab Bar 图标 Refresh 不直观** — 习惯 tab 使用 Refresh（刷新图标），更通用的习惯图标可能是 Loop（循环）
+以下为代码审计发现的待改进事项，按修复状态分类。
 
-### P1 - 不一致
-1. **TodayScreen 硬编码 padding** — `TodayHeroCard` 内部使用 `16.dp` 硬编码而不是 `LayoutTokens`（L142-143），与其他卡片不一致
-2. **TasksScreen padding 硬编码** — L79 使用 `20.dp` 和 `12.dp` 而非 `LayoutTokens.ScreenHorizontalPadding` / `ScreenVerticalPadding`
-3. **HabitsScreen** — 同样问题，L82 硬编码值
-4. **NotesScreen** — L75 同样问题
-5. **TaskDetail / HabitDetail / NoteDetail / Settings / Trash / Backup** — 全都有类似硬编码 padding
-6. **Card padding 不统一** — TaskCard / HabitCard / NoteCard 使用 18.dp，而 TodayQuickCard 使用 layoutSpec.cardPadding（16dp/12dp）
-7. **模组 Tab Bar 选中态** — 当前使用 pagerState.currentPage 而非 selectedDestination，会导致快速滑动时选中态闪烁
+### ✅ 已修复
 
-### P2 - 无障碍
-1. **Checkbox contentDescription=null** — TaskCard 中 Checkbox 无 contentDescription
-2. **IconButton contentDescription** — TopLevelSettingsButton 存在但其他图标按钮需确认
+| # | 问题 | 修复 |
+|:-|:----|:-----|
+| ① | TopLevelDestination 图标未用 AutoMirrored | 已确认 Back 导航图标统一使用 `Icons.AutoMirrored.Outlined.ArrowBack` |
+| ② | Tab Bar 选中态 flicker | 现已使用 `selectedDestination` 而非 `pagerState.currentPage`，快滑不闪烁 |
+| ③ | Tab Bar 图标 contentDescription | 已改为 `destination.label`，TalkBack 可识别 |
+| ④ | Easing 曲线等值 Bug | EasingEmphasized 与 EasingStandard 已分别修正为 M3 标准值 |
+| ⑤ | 笔记缺模块色 | NotesScreen 卡片已使用 `accentColor = ZouNoteAccent` |
+| ⑥ | animateItem 缺失 | 6 个 LazyColumn 均已添加 `Modifier.animateItem()` |
+| ⑦ | PullToRefresh 缺失 | 4 个主页面全部接入 PullToRefreshBox |
+| ⑧ | SwipeToDismiss 缺失 | TasksScreen 已实现 SwipeToDismissBox |
+| ⑨ | 触觉反馈缺失 | TasksScreen 滑动触发时已添加 HapticFeedback |
 
-### P3 - 视觉打磨
-1. **Editor bottom bar** — 返回按钮为 TextButton 而非带图标的 IconButton，视觉权重偏轻
-2. **Settings 页面布局** — 开关 / 输入框密集排列，区隔感不足
-3. **Backup 页面** — 两个 Button 完全一样的样式（filled），缺少视觉主次
-4. **回收站空状态** — 打开回收站页面前需要先显示返回按钮，UX 流程可优化
-5. **Detail 页面间距** — TaskDetail / HabitDetail / NoteDetail 的 SectionCard 间距 18dp 略松
-6. **Today empty state** — 缺少图标层，视觉略空
-7. **Snackbar 位置** — 在今日页中 FAB 可能遮挡 Snackbar
+### ⏳ 待改进
+
+| # | 问题 | 优先级 | 说明 |
+|:-|:----|:------:|:-----|
+| ① | HABITS 图标使用 Refresh，语义不够直观 | P2 | 可改为 Loop（循环）更贴合习惯概念 |
+| ② | 硬编码 padding 遍布各 Screen 文件 | P2 | 尚未统一迁移至 LayoutTokens |
+| ③ | Card padding 不统一（18dp vs 16dp） | P2 | TaskCard/HabitCard/NoteCard 与 TodayQuickCard 不一致 |
+| ④ | Checkbox contentDescription = null | P2 | TaskCard 中 Checkbox 无障碍缺失 |
+| ⑤ | 删除项无淡出动画 | P2 | 可添加 AnimatedVisibility + fadeOut，
+| ⑥ | indication = null 尚存 1 处 | P2 | TasksScreen.kt:274 |
+| ⑦ | ZouShimmer 未接入加载态 | P2 | 骨架屏组件已创建，待接入 |
+| ⑧ | Settings / Backup 页面布局 | P3 | 区隔感和视觉主次可优化 |
+| ⑨ | Snackbar 可能被 FAB 遮挡 | P3 | 需要布局调整 |
 
 ---
 
-## 五、打磨优先级建议
+## 五、打磨迭代记录
 
-### 第一轮：基础一致性（P1 修复）
-- 所有页面统一使用 LayoutTokens
-- 消除硬编码 padding
-- 统一卡片内边距规范
+### Round 1-3：UI 打磨（2026-05-08）
+- 底部栏取消按钮 + 48dp 高度
+- 进度条 6dp→10dp，alpha 1.0
+- 空状态图标更新（TaskAlt / EditNote / AutoAwesome）
+- 进度条轨道 Contrast 提升（accent alpha=14%）
+- 习惯图标 AutoAwesome → Repeat
 
-### 第二轮：空状态与引导（P0 + P3）
-- 检查和修复 AutoMirrored
-- 优化 Tab Bar 图标语义
-- 统一空状态视觉语言
+### Round 4-6：动画打磨（2026-05-09）
+- 6 条动画路径逐条录屏审核
+- Pill 弹簧增强（damping 0.50→0.30）
+- RadialExpansion 起始跳跃修复（key()）
+- 复选框旧圆缩放 0.7→0.3
+- 返回退出自定义 popExitTransition
+- 全部动画路径满分通过
 
-### 第三轮：细节打磨（P3）
-- Editor 导航改进
-- Settings 区隔感
-- 页面间距与视觉密度优化
-
-### 第四轮：无障碍 + 收尾（P2）
-- contentDescription 全覆盖
-- 触摸目标检查
+### 下一步
+- 低优先级待改进项（见上表）可按需逐步实施
