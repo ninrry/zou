@@ -33,6 +33,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import luzzr.zou.core.designsystem.theme.ZouHabitAccent
 import luzzr.zou.core.designsystem.theme.ZouTaskAccent
 import luzzr.zou.core.ui.ZouStaggeredReveal
+import luzzr.zou.core.ui.LayoutTokens
 import luzzr.zou.domain.usecase.HabitQuickActionType
 import luzzr.zou.domain.usecase.TaskQuickActionType
 import kotlinx.coroutines.flow.Flow
@@ -147,8 +148,8 @@ fun TodayScreen(
             LazyColumn(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(horizontal = 16.dp, vertical = 12.dp),
-                verticalArrangement = Arrangement.spacedBy(10.dp),
+                    .padding(horizontal = LayoutTokens.ScreenHorizontalPadding, vertical = LayoutTokens.ScreenVerticalPadding),
+                verticalArrangement = Arrangement.spacedBy(LayoutTokens.Space12),
             ) {
             item {
                 TodayHeroCard(

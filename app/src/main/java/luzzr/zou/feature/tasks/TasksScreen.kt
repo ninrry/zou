@@ -1,6 +1,10 @@
 package luzzr.zou.feature.tasks
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
@@ -34,6 +38,10 @@ import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -46,6 +54,8 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import luzzr.zou.core.designsystem.theme.ZouTaskAccent
 import luzzr.zou.core.ui.GlassSurface
 import luzzr.zou.core.ui.ModuleFab
@@ -91,6 +101,8 @@ fun TasksScreen(
     isRefreshing: Boolean = false,
     onRefresh: () -> Unit = {},
 ) {
+    var removingIds by remember { mutableStateOf(emptySet<String>()) }
+    val coroutineScope = rememberCoroutineScope()
     Scaffold(
         containerColor = Color.Transparent,
         floatingActionButton = {
@@ -137,17 +149,26 @@ fun TasksScreen(
                                         false // snap back
                                     }
                                     SwipeToDismissBoxValue.EndToStart -> {
-                                        onDeleteTask(task.id)
+                                        coroutineScope.launch {
+                                            removingIds = removingIds + task.id
+                                            delay(300)
+                                            onDeleteTask(task.id)
+                                        }
                                         false // snap back
                                     }
                                     else -> false
                                 }
                             },
                         )
-                        SwipeToDismissBox(
-                            state = dismissState,
-                            modifier = Modifier
-                                .animateItem(),
+                        AnimatedVisibility(
+                            visible = task.id !in removingIds,
+                            exit = fadeOut(animationSpec = tween(250)) +
+                                    shrinkVertically(animationSpec = tween(250)) { it / 2 },
+                        ) {
+                            SwipeToDismissBox(
+                                state = dismissState,
+                                modifier = Modifier
+                                    .animateItem(),
                             backgroundContent = {
                                 when (dismissState.currentValue) {
                                     SwipeToDismissBoxValue.StartToEnd -> {
@@ -196,6 +217,7 @@ fun TasksScreen(
                                 onLongClick = { onEditTask(task.id) },
                                 onTaskCompletionToggle = onTaskCompletionToggle,
                             )
+                        }
                         }
                     }
                 }
@@ -271,7 +293,6 @@ private fun TaskCard(
                         .testTag("task_completion_toggle")
                         .clickable(
                             interactionSource = rememberPressInteractionSource(),
-                            indication = null,
                         ) {
                             if (item.canToggleCompletion) {
                                 hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)

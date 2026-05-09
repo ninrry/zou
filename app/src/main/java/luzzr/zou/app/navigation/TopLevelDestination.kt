@@ -4,11 +4,11 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Description
 import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.Loop
 import androidx.compose.material.icons.outlined.CheckCircle
 import androidx.compose.material.icons.outlined.Description
 import androidx.compose.material.icons.outlined.Home
-import androidx.compose.material.icons.outlined.Refresh
+import androidx.compose.material.icons.outlined.Loop
 import androidx.compose.ui.graphics.vector.ImageVector
 import luzzr.zou.core.designsystem.theme.ZouHabitAccent
 import luzzr.zou.core.designsystem.theme.ZouHabitAccentGlow
@@ -63,8 +63,8 @@ enum class TopLevelDestination(
     HABITS(
         route = "habits",
         label = "习惯",
-        selectedIcon = Icons.Filled.Refresh,
-        unselectedIcon = Icons.Outlined.Refresh,
+        selectedIcon = Icons.Filled.Loop,
+        unselectedIcon = Icons.Outlined.Loop,
         visualStyle = ModuleVisualStyle(
             accentColor = ZouHabitAccent,
             accentSoftColor = ZouHabitAccentSoft,
