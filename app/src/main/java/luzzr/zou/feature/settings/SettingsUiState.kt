@@ -1,5 +1,7 @@
 ﻿package luzzr.zou.feature.settings
 
+import luzzr.zou.core.hyperos.XiaomiPowerKeeper
+
 data class SettingsUiState(
     val title: String = "设置",
     val defaultTaskRepeatIntervalText: String = "",
@@ -9,6 +11,14 @@ data class SettingsUiState(
     val showDeletedHabits: Boolean = false,
     val hasPendingChanges: Boolean = false,
     val notificationPermissionGranted: Boolean = false,
+    val isHyperOS: Boolean = false,
+    val hyperOsOptimizationDone: Boolean = false,
+    val optimizeStatus: XiaomiPowerKeeper.OptimizeStatus = XiaomiPowerKeeper.OptimizeStatus(
+        batteryOptOk = false,
+        exactAlarmOk = false,
+        autoStartOk = false,
+        lockScreenOk = false,
+    ),
     val isLoading: Boolean = false,
     val isSaving: Boolean = false,
     val defaultsError: String? = null,

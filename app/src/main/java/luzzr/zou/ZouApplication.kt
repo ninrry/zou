@@ -33,7 +33,7 @@ class ZouApplication : Application(), Configuration.Provider {
 
     override fun onCreate() {
         super.onCreate()
-        reminderNotificationManager.ensureChannel()
+        reminderNotificationManager.ensureChannels()
         reminderRecoveryCoordinator.ensureHealthCheckScheduled()
         applicationScope.launch {
             runCatching { noteRepository.cleanupOrphanedMedia() }

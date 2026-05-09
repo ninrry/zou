@@ -1,8 +1,27 @@
 ﻿package luzzr.zou.core.reminder
 
+import android.app.NotificationManager
+
 object ReminderConstants {
-    const val notificationChannelId = "task_reminders"
-    const val notificationChannelName = "提醒"
+    // ── 通知频道 ──────────────────────────────────────────────
+    const val channelTaskStart = "task_start"          // 任务开始提醒
+    const val channelTaskDue = "task_due"              // 任务截止提醒
+    const val channelHabitReminder = "habit_reminder"  // 习惯打卡提醒
+    const val channelRepeat = "repeat_reminder"        // 重复提醒
+
+    val channelConfigs = listOf(
+        ChannelConfig(channelTaskStart, "任务开始", NotificationManager.IMPORTANCE_HIGH),
+        ChannelConfig(channelTaskDue, "任务截止", NotificationManager.IMPORTANCE_HIGH),
+        ChannelConfig(channelHabitReminder, "习惯提醒", NotificationManager.IMPORTANCE_HIGH),
+        ChannelConfig(channelRepeat, "重复提醒", NotificationManager.IMPORTANCE_DEFAULT),
+    )
+
+    data class ChannelConfig(
+        val id: String,
+        val name: String,
+        val importance: Int,
+    )
+
     const val alertTitleExtra = "reminder_alert_title"
     const val alertBodyExtra = "reminder_alert_body"
     const val alertNotificationIdExtra = "reminder_alert_notification_id"

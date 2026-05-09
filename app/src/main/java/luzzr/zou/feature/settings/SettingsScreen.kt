@@ -1,20 +1,30 @@
-﻿package luzzr.zou.feature.settings
+package luzzr.zou.feature.settings
 
 import android.content.Intent
 import android.provider.Settings
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
+import androidx.compose.material.icons.outlined.BatterySaver
+import androidx.compose.material.icons.outlined.Info
+import androidx.compose.material.icons.outlined.Lock
+import androidx.compose.material.icons.outlined.PlayArrow
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -25,15 +35,23 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import luzzr.zou.core.designsystem.theme.ZouTodayAccent
+import luzzr.zou.core.hyperos.XiaomiPowerKeeper
 import luzzr.zou.core.ui.GlassLevel
 import luzzr.zou.core.ui.GlassSurface
 import luzzr.zou.core.ui.LayoutTokens
@@ -53,7 +71,20 @@ fun SettingsRoute(
     viewModel: SettingsViewModel = hiltViewModel(),
 ) {
     val context = LocalContext.current
+    val lifecycleOwner = LocalLifecycleOwner.current
     val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
+
+    // 每次从外部设置页返回时自动刷新检测状态
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_RESUME) {
+                viewModel.refreshOptimizationStatus()
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
+    }
+
     SettingsScreen(
         uiState = uiState,
         onNavigateBack = onNavigateBack,
@@ -63,6 +94,7 @@ fun SettingsRoute(
         onShowOnlyTodayHabitsChanged = viewModel::onShowOnlyTodayHabitsChanged,
         onShowDeletedHabitsChanged = viewModel::onShowDeletedHabitsChanged,
         onSaveDefaults = viewModel::saveDefaultIntervals,
+        onHyperOsOptimizationDone = viewModel::onHyperOsOptimizationDone,
         onOpenNotificationSettings = {
             context.startActivity(
                 Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS).apply {
@@ -70,6 +102,9 @@ fun SettingsRoute(
                 },
             )
         },
+        onOpenBatterySettings = { XiaomiPowerKeeper.openBatteryOptimizationSettings(context) },
+        onOpenAutoStart = { XiaomiPowerKeeper.openAutoStartSettings(context) },
+        onOpenLockScreenSettings = { XiaomiPowerKeeper.openNotificationChannelSettings(context) },
         onOpenTrash = onOpenTrash,
         onOpenBackup = onOpenBackup,
     )
@@ -85,7 +120,11 @@ fun SettingsScreen(
     onShowOnlyTodayHabitsChanged: (Boolean) -> Unit,
     onShowDeletedHabitsChanged: (Boolean) -> Unit,
     onSaveDefaults: () -> Unit,
+    onHyperOsOptimizationDone: () -> Unit = {},
     onOpenNotificationSettings: () -> Unit,
+    onOpenBatterySettings: () -> Unit = {},
+    onOpenAutoStart: () -> Unit = {},
+    onOpenLockScreenSettings: () -> Unit = {},
     onOpenTrash: () -> Unit,
     onOpenBackup: () -> Unit,
 ) {
@@ -130,6 +169,19 @@ fun SettingsScreen(
                 CircularProgressIndicator(modifier = Modifier.testTag("settings_loading"))
             }
 
+            // ── HyperOS 优化引导（仅小米系设备、未完成时显示） ──────
+            if (uiState.isHyperOS && !uiState.hyperOsOptimizationDone) {
+                HyperOsOptimizationCard(
+                    onOpenBatterySettings = onOpenBatterySettings,
+                    onOpenAutoStart = onOpenAutoStart,
+                    onOpenLockScreenSettings = onOpenLockScreenSettings,
+                    onDismiss = onHyperOsOptimizationDone,
+                    batteryOptOk = uiState.optimizeStatus.batteryOptOk,
+                    exactAlarmOk = uiState.optimizeStatus.exactAlarmOk,
+                )
+            }
+
+            // ── 提醒偏好 ──────────────────────────────────────────
             StandardSectionCard(
                 title = "提醒偏好",
                 subtitle = "这些配置会同时作用于任务、习惯和今日页的提醒节奏。",
@@ -179,6 +231,7 @@ fun SettingsScreen(
                 }
             }
 
+            // ── 显示偏好 ──────────────────────────────────────────
             StandardSectionCard(
                 title = "显示偏好",
                 subtitle = "列表筛选统一收拢到这里，不再占用待办区和习惯区顶部空间。",
@@ -210,6 +263,7 @@ fun SettingsScreen(
                 )
             }
 
+            // ── 配置同步 ──────────────────────────────────────────
             StandardSectionCard(
                 title = "配置同步",
                 subtitle = "只在有变更时保存，避免重复操作。",
@@ -256,6 +310,7 @@ fun SettingsScreen(
                 }
             }
 
+            // ── 数据管理 ──────────────────────────────────────────
             StandardSectionCard(
                 title = "数据管理",
                 accentColor = ZouTodayAccent,
@@ -281,6 +336,135 @@ fun SettingsScreen(
                     Text("备份与恢复")
                 }
             }
+        }
+    }
+}
+
+// ── HyperOS 优化引导卡片 ──────────────────────────────────────
+
+@Composable
+private fun HyperOsOptimizationCard(
+    onOpenBatterySettings: () -> Unit,
+    onOpenAutoStart: () -> Unit,
+    onOpenLockScreenSettings: () -> Unit,
+    onDismiss: () -> Unit,
+    batteryOptOk: Boolean = false,
+    exactAlarmOk: Boolean = false,
+) {
+    GlassSurface(
+        modifier = Modifier.testTag("settings_hyperos_optimization"),
+        shape = RoundedCornerShape(20.dp),
+        accentColor = Color(0xFFFF6B35),
+        level = GlassLevel.Strong,
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
+        ) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(
+                    imageVector = Icons.Outlined.Info,
+                    contentDescription = null,
+                    tint = Color(0xFFFF6B35),
+                    modifier = Modifier.size(22.dp),
+                )
+                Spacer(Modifier.width(8.dp))
+                Text(
+                    text = "澎湃OS 提醒优化",
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.SemiBold,
+                    color = MaterialTheme.colorScheme.onSurface,
+                )
+            }
+            Text(
+                text = "为确保提醒准时弹出，建议完成以下设置：",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+
+            OptimizeActionRow(
+                icon = Icons.Outlined.BatterySaver,
+                label = "省电策略 → 无限制",
+                desc = "防止系统自动限制后台提醒",
+                onClick = onOpenBatterySettings,
+                done = batteryOptOk,
+            )
+            OptimizeActionRow(
+                icon = Icons.Outlined.PlayArrow,
+                label = "允许自启动",
+                desc = "重启手机后仍可接收提醒广播",
+                onClick = onOpenAutoStart,
+                done = false, // 无法自动检测
+            )
+            OptimizeActionRow(
+                icon = Icons.Outlined.Lock,
+                label = "锁屏通知 → 显示所有内容",
+                desc = "锁屏时也能看到提醒详情",
+                onClick = onOpenLockScreenSettings,
+                done = false, // 无法自动检测
+            )
+
+            Spacer(Modifier.height(4.dp))
+            Text(
+                text = if (batteryOptOk) "✅ 省电策略已就绪" else "🔔 完成上方 3 项设置后点击下方按钮",
+                style = MaterialTheme.typography.bodySmall,
+                color = if (batteryOptOk) Color(0xFF4CAF50) else MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+            Button(
+                modifier = Modifier.fillMaxWidth(),
+                onClick = onDismiss,
+                colors = noteFlowButtonColors(ZouTodayAccent),
+            ) {
+                Text("已完成设置，不再提示")
+            }
+        }
+    }
+}
+
+@Composable
+private fun OptimizeActionRow(
+    icon: ImageVector,
+    label: String,
+    desc: String,
+    onClick: () -> Unit,
+    done: Boolean = false,
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        if (done) {
+            Text("✅", modifier = Modifier.size(20.dp))
+        } else {
+            Icon(
+                imageVector = icon,
+                contentDescription = null,
+                tint = Color(0xFFFF6B35),
+                modifier = Modifier.size(20.dp),
+            )
+        }
+        Spacer(Modifier.width(12.dp))
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = label,
+                style = MaterialTheme.typography.bodyMedium,
+                fontWeight = FontWeight.Medium,
+            )
+            Text(
+                text = desc,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
+        Spacer(Modifier.width(8.dp))
+        OutlinedButton(
+            onClick = onClick,
+            contentPadding = ButtonDefaults.TextButtonContentPadding,
+            colors = noteFlowOutlinedButtonColors(),
+        ) {
+            Text("设置", style = MaterialTheme.typography.labelSmall)
         }
     }
 }

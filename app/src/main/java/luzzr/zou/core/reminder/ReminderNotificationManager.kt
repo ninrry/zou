@@ -26,7 +26,7 @@ class ReminderNotificationManager @Inject constructor(
 ) {
     private val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm", Locale.getDefault())
 
-    fun ensureChannel() {
+    fun ensureChannels() {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return
         val notificationManager = context.getSystemService(NotificationManager::class.java)
         val soundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM)
@@ -35,19 +35,29 @@ class ReminderNotificationManager @Inject constructor(
             .setUsage(AudioAttributes.USAGE_ALARM)
             .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
             .build()
-        val channel = NotificationChannel(
-            ReminderConstants.notificationChannelId,
-            ReminderConstants.notificationChannelName,
-            NotificationManager.IMPORTANCE_HIGH,
-        ).apply {
-            description = "任务和习惯的开始提醒、特别提醒与重复提醒通知"
-            enableVibration(true)
-            vibrationPattern = longArrayOf(0, 400, 200, 400, 200, 600)
-            lockscreenVisibility = Notification.VISIBILITY_PUBLIC
-            setShowBadge(false)
-            setSound(soundUri, audioAttributes)
+        for (config in ReminderConstants.channelConfigs) {
+            val existing = notificationManager.getNotificationChannel(config.id)
+            if (existing != null) continue // 已创建，保留用户自定义
+            val channel = NotificationChannel(
+                config.id,
+                config.name,
+                config.importance,
+            ).apply {
+                description = when (config.id) {
+                    ReminderConstants.channelTaskStart -> "任务开始时间的提醒"
+                    ReminderConstants.channelTaskDue -> "任务截止时间的提醒"
+                    ReminderConstants.channelHabitReminder -> "习惯打卡的定时提醒"
+                    ReminderConstants.channelRepeat -> "逾期任务的重复提醒"
+                    else -> "提醒通知"
+                }
+                enableVibration(true)
+                vibrationPattern = longArrayOf(0, 400, 200, 400, 200, 600)
+                lockscreenVisibility = Notification.VISIBILITY_PUBLIC
+                setShowBadge(false)
+                setSound(soundUri, audioAttributes)
+            }
+            notificationManager.createNotificationChannel(channel)
         }
-        notificationManager.createNotificationChannel(channel)
     }
 
     fun showTaskReminder(
@@ -58,11 +68,13 @@ class ReminderNotificationManager @Inject constructor(
         customTitle: String? = null,
         customBody: String? = null,
     ) {
-        ensureChannel()
+        ensureChannels()
         val notificationId = ReminderConstants.notificationId(taskId)
         val title = resolveNotificationTitle(taskTitle, customTitle)
         val body = resolveNotificationBody(triggerAtMillis, reason, customBody)
+        val channelId = channelIdForTaskReason(reason)
         val notification = createBaseBuilder(
+            channelId = channelId,
             title = title,
             body = body,
             contentIntent = createTaskDetailPendingIntent(taskId),
@@ -86,11 +98,12 @@ class ReminderNotificationManager @Inject constructor(
         customTitle: String? = null,
         customBody: String? = null,
     ) {
-        ensureChannel()
+        ensureChannels()
         val notificationId = ReminderConstants.habitNotificationId(habitId)
         val title = resolveNotificationTitle(habitTitle, customTitle)
         val body = resolveNotificationBody(triggerAtMillis, reason, customBody)
         val notification = createBaseBuilder(
+            channelId = ReminderConstants.channelHabitReminder,
             title = title,
             body = body,
             contentIntent = createHabitDetailPendingIntent(habitId),
@@ -109,6 +122,18 @@ class ReminderNotificationManager @Inject constructor(
     fun cancelNotification(notificationId: Int) {
         NotificationManagerCompat.from(context).cancel(notificationId)
     }
+
+    // ── 频道选择 ──────────────────────────────────────────────
+
+    private fun channelIdForTaskReason(reason: ReminderTriggerReason): String {
+        return when (reason) {
+            ReminderTriggerReason.REPEAT -> ReminderConstants.channelRepeat
+            ReminderTriggerReason.START,
+            ReminderTriggerReason.EXACT -> ReminderConstants.channelTaskStart
+        }
+    }
+
+    // ── Intent 构建 ────────────────────────────────────────────
 
     internal fun buildTaskDetailIntent(taskId: String): Intent {
         return Intent(context, MainActivity::class.java).apply {
@@ -178,7 +203,10 @@ class ReminderNotificationManager @Inject constructor(
         return "$reasonText · $timeText"
     }
 
+    // ── Builder ───────────────────────────────────────────────
+
     private fun createBaseBuilder(
+        channelId: String,
         title: String,
         body: String,
         contentIntent: PendingIntent,
@@ -186,7 +214,7 @@ class ReminderNotificationManager @Inject constructor(
     ): NotificationCompat.Builder {
         val soundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM)
             ?: RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
-        return NotificationCompat.Builder(context, ReminderConstants.notificationChannelId)
+        return NotificationCompat.Builder(context, channelId)
             .setSmallIcon(android.R.drawable.ic_lock_idle_alarm)
             .setContentTitle(title)
             .setContentText(body)
@@ -203,8 +231,10 @@ class ReminderNotificationManager @Inject constructor(
             .setFullScreenIntent(fullScreenIntent, true)
             .setTicker(title)
             .setWhen(System.currentTimeMillis())
-            .setChannelId(ReminderConstants.notificationChannelId)
+            .setChannelId(channelId)
     }
+
+    // ── PendingIntent 工厂 ────────────────────────────────────
 
     private fun createTaskDetailPendingIntent(taskId: String): PendingIntent {
         return PendingIntent.getActivity(

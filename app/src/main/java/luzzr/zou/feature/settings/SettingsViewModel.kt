@@ -1,13 +1,16 @@
-﻿package luzzr.zou.feature.settings
+package luzzr.zou.feature.settings
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
+import luzzr.zou.core.hyperos.XiaomiPowerKeeper
 import luzzr.zou.core.reminder.NotificationPermissionChecker
 import luzzr.zou.core.time.TimeProvider
 import luzzr.zou.data.settings.ReminderPreferences
 import luzzr.zou.domain.usecase.ObserveReminderPreferencesUseCase
 import luzzr.zou.domain.usecase.UpdateReminderPreferencesUseCase
-import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -20,18 +23,24 @@ import kotlinx.coroutines.withContext
 
 @HiltViewModel
 class SettingsViewModel @Inject constructor(
+    @ApplicationContext private val context: Context,
     observeReminderPreferencesUseCase: ObserveReminderPreferencesUseCase,
     private val updateReminderPreferencesUseCase: UpdateReminderPreferencesUseCase,
     private val notificationPermissionChecker: NotificationPermissionChecker,
     private val timeProvider: TimeProvider,
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow(SettingsUiState(isLoading = true))
+    private val _uiState = MutableStateFlow(SettingsUiState(
+        isLoading = true,
+        isHyperOS = XiaomiPowerKeeper.isHyperOS(),
+    ))
     val uiState = _uiState.asStateFlow()
     private var persistedPreferences: ReminderPreferences? = null
 
     init {
         viewModelScope.launch {
+            refreshOptimizationStatus()
+
             observeReminderPreferencesUseCase()
                 .catch { throwable ->
                     _uiState.update {
@@ -59,6 +68,30 @@ class SettingsViewModel @Inject constructor(
                         )
                     }
                 }
+        }
+    }
+
+    fun onHyperOsOptimizationDone() {
+        XiaomiPowerKeeper.markOptimizationDone(context)
+        _uiState.update { it.copy(hyperOsOptimizationDone = true) }
+    }
+
+    /** 刷新优化检测状态，可检测项全部通过时自动关闭引导 */
+    fun refreshOptimizationStatus() {
+        val isHyperOs = XiaomiPowerKeeper.isHyperOS()
+        val status = if (isHyperOs) XiaomiPowerKeeper.checkStatus(context)
+            else XiaomiPowerKeeper.OptimizeStatus(true, true, true, true)
+        val alreadyDone = !isHyperOs || XiaomiPowerKeeper.isOptimizationDone(context)
+        // 可检测项全部通过 → 自动标记完成
+        val autoDone = alreadyDone || status.detectableAllOk
+        if (autoDone && !alreadyDone) {
+            XiaomiPowerKeeper.markOptimizationDone(context)
+        }
+        _uiState.update {
+            it.copy(
+                hyperOsOptimizationDone = autoDone || it.hyperOsOptimizationDone,
+                optimizeStatus = status,
+            )
         }
     }
 
