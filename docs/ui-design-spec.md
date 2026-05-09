@@ -127,20 +127,22 @@ RadiusInput=16dp, RadiusCard=24dp, RadiusFab=20dp, RadiusPill=32dp
 | ⑦ | PullToRefresh 缺失 | 4 个主页面全部接入 PullToRefreshBox |
 | ⑧ | SwipeToDismiss 缺失 | TasksScreen 已实现 SwipeToDismissBox |
 | ⑨ | 触觉反馈缺失 | TasksScreen 滑动触发时已添加 HapticFeedback |
+| ⑩ | indication = null 全部消除 | 默认 M3 ripple 恢复（删除 indication=null 参数） |
+| ⑪ | HABITS 图标语义 | Refresh → Loop（循环箭头更贴切习惯概念） |
+| ⑫ | 删除无淡出动画 | 已添加 AnimatedVisibility + fadeOut(250ms) + shrinkVertically |
+| ⑬ | TodayScreen padding/spacing 不一致 | 已统一使用 LayoutTokens（20dp/Space12） |
 
 ### ⏳ 待改进
 
 | # | 问题 | 优先级 | 说明 |
 |:-|:----|:------:|:-----|
-| ① | HABITS 图标使用 Refresh，语义不够直观 | P2 | 可改为 Loop（循环）更贴合习惯概念 |
-| ② | 硬编码 padding 遍布各 Screen 文件 | P2 | 尚未统一迁移至 LayoutTokens |
-| ③ | Card padding 不统一（18dp vs 16dp） | P2 | TaskCard/HabitCard/NoteCard 与 TodayQuickCard 不一致 |
-| ④ | Checkbox contentDescription = null | P2 | TaskCard 中 Checkbox 无障碍缺失 |
-| ⑤ | 删除项无淡出动画 | P2 | 可添加 AnimatedVisibility + fadeOut，
-| ⑥ | indication = null 尚存 1 处 | P2 | TasksScreen.kt:274 |
-| ⑦ | ZouShimmer 未接入加载态 | P2 | 骨架屏组件已创建，待接入 |
-| ⑧ | Settings / Backup 页面布局 | P3 | 区隔感和视觉主次可优化 |
-| ⑨ | Snackbar 可能被 FAB 遮挡 | P3 | 需要布局调整 |
+| ① | 硬编码 padding 遍布各 Screen 文件 | P3 | 尚有若干页面未统一迁移至 LayoutTokens |
+| ② | Card padding 不统一（18dp vs 16dp） | P3 | TaskCard/HabitCard/NoteCard 与 TodayQuickCard 不一致 |
+| ③ | Checkbox contentDescription = null | P2 | TaskCard 中 Checkbox，但已使用 Filled/Outlined Circle 图标，视觉可识别 |
+| ④ | ZouShimmer 未接入加载态 | P2 | 骨架屏组件已创建，待接入各 Screen 加载状态 |
+| ⑤ | Settings / Backup 页面布局 | P3 | 区隔感和视觉主次可优化 |
+| ⑥ | Snackbar 可能被 FAB 遮挡 | P3 | 需要布局调整 |
+| ⑦ | animateContentSize 覆盖不足 | P3 | 仅在 TodayComponents 有 1 处 |
 
 ---
 
@@ -160,6 +162,14 @@ RadiusInput=16dp, RadiusCard=24dp, RadiusFab=20dp, RadiusPill=32dp
 - 复选框旧圆缩放 0.7→0.3
 - 返回退出自定义 popExitTransition
 - 全部动画路径满分通过
+
+### Round 7：最终收尾（2026-05-09）
+- indication 默认 M3 ripple 恢复
+- HABITS 图标 Refresh → Loop
+- TodayScreen padding/spacing 统一 LayoutTokens
+- 删除淡出动画（AnimatedVisibility 250ms）
+- GitHub 仓库清理（移除旧 package schema 文件）
+- Release 构建 v0.3.2
 
 ### 下一步
 - 低优先级待改进项（见上表）可按需逐步实施
