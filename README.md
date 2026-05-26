@@ -1,6 +1,6 @@
 # Zou — 个人多功能记事本
 
-> **本地优先 · Material You · 动画驱动**  
+> **本地优先 · 自建设计规范 · 动画驱动**  
 > 用 Android 原生 Kotlin + Jetpack Compose 打造的个人效率工具，聚合任务、习惯、笔记与今日概览。
 
 [![Kotlin](https://img.shields.io/badge/Kotlin-2.1+-7F52FF?logo=kotlin)](https://kotlinlang.org)
@@ -36,7 +36,7 @@
 
 ### 🎯 设计系统
 
-- **Material You** — 完全跟随系统动态颜色
+- **自建设计规范** — 精心定制的全局主题与交互组件库
 - **温暖色调** — 默认底色盘 `#FFFBF7`，深暖灰文本
 - **圆角语言** — 大一统的 CornerRadius 体系（4dp / 8dp / 12dp / 16dp）
 - **间距系统** — 基于 4dp 倍数的层级间距（4 / 8 / 12 / 16 / 24 / 32 / 48dp）
@@ -104,7 +104,7 @@ app/src/main/java/luzzr/zou/
 - **JDK** 17+
 - **Android SDK** 36
 - **最低支持** Android 10（API 29）
-- **推荐设备** Android 13+（API 33+）以体验完整 Material You 动态取色
+- **推荐设备** Android 13+（API 33+）以获得最佳交互体验
 
 ### 构建
 
@@ -153,7 +153,7 @@ app/src/main/java/luzzr/zou/
 1. **本地优先** — 不依赖云服务，数据 100% 在设备上
 2. **离线可用** — 全功能离线，无需网络
 3. **动画驱动** — 微交互是体验的核心，每条动画路径独立审核
-4. **Material You** — 尊重系统设计语言，融入动态取色
+4. **独立视觉语言** — 抛弃原生刻板印象，打造专属设计规范
 5. **渐进式构建** — 功能按里程碑交付，保持可编译可运行
 
 ---
