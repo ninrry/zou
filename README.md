@@ -165,6 +165,7 @@ app/src/main/java/luzzr/zou/
 | v0.3.1 | UI 打磨 R1-R3 | 底部栏优化、进度条视觉增强、空状态图标规范化 |
 | v0.3.2 | UI 打磨 R4-R6 | 底部栏平衡方案、进度条 10dp/轨道透明度修正、AutoMirrored 修复 |
 | v0.3.3 | HyperOS | 澎湃OS 通知优化：USE_EXACT_ALARM、4 频道、XiaomiPowerKeeper 检测 |
+| v0.3.4 | DateRange | 任务提醒日期范围控制：支持指定提醒的起止日期，仅在范围内发送提醒 |
 
 ---
 
