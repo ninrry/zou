@@ -62,7 +62,7 @@
 | **架构** | MVVM + UseCase + Repository 模式 |
 | **DI** | Hilt |
 | **导航** | Navigation Compose（类型安全路由） |
-| **数据库** | Room（KSP） |
+| **数据库** | Room（KAPT） |
 | **异步** | Kotlin Coroutines + Flow |
 | **序列化** | Kotlin Serialization |
 | **后台** | WorkManager / AlarmManager |
@@ -76,10 +76,13 @@
 app/src/main/java/luzzr/zou/
 ├── app/                    # 应用入口、Hilt 模块、导航（ZouNavHost）
 ├── core/
-│   ├── data/               # DataStore、Markdown、备份
+│   ├── designsystem/       # 主题与基础设计系统
+│   ├── hyperos/            # 澎湃OS 系统兼容层
+│   ├── markdown/           # Markdown 渲染核心
 │   ├── reminder/           # 提醒调度（AlarmScheduler）
-│   └── ui/                 # 设计系统（MotionTokens、LayoutTokens、控件库）
-├── data/                   # Room 数据库、Repository 实现
+│   ├── time/               # 时间处理工具
+│   └── ui/                 # UI 通用控件与组件库
+├── data/                   # Room 数据库、DataStore 设置、Repository 实现与备份逻辑
 ├── domain/                 # 领域模型、仓储接口、UseCase
 └── feature/
     ├── backup/             # 备份与恢复
