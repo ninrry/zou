@@ -1,0 +1,12 @@
+package luzzr.zou.domain.usecase
+
+import luzzr.zou.domain.repository.TaskRepository
+import javax.inject.Inject
+
+class HardDeleteTaskUseCase @Inject constructor(
+    private val taskRepository: TaskRepository,
+) {
+    suspend operator fun invoke(taskId: String) {
+        taskRepository.hardDeleteTask(taskId)
+    }
+}

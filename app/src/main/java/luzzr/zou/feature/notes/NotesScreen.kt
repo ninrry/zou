@@ -1,0 +1,154 @@
+package luzzr.zou.feature.notes
+
+import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.outlined.EditNote
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.unit.dp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import luzzr.zou.core.designsystem.theme.ZouNoteAccent
+import luzzr.zou.core.ui.GlassSurface
+import luzzr.zou.core.ui.ModuleFab
+import luzzr.zou.core.ui.ZouEmptyStateCard
+import luzzr.zou.core.ui.ZouMetaChip
+import luzzr.zou.core.ui.ZouStaggeredReveal
+import luzzr.zou.core.ui.noteFlowPressScale
+import luzzr.zou.core.ui.rememberPressInteractionSource
+import luzzr.zou.core.ui.LayoutTokens
+import luzzr.zou.core.ui.ZouShimmer
+
+@Composable
+fun NotesRoute(
+    onCreateNote: () -> Unit,
+    onOpenNote: (String) -> Unit,
+    onEditNote: (String) -> Unit,
+    isRefreshing: Boolean = false,
+    onRefresh: () -> Unit = {},
+    viewModel: NotesViewModel = hiltViewModel(),
+) {
+    val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
+
+    NotesScreen(
+        uiState = uiState,
+        onCreateNote = onCreateNote,
+        onOpenNote = onOpenNote,
+        onEditNote = onEditNote,
+        isRefreshing = isRefreshing,
+        onRefresh = onRefresh,
+    )
+}
+
+@Composable
+fun NotesScreen(
+    uiState: NotesUiState,
+    onCreateNote: () -> Unit,
+    onOpenNote: (String) -> Unit,
+    onEditNote: (String) -> Unit,
+    isRefreshing: Boolean = false,
+    onRefresh: () -> Unit = {},
+) {
+    Scaffold(
+        containerColor = Color.Transparent,
+        floatingActionButton = {
+            ModuleFab(
+                accentColor = ZouNoteAccent,
+                contentDescription = "新建笔记",
+                icon = Icons.Default.Add,
+                testTag = "notes_fab",
+                onClick = onCreateNote,
+            )
+        },
+    ) { innerPadding ->
+        PullToRefreshBox(
+            isRefreshing = isRefreshing,
+            onRefresh = onRefresh,
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding),
+        ) {
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = LayoutTokens.ScreenHorizontalPadding, vertical = LayoutTokens.Space12),
+                verticalArrangement = Arrangement.spacedBy(LayoutTokens.Space12),
+            ) {
+            if (uiState.isLoading) {
+                item {
+                    ZouShimmer(
+                        modifier = Modifier.padding(vertical = LayoutTokens.Space8),
+                    )
+                }
+            } else if (uiState.notes.isEmpty()) {
+                item {
+                    ZouStaggeredReveal(revealKey = "notes_empty", index = 0) {
+                        ZouEmptyStateCard(
+                            title = uiState.emptyTitle,
+                            description = uiState.emptyDescription,
+                            accentColor = ZouNoteAccent,
+                            icon = Icons.Outlined.EditNote,
+                        )
+                    }
+                }
+            } else {
+                items(uiState.notes, key = { it.id }) { note ->
+                    val interactionSource = rememberPressInteractionSource()
+                    GlassSurface(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .animateItem()
+                            .testTag("note_card_${note.id}")
+                            .noteFlowPressScale(interactionSource = interactionSource)
+                            .combinedClickable(
+                                interactionSource = interactionSource,
+                                onClick = { onOpenNote(note.id) },
+                                onLongClick = { onEditNote(note.id) },
+                            ),
+                        accentColor = ZouNoteAccent,
+                    ) {
+                        Column(
+                            modifier = Modifier.padding(horizontal = LayoutTokens.ScreenHorizontalPadding, vertical = LayoutTokens.Space16),
+                            verticalArrangement = Arrangement.spacedBy(LayoutTokens.Space12),
+                        ) {
+                            Text(
+                                text = note.title,
+                                style = MaterialTheme.typography.titleMedium,
+                                color = MaterialTheme.colorScheme.onSurface,
+                            )
+                            Text(
+                                text = note.previewText,
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                            ZouMetaChip(
+                                text = "最近编辑：${note.updatedAtText}",
+                                accentColor = ZouNoteAccent,
+                            )
+                        }
+                    }
+                }
+            }
+            item {
+                Spacer(modifier = Modifier.height(112.dp))
+            }
+            }
+        }
+    }
+}

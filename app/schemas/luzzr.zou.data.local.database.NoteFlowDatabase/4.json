@@ -1,0 +1,714 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 4,
+    "identityHash": "9bebaef03ce98351b710104e5b57bb39",
+    "entities": [
+      {
+        "tableName": "tasks",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `title` TEXT NOT NULL, `contentMarkdown` TEXT, `priority` TEXT NOT NULL, `isUrgent` INTEGER NOT NULL, `status` TEXT NOT NULL, `startRemindAt` INTEGER, `remindWindowEndAt` INTEGER, `startReminderMinuteOfDay` INTEGER, `windowEndMinuteOfDay` INTEGER, `dueAt` INTEGER, `repeatIntervalMinutes` INTEGER, `exactReminderTimesJson` TEXT, `allDay` INTEGER NOT NULL, `completionRule` TEXT NOT NULL, `createdAt` INTEGER NOT NULL, `updatedAt` INTEGER NOT NULL, `isDeleted` INTEGER NOT NULL, `deletedAt` INTEGER, `tags` TEXT, `archived` INTEGER NOT NULL, `reminderNotificationTitle` TEXT, `reminderNotificationBody` TEXT, PRIMARY KEY(`id`))",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "title",
+            "columnName": "title",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "contentMarkdown",
+            "columnName": "contentMarkdown",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "priority",
+            "columnName": "priority",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "isUrgent",
+            "columnName": "isUrgent",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "status",
+            "columnName": "status",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "startRemindAt",
+            "columnName": "startRemindAt",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "remindWindowEndAt",
+            "columnName": "remindWindowEndAt",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "startReminderMinuteOfDay",
+            "columnName": "startReminderMinuteOfDay",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "windowEndMinuteOfDay",
+            "columnName": "windowEndMinuteOfDay",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "dueAt",
+            "columnName": "dueAt",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "repeatIntervalMinutes",
+            "columnName": "repeatIntervalMinutes",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "exactReminderTimesJson",
+            "columnName": "exactReminderTimesJson",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "allDay",
+            "columnName": "allDay",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "completionRule",
+            "columnName": "completionRule",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "createdAt",
+            "columnName": "createdAt",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "updatedAt",
+            "columnName": "updatedAt",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "isDeleted",
+            "columnName": "isDeleted",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "deletedAt",
+            "columnName": "deletedAt",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "tags",
+            "columnName": "tags",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "archived",
+            "columnName": "archived",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "reminderNotificationTitle",
+            "columnName": "reminderNotificationTitle",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "reminderNotificationBody",
+            "columnName": "reminderNotificationBody",
+            "affinity": "TEXT"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_tasks_dueAt",
+            "unique": false,
+            "columnNames": [
+              "dueAt"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_tasks_dueAt` ON `${TABLE_NAME}` (`dueAt`)"
+          },
+          {
+            "name": "index_tasks_isUrgent",
+            "unique": false,
+            "columnNames": [
+              "isUrgent"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_tasks_isUrgent` ON `${TABLE_NAME}` (`isUrgent`)"
+          },
+          {
+            "name": "index_tasks_isDeleted",
+            "unique": false,
+            "columnNames": [
+              "isDeleted"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_tasks_isDeleted` ON `${TABLE_NAME}` (`isDeleted`)"
+          },
+          {
+            "name": "index_tasks_status",
+            "unique": false,
+            "columnNames": [
+              "status"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_tasks_status` ON `${TABLE_NAME}` (`status`)"
+          }
+        ]
+      },
+      {
+        "tableName": "sub_tasks",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `taskId` TEXT NOT NULL, `title` TEXT NOT NULL, `sortOrder` INTEGER NOT NULL, `isCompleted` INTEGER NOT NULL, `completedAt` INTEGER, `createdAt` INTEGER NOT NULL, `updatedAt` INTEGER NOT NULL, `isDeleted` INTEGER NOT NULL, PRIMARY KEY(`id`))",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "taskId",
+            "columnName": "taskId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "title",
+            "columnName": "title",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "sortOrder",
+            "columnName": "sortOrder",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "isCompleted",
+            "columnName": "isCompleted",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "completedAt",
+            "columnName": "completedAt",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "createdAt",
+            "columnName": "createdAt",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "updatedAt",
+            "columnName": "updatedAt",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "isDeleted",
+            "columnName": "isDeleted",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_sub_tasks_taskId",
+            "unique": false,
+            "columnNames": [
+              "taskId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_sub_tasks_taskId` ON `${TABLE_NAME}` (`taskId`)"
+          }
+        ]
+      },
+      {
+        "tableName": "habits",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `title` TEXT NOT NULL, `contentMarkdown` TEXT, `frequencyType` TEXT NOT NULL, `frequencyValueJson` TEXT, `remindWindowStart` TEXT, `remindWindowEnd` TEXT, `repeatIntervalMinutes` INTEGER, `exactReminderTimesJson` TEXT, `checkInMode` TEXT NOT NULL, `targetDurationMinutes` INTEGER, `streakCountCache` INTEGER NOT NULL, `createdAt` INTEGER NOT NULL, `updatedAt` INTEGER NOT NULL, `isDeleted` INTEGER NOT NULL, `deletedAt` INTEGER, `tags` TEXT, `archived` INTEGER NOT NULL, `reminderNotificationTitle` TEXT, `reminderNotificationBody` TEXT, PRIMARY KEY(`id`))",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "title",
+            "columnName": "title",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "contentMarkdown",
+            "columnName": "contentMarkdown",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "frequencyType",
+            "columnName": "frequencyType",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "frequencyValueJson",
+            "columnName": "frequencyValueJson",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "remindWindowStart",
+            "columnName": "remindWindowStart",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "remindWindowEnd",
+            "columnName": "remindWindowEnd",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "repeatIntervalMinutes",
+            "columnName": "repeatIntervalMinutes",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "exactReminderTimesJson",
+            "columnName": "exactReminderTimesJson",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "checkInMode",
+            "columnName": "checkInMode",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "targetDurationMinutes",
+            "columnName": "targetDurationMinutes",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "streakCountCache",
+            "columnName": "streakCountCache",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "createdAt",
+            "columnName": "createdAt",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "updatedAt",
+            "columnName": "updatedAt",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "isDeleted",
+            "columnName": "isDeleted",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "deletedAt",
+            "columnName": "deletedAt",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "tags",
+            "columnName": "tags",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "archived",
+            "columnName": "archived",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "reminderNotificationTitle",
+            "columnName": "reminderNotificationTitle",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "reminderNotificationBody",
+            "columnName": "reminderNotificationBody",
+            "affinity": "TEXT"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_habits_isDeleted",
+            "unique": false,
+            "columnNames": [
+              "isDeleted"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_habits_isDeleted` ON `${TABLE_NAME}` (`isDeleted`)"
+          }
+        ]
+      },
+      {
+        "tableName": "habit_steps",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `habitId` TEXT NOT NULL, `title` TEXT NOT NULL, `sortOrder` INTEGER NOT NULL, `createdAt` INTEGER NOT NULL, `updatedAt` INTEGER NOT NULL, `isDeleted` INTEGER NOT NULL, PRIMARY KEY(`id`))",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "habitId",
+            "columnName": "habitId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "title",
+            "columnName": "title",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "sortOrder",
+            "columnName": "sortOrder",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "createdAt",
+            "columnName": "createdAt",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "updatedAt",
+            "columnName": "updatedAt",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "isDeleted",
+            "columnName": "isDeleted",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_habit_steps_habitId",
+            "unique": false,
+            "columnNames": [
+              "habitId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_habit_steps_habitId` ON `${TABLE_NAME}` (`habitId`)"
+          }
+        ]
+      },
+      {
+        "tableName": "habit_records",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `habitId` TEXT NOT NULL, `recordDate` INTEGER NOT NULL, `status` TEXT NOT NULL, `durationMinutes` INTEGER, `stepProgressJson` TEXT, `durationElapsedSeconds` INTEGER NOT NULL, `durationRunningSinceMillis` INTEGER, `createdAt` INTEGER NOT NULL, `updatedAt` INTEGER NOT NULL, PRIMARY KEY(`id`))",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "habitId",
+            "columnName": "habitId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "recordDate",
+            "columnName": "recordDate",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "status",
+            "columnName": "status",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "durationMinutes",
+            "columnName": "durationMinutes",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "stepProgressJson",
+            "columnName": "stepProgressJson",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "durationElapsedSeconds",
+            "columnName": "durationElapsedSeconds",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "durationRunningSinceMillis",
+            "columnName": "durationRunningSinceMillis",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "createdAt",
+            "columnName": "createdAt",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "updatedAt",
+            "columnName": "updatedAt",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_habit_records_habitId_recordDate",
+            "unique": false,
+            "columnNames": [
+              "habitId",
+              "recordDate"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_habit_records_habitId_recordDate` ON `${TABLE_NAME}` (`habitId`, `recordDate`)"
+          }
+        ]
+      },
+      {
+        "tableName": "notes",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `title` TEXT NOT NULL, `contentMarkdown` TEXT, `previewText` TEXT, `createdAt` INTEGER NOT NULL, `updatedAt` INTEGER NOT NULL, `lastOpenedAt` INTEGER, `isDeleted` INTEGER NOT NULL, `deletedAt` INTEGER, `tags` TEXT, `archived` INTEGER NOT NULL, PRIMARY KEY(`id`))",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "title",
+            "columnName": "title",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "contentMarkdown",
+            "columnName": "contentMarkdown",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "previewText",
+            "columnName": "previewText",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "createdAt",
+            "columnName": "createdAt",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "updatedAt",
+            "columnName": "updatedAt",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "lastOpenedAt",
+            "columnName": "lastOpenedAt",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "isDeleted",
+            "columnName": "isDeleted",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "deletedAt",
+            "columnName": "deletedAt",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "tags",
+            "columnName": "tags",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "archived",
+            "columnName": "archived",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_notes_updatedAt",
+            "unique": false,
+            "columnNames": [
+              "updatedAt"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_notes_updatedAt` ON `${TABLE_NAME}` (`updatedAt`)"
+          },
+          {
+            "name": "index_notes_isDeleted",
+            "unique": false,
+            "columnNames": [
+              "isDeleted"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_notes_isDeleted` ON `${TABLE_NAME}` (`isDeleted`)"
+          }
+        ]
+      },
+      {
+        "tableName": "media",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `ownerType` TEXT NOT NULL, `ownerId` TEXT NOT NULL, `localPath` TEXT NOT NULL, `mimeType` TEXT NOT NULL, `sizeBytes` INTEGER NOT NULL, `createdAt` INTEGER NOT NULL, `updatedAt` INTEGER NOT NULL, `isDeleted` INTEGER NOT NULL, PRIMARY KEY(`id`))",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "ownerType",
+            "columnName": "ownerType",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "ownerId",
+            "columnName": "ownerId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "localPath",
+            "columnName": "localPath",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mimeType",
+            "columnName": "mimeType",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "sizeBytes",
+            "columnName": "sizeBytes",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "createdAt",
+            "columnName": "createdAt",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "updatedAt",
+            "columnName": "updatedAt",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "isDeleted",
+            "columnName": "isDeleted",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_media_ownerType_ownerId",
+            "unique": false,
+            "columnNames": [
+              "ownerType",
+              "ownerId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_media_ownerType_ownerId` ON `${TABLE_NAME}` (`ownerType`, `ownerId`)"
+          }
+        ]
+      }
+    ],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '9bebaef03ce98351b710104e5b57bb39')"
+    ]
+  }
+}
