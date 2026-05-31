@@ -36,7 +36,6 @@ import luzzr.zou.core.designsystem.theme.ZouDesignTokens
 import kotlin.math.abs
 
 import androidx.compose.animation.animateColorAsState
-import androidx.compose.animation.core.tween
 
 @Composable
 fun TopModuleTabBar(
@@ -47,20 +46,21 @@ fun TopModuleTabBar(
     motionStyle: ModuleVisualStyle = selectedDestination.visualStyle,
     modifier: Modifier = Modifier,
 ) {
+    val motion = LocalZouMotion.current
     val designTokens = ZouDesignTokens.colors
     val animatedAccentColor by animateColorAsState(
         targetValue = motionStyle.accentColor,
-        animationSpec = tween(300, easing = MotionTokens.EasingEmphasized),
+        animationSpec = motion.colorShift,
         label = "tab_accent_color"
     )
     val animatedAccentGlowColor by animateColorAsState(
         targetValue = motionStyle.accentGlowColor,
-        animationSpec = tween(300, easing = MotionTokens.EasingEmphasized),
+        animationSpec = motion.colorShift,
         label = "tab_accent_glow_color"
     )
     val animatedGlassTintColor by animateColorAsState(
         targetValue = motionStyle.glassTintColor,
-        animationSpec = tween(300, easing = MotionTokens.EasingEmphasized),
+        animationSpec = motion.colorShift,
         label = "tab_glass_tint_color"
     )
 
@@ -77,7 +77,7 @@ fun TopModuleTabBar(
         val highlightOffset = slotWidth * normalizedSelectionPosition + 6.dp
         val animatedHighlightOffset by animateDpAsState(
             targetValue = highlightOffset,
-            animationSpec = MotionTokens.SpringSmoothDp,
+            animationSpec = motion.tabSwitchDp,
             label = "tab_highlight_offset",
         )
 

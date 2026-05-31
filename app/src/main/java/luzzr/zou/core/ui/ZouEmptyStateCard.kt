@@ -2,7 +2,6 @@ package luzzr.zou.core.ui
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.scaleIn
 import androidx.compose.foundation.layout.Arrangement
@@ -36,9 +35,10 @@ fun ZouEmptyStateCard(
     actionTestTag: String? = null,
     onActionClick: (() -> Unit)? = null,
 ) {
+    val motion = LocalZouMotion.current
     val iconScale by animateFloatAsState(
         targetValue = 1f,
-        animationSpec = MotionTokens.SpringBouncy,
+        animationSpec = motion.press,
         label = "empty_icon_scale",
     )
     GlassSurface(
@@ -49,17 +49,10 @@ fun ZouEmptyStateCard(
         AnimatedVisibility(
             visible = true,
             enter = fadeIn(
-                animationSpec = tween(
-                    durationMillis = MotionTokens.DurationMedium,
-                    easing = MotionTokens.EasingEmphasized,
-                ),
+                animationSpec = motion.listEnter,
             ) + scaleIn(
                 initialScale = 0.92f,
-                animationSpec = tween(
-                    durationMillis = MotionTokens.DurationMedium,
-                    delayMillis = 60,
-                    easing = MotionTokens.EasingEmphasized,
-                ),
+                animationSpec = motion.listEnter,
             ),
         ) {
             Column(

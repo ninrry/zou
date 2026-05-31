@@ -38,13 +38,14 @@ fun ZouShimmer(
     baseColor: Color = ZouDesignTokens.colors.glassSurface.copy(alpha = 0.45f),
     highlightColor: Color = ZouDesignTokens.colors.glassSurface.copy(alpha = 0.75f),
 ) {
+    val motion = LocalZouMotion.current
     val transition = rememberInfiniteTransition(label = "shimmer_sweep")
     val progress by transition.animateFloat(
         initialValue = -0.5f,
         targetValue = 1.5f,
         animationSpec = infiniteRepeatable(
             animation = tween(
-                durationMillis = MotionTokens.DurationShimmerCycle,
+                durationMillis = motion.shimmerDurationMillis,
                 easing = LinearEasing,
             ),
             repeatMode = RepeatMode.Restart,
@@ -124,9 +125,10 @@ fun ZouShimmerCard(
 @Composable
 fun ZouShimmerList(
     itemCount: Int = 4,
+    modifier: Modifier = Modifier,
 ) {
     Column(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .padding(horizontal = 20.dp, vertical = 12.dp),
     ) {

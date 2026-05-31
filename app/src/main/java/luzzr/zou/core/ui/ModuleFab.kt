@@ -6,7 +6,6 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.spring
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -41,14 +40,12 @@ fun ModuleFab(
     onClick: () -> Unit,
 ) {
     val interactionSource = rememberPressInteractionSource()
+    val motion = LocalZouMotion.current
     val radialExpansionController = LocalRadialExpansionController.current
     val fabCenter = remember { mutableStateOf<Offset?>(null) }
     val iconRotation by animateFloatAsState(
         targetValue = if (isRotated) 135f else 0f,
-        animationSpec = spring(
-            dampingRatio = 0.72f,
-            stiffness = 180f,
-        ),
+        animationSpec = motion.fabMenu,
         label = "module_fab_icon_rotation",
     )
 

@@ -37,10 +37,10 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -55,18 +55,20 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import luzzr.zou.core.designsystem.theme.ZouTaskAccent
 import luzzr.zou.core.ui.GlassSurface
+import luzzr.zou.core.ui.LocalZouMotion
 import luzzr.zou.core.ui.ModuleFab
-import luzzr.zou.core.ui.MotionTokens
 import luzzr.zou.core.ui.ZouEmptyStateCard
+import luzzr.zou.core.ui.ZouListHeader
 import luzzr.zou.core.ui.ZouMetaChip
+import luzzr.zou.core.ui.ZouPageScaffold
 import luzzr.zou.core.ui.ZouStaggeredReveal
 import luzzr.zou.core.ui.noteFlowPressScale
 import luzzr.zou.core.ui.rememberPressInteractionSource
 import luzzr.zou.core.ui.LayoutTokens
 import luzzr.zou.core.ui.ZouShimmer
+import luzzr.zou.core.ui.ZouShimmerList
 import luzzr.zou.core.designsystem.theme.ZouDesignTokens
 import androidx.compose.material3.ripple
 
@@ -76,7 +78,6 @@ fun TasksRoute(
     onCreateTask: () -> Unit,
     onOpenTask: (String) -> Unit,
     onEditTask: (String) -> Unit,
-    onDeleteTask: (String) -> Unit = {},
     isRefreshing: Boolean = false,
     onRefresh: () -> Unit = {},
     viewModel: TasksViewModel = hiltViewModel(),
@@ -89,7 +90,7 @@ fun TasksRoute(
         onOpenTask = onOpenTask,
         onEditTask = onEditTask,
         onTaskCompletionToggle = viewModel::onTaskCompletionToggle,
-        onDeleteTask = onDeleteTask,
+        onDeleteTask = viewModel::onDeleteTask,
         isRefreshing = isRefreshing,
         onRefresh = onRefresh,
     )
@@ -107,9 +108,16 @@ fun TasksScreen(
     onRefresh: () -> Unit = {},
 ) {
     var removingIds by remember { mutableStateOf(emptySet<String>()) }
-    val coroutineScope = rememberCoroutineScope()
-    Scaffold(
-        containerColor = Color.Transparent,
+    val designTokens = ZouDesignTokens.colors
+    val motion = LocalZouMotion.current
+    val visibleTaskCount = uiState.tasks.count { task -> task.id !in removingIds }
+
+    LaunchedEffect(uiState.tasks) {
+        val currentTaskIds = uiState.tasks.map { task -> task.id }.toSet()
+        removingIds = removingIds.intersect(currentTaskIds)
+    }
+
+    ZouPageScaffold(
         floatingActionButton = {
             ModuleFab(
                 accentColor = ZouTaskAccent,
@@ -133,11 +141,17 @@ fun TasksScreen(
                     .padding(horizontal = LayoutTokens.ScreenHorizontalPadding, vertical = LayoutTokens.Space12),
                 verticalArrangement = Arrangement.spacedBy(LayoutTokens.Space12),
             ) {
+                item {
+                    ZouListHeader(
+                        title = "待办",
+                        subtitle = "滑动完成或删除，长按进入编辑。",
+                        count = if (uiState.isLoading) null else visibleTaskCount,
+                        accentColor = ZouTaskAccent,
+                    )
+                }
                 if (uiState.isLoading) {
                     item {
-                        ZouShimmer(
-                            modifier = Modifier.padding(vertical = LayoutTokens.Space8),
-                        )
+                        ZouShimmerList(itemCount = 3)
                     }
                 } else if (uiState.tasks.isEmpty()) {
                     item {
@@ -152,29 +166,28 @@ fun TasksScreen(
                     }
                 } else {
                     items(uiState.tasks, key = { it.id }) { task ->
-                        val dismissState = rememberSwipeToDismissBoxState(
-                            confirmValueChange = { dismissValue ->
-                                when (dismissValue) {
-                                    SwipeToDismissBoxValue.StartToEnd -> {
-                                        onTaskCompletionToggle(task.id, true)
-                                        false // snap back
-                                    }
-                                    SwipeToDismissBoxValue.EndToStart -> {
-                                        coroutineScope.launch {
-                                            removingIds = removingIds + task.id
-                                            delay(300)
-                                            onDeleteTask(task.id)
-                                        }
-                                        false // snap back
-                                    }
-                                    else -> false
+                        val dismissState = rememberSwipeToDismissBoxState()
+                        LaunchedEffect(dismissState.currentValue, task.id) {
+                            when (dismissState.currentValue) {
+                                SwipeToDismissBoxValue.StartToEnd -> {
+                                    onTaskCompletionToggle(task.id, true)
+                                    dismissState.reset()
                                 }
-                            },
-                        )
+                                SwipeToDismissBoxValue.EndToStart -> {
+                                    removingIds = removingIds + task.id
+                                    delay(300)
+                                    onDeleteTask(task.id)
+                                    dismissState.reset()
+                                    delay(900)
+                                    removingIds = removingIds - task.id
+                                }
+                                SwipeToDismissBoxValue.Settled -> Unit
+                            }
+                        }
                         AnimatedVisibility(
                             visible = task.id !in removingIds,
-                            exit = fadeOut(animationSpec = tween(300)) +
-                                    shrinkVertically(animationSpec = tween(300)),
+                            exit = fadeOut(animationSpec = motion.listExit) +
+                                    shrinkVertically(animationSpec = motion.listExitSize),
                         ) {
                             SwipeToDismissBox(
                                 state = dismissState,
@@ -187,7 +200,7 @@ fun TasksScreen(
                                             modifier = Modifier
                                                 .fillMaxSize()
                                                 .clip(RoundedCornerShape(24.dp))
-                                                .background(Color(0xFF4CAF50).copy(alpha = 0.9f))
+                                                .background(designTokens.success.copy(alpha = 0.88f))
                                                 .padding(horizontal = 24.dp),
                                             contentAlignment = Alignment.CenterStart,
                                         ) {
@@ -204,7 +217,7 @@ fun TasksScreen(
                                             modifier = Modifier
                                                 .fillMaxSize()
                                                 .clip(RoundedCornerShape(24.dp))
-                                                .background(Color(0xFFE53935).copy(alpha = 0.9f))
+                                                .background(designTokens.danger.copy(alpha = 0.88f))
                                                 .padding(horizontal = 24.dp),
                                             contentAlignment = Alignment.CenterEnd,
                                         ) {
@@ -250,6 +263,7 @@ private fun TaskCard(
 ) {
     val interactionSource = rememberPressInteractionSource()
     val hapticFeedback = LocalHapticFeedback.current
+    val motion = LocalZouMotion.current
     // 动态色彩流转：当任务被勾选为“已完成”时，色彩平滑流变流转为烟灰色，未完成则呈饱满的任务亮色
     val currentAccentColor = if (item.isCompleted) {
         ZouDesignTokens.colors.textTertiary
@@ -300,7 +314,7 @@ private fun TaskCard(
                 val isCompleted = item.isCompleted
                 val checkAnimationProgress by animateFloatAsState(
                     targetValue = if (isCompleted) 1f else 0f,
-                    animationSpec = MotionTokens.SpringBouncy,
+                    animationSpec = motion.press,
                     label = "check_anim_progress",
                 )
                 val checkIconSize = 32.dp

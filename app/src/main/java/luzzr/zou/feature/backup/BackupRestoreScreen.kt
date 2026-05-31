@@ -27,7 +27,9 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import luzzr.zou.core.designsystem.theme.ZouTodayAccent
 import luzzr.zou.core.ui.ZouPageHeader
+import luzzr.zou.core.ui.ZouPageScaffold
 import luzzr.zou.core.ui.ZouSectionCard
+import luzzr.zou.core.ui.ZouShimmerList
 import luzzr.zou.core.ui.noteFlowButtonColors
 import luzzr.zou.core.ui.noteFlowOutlinedButtonColors
 import luzzr.zou.core.ui.LayoutTokens
@@ -63,7 +65,7 @@ fun BackupRestoreScreen(
     onExportBackup: () -> Unit,
     onImportBackup: () -> Unit,
 ) {
-    Scaffold(containerColor = Color.Transparent) { innerPadding ->
+    ZouPageScaffold { innerPadding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -118,7 +120,10 @@ fun BackupRestoreScreen(
             }
 
             if (uiState.isLoading) {
-                CircularProgressIndicator(modifier = Modifier.testTag("backup_loading"))
+                ZouShimmerList(
+                    itemCount = 2,
+                    modifier = Modifier.testTag("backup_loading"),
+                )
             }
             uiState.errorMessage?.let {
                 Text(

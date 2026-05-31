@@ -20,6 +20,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import luzzr.zou.core.ui.circularReveal
+import luzzr.zou.core.ui.LocalZouMotion
 import androidx.navigation.NavType
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -53,28 +54,20 @@ fun ZouNavHost(
     radialExpansionController: RadialExpansionController,
     modifier: Modifier = Modifier,
 ) {
+    val motion = LocalZouMotion.current
     NavHost(
         navController = navController,
         startDestination = RootRoutes.TopLevelCanvas,
         modifier = modifier,
         enterTransition = {
             fadeIn(
-                animationSpec = tween(
-                    durationMillis = MotionTokens.DurationDepthEnter,
-                    easing = MotionTokens.EasingEmphasized,
-                ),
+                animationSpec = motion.pageEnter,
             ) + slideInVertically(
-                animationSpec = tween(
-                    durationMillis = MotionTokens.DurationDepthEnter,
-                    easing = MotionTokens.EasingEmphasized,
-                ),
+                animationSpec = motion.pageEnterOffset,
                 initialOffsetY = { (it * 0.08f).toInt() },
             ) + scaleIn(
                 initialScale = 0.98f,
-                animationSpec = tween(
-                    durationMillis = MotionTokens.DurationDepthEnter,
-                    easing = MotionTokens.EasingEmphasized,
-                ),
+                animationSpec = motion.pageEnter,
             )
         },
         exitTransition = {
@@ -83,21 +76,12 @@ fun ZouNavHost(
                 ExitTransition.None
             } else {
                 fadeOut(
-                    animationSpec = tween(
-                        durationMillis = MotionTokens.DurationDepthExit,
-                        easing = MotionTokens.EasingStandard,
-                    ),
+                    animationSpec = motion.pageExit,
                 ) + scaleOut(
                     targetScale = 0.95f,
-                    animationSpec = tween(
-                        durationMillis = MotionTokens.DurationDepthExit,
-                        easing = MotionTokens.EasingStandard,
-                    ),
+                    animationSpec = motion.pageExit,
                 ) + slideOutVertically(
-                    animationSpec = tween(
-                        durationMillis = MotionTokens.DurationDepthExit,
-                        easing = MotionTokens.EasingStandard,
-                    ),
+                    animationSpec = motion.pageExitOffset,
                     targetOffsetY = { (it * 0.04f).toInt() },
                 )
             }
@@ -108,43 +92,25 @@ fun ZouNavHost(
                 EnterTransition.None
             } else {
                 fadeIn(
-                    animationSpec = tween(
-                        durationMillis = MotionTokens.DurationDepthEnter,
-                        easing = MotionTokens.EasingEmphasized,
-                    ),
+                    animationSpec = motion.pageEnter,
                 ) + slideInVertically(
-                    animationSpec = tween(
-                        durationMillis = MotionTokens.DurationDepthEnter,
-                        easing = MotionTokens.EasingEmphasized,
-                    ),
+                    animationSpec = motion.pageEnterOffset,
                     initialOffsetY = { -(it * 0.04f).toInt() },
                 ) + scaleIn(
                     initialScale = 0.985f,
-                    animationSpec = tween(
-                        durationMillis = MotionTokens.DurationDepthEnter,
-                        easing = MotionTokens.EasingEmphasized,
-                    ),
+                    animationSpec = motion.pageEnter,
                 )
             }
         },
         popExitTransition = {
             fadeOut(
-                animationSpec = tween(
-                    durationMillis = MotionTokens.DurationDepthExit,
-                    easing = MotionTokens.EasingEmphasized,
-                ),
+                animationSpec = motion.pageExit,
             ) + slideOutVertically(
-                animationSpec = tween(
-                    durationMillis = MotionTokens.DurationDepthExit,
-                    easing = MotionTokens.EasingEmphasized,
-                ),
+                animationSpec = motion.pageExitOffset,
                 targetOffsetY = { (it * 0.12f).toInt() },
             ) + scaleOut(
                 targetScale = 0.90f,
-                animationSpec = tween(
-                    durationMillis = MotionTokens.DurationDepthExit,
-                    easing = MotionTokens.EasingEmphasized,
-                ),
+                animationSpec = motion.pageExit,
             )
         },
     ) {
@@ -222,41 +188,10 @@ fun ZouNavHost(
             popEnterTransition = { EnterTransition.None },
             popExitTransition = { ExitTransition.None },
         ) {
-            val scope = rememberCoroutineScope()
-            val revealProgress = remember { Animatable(0f) }
-
-            LaunchedEffect(Unit) {
-                revealProgress.animateTo(
-                    targetValue = 1f,
-                    animationSpec = tween(
-                        durationMillis = MotionTokens.DurationFabRadial,
-                        easing = MotionTokens.EasingEmphasizedDecelerate,
-                    ),
-                )
-            }
-
-            val navigateBackWithCollapse: () -> Unit = {
-                scope.launch {
-                    revealProgress.animateTo(
-                        targetValue = 0f,
-                        animationSpec = tween(
-                            durationMillis = MotionTokens.DurationFabRadial,
-                            easing = MotionTokens.EasingAccelerate,
-                        ),
-                    )
-                    navController.navigateUp()
-                }
-            }
-
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .circularReveal(
-                        progress = revealProgress.value,
-                        origin = radialExpansionController.lastAnchor?.origin,
-                        backgroundColor = MaterialTheme.colorScheme.background,
-                    ),
-            ) {
+            RadialCreateScreen(
+                radialExpansionController = radialExpansionController,
+                onNavigateBack = { navController.navigateUp() },
+            ) { navigateBackWithCollapse ->
                 TaskEditorRoute(
                     onNavigateBack = navigateBackWithCollapse,
                 )
@@ -307,41 +242,10 @@ fun ZouNavHost(
             popEnterTransition = { EnterTransition.None },
             popExitTransition = { ExitTransition.None },
         ) {
-            val scope = rememberCoroutineScope()
-            val revealProgress = remember { Animatable(0f) }
-
-            LaunchedEffect(Unit) {
-                revealProgress.animateTo(
-                    targetValue = 1f,
-                    animationSpec = tween(
-                        durationMillis = MotionTokens.DurationFabRadial,
-                        easing = MotionTokens.EasingEmphasizedDecelerate,
-                    ),
-                )
-            }
-
-            val navigateBackWithCollapse: () -> Unit = {
-                scope.launch {
-                    revealProgress.animateTo(
-                        targetValue = 0f,
-                        animationSpec = tween(
-                            durationMillis = MotionTokens.DurationFabRadial,
-                            easing = MotionTokens.EasingAccelerate,
-                        ),
-                    )
-                    navController.navigateUp()
-                }
-            }
-
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .circularReveal(
-                        progress = revealProgress.value,
-                        origin = radialExpansionController.lastAnchor?.origin,
-                        backgroundColor = MaterialTheme.colorScheme.background,
-                    ),
-            ) {
+            RadialCreateScreen(
+                radialExpansionController = radialExpansionController,
+                onNavigateBack = { navController.navigateUp() },
+            ) { navigateBackWithCollapse ->
                 HabitEditorRoute(
                     onNavigateBack = navigateBackWithCollapse,
                 )
@@ -392,41 +296,10 @@ fun ZouNavHost(
             popEnterTransition = { EnterTransition.None },
             popExitTransition = { ExitTransition.None },
         ) {
-            val scope = rememberCoroutineScope()
-            val revealProgress = remember { Animatable(0f) }
-
-            LaunchedEffect(Unit) {
-                revealProgress.animateTo(
-                    targetValue = 1f,
-                    animationSpec = tween(
-                        durationMillis = MotionTokens.DurationFabRadial,
-                        easing = MotionTokens.EasingEmphasizedDecelerate,
-                    ),
-                )
-            }
-
-            val navigateBackWithCollapse: () -> Unit = {
-                scope.launch {
-                    revealProgress.animateTo(
-                        targetValue = 0f,
-                        animationSpec = tween(
-                            durationMillis = MotionTokens.DurationFabRadial,
-                            easing = MotionTokens.EasingAccelerate,
-                        ),
-                    )
-                    navController.navigateUp()
-                }
-            }
-
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .circularReveal(
-                        progress = revealProgress.value,
-                        origin = radialExpansionController.lastAnchor?.origin,
-                        backgroundColor = MaterialTheme.colorScheme.background,
-                    ),
-            ) {
+            RadialCreateScreen(
+                radialExpansionController = radialExpansionController,
+                onNavigateBack = { navController.navigateUp() },
+            ) { navigateBackWithCollapse ->
                 NoteEditorRoute(
                     onNavigateBack = navigateBackWithCollapse,
                 )
@@ -476,5 +349,45 @@ fun ZouNavHost(
                 onNavigateBack = { navController.navigateUp() },
             )
         }
+    }
+}
+
+@Composable
+private fun RadialCreateScreen(
+    radialExpansionController: RadialExpansionController,
+    onNavigateBack: () -> Unit,
+    content: @Composable (navigateBackWithCollapse: () -> Unit) -> Unit,
+) {
+    val motion = LocalZouMotion.current
+    val scope = rememberCoroutineScope()
+    val revealProgress = remember { Animatable(0f) }
+
+    LaunchedEffect(Unit) {
+        revealProgress.animateTo(
+            targetValue = 1f,
+            animationSpec = motion.fabReveal,
+        )
+    }
+
+    val navigateBackWithCollapse: () -> Unit = {
+        scope.launch {
+            revealProgress.animateTo(
+                targetValue = 0f,
+                animationSpec = motion.fabCollapse,
+            )
+            onNavigateBack()
+        }
+    }
+
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .circularReveal(
+                progress = revealProgress.value,
+                origin = radialExpansionController.lastAnchor?.origin,
+                backgroundColor = MaterialTheme.colorScheme.background,
+            ),
+    ) {
+        content(navigateBackWithCollapse)
     }
 }

@@ -11,6 +11,8 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import luzzr.zou.core.ui.LocalZouMotion
+import luzzr.zou.core.ui.ZouMotionSpec
 
 private val LightColorScheme = lightColorScheme(
     primary = ZouTodayAccent,
@@ -32,10 +34,10 @@ private val LightColorScheme = lightColorScheme(
 )
 
 private val DarkColorScheme = darkColorScheme(
-    primary = ZouTaskAccent,
+    primary = ZouTodayAccent,
     onPrimary = DarkZouUiColors.onAccent,
-    secondary = ZouHabitAccent,
-    tertiary = ZouNoteAccent,
+    secondary = ZouTaskAccent,
+    tertiary = ZouHabitAccent,
     background = DarkZouUiColors.background,
     onBackground = DarkZouUiColors.textPrimary,
     surface = DarkZouUiColors.surface,
@@ -44,10 +46,10 @@ private val DarkColorScheme = darkColorScheme(
     onSurfaceVariant = DarkZouUiColors.textSecondary,
     outline = DarkZouUiColors.outlineSoft,
     outlineVariant = DarkZouUiColors.outlineSoft.copy(alpha = 0.82f),
-    primaryContainer = Color(0xFF37315A),
-    secondaryContainer = Color(0xFF2D433B),
-    tertiaryContainer = Color(0xFF4A4126),
-    error = Color(0xFFE08B8B),
+    primaryContainer = Color(0xFF233842),
+    secondaryContainer = Color(0xFF352F4B),
+    tertiaryContainer = Color(0xFF273A31),
+    error = DarkZouUiColors.danger,
 )
 
 @Composable
@@ -68,7 +70,10 @@ fun ZouTheme(
         else -> LightColorScheme
     }
 
-    CompositionLocalProvider(LocalZouUiColors provides noteFlowUiColors) {
+    CompositionLocalProvider(
+        LocalZouUiColors provides noteFlowUiColors,
+        LocalZouMotion provides ZouMotionSpec.Default,
+    ) {
         MaterialTheme(
             colorScheme = colorScheme,
             typography = ZouTypography,

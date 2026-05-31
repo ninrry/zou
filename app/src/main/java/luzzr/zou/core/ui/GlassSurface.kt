@@ -12,7 +12,6 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.dp
 import luzzr.zou.core.designsystem.theme.ZouDesignTokens
 import androidx.compose.animation.animateColorAsState
-import androidx.compose.animation.core.tween
 import androidx.compose.ui.graphics.lerp
 
 enum class GlassLevel {
@@ -31,6 +30,7 @@ fun GlassSurface(
     content: @Composable BoxScope.() -> Unit,
 ) {
     val designTokens = ZouDesignTokens.colors
+    val motion = LocalZouMotion.current
     val resolvedLevel = if (strong) GlassLevel.Strong else level
     val containerColor = when (resolvedLevel) {
         GlassLevel.Weak -> designTokens.backgroundRaised
@@ -48,24 +48,32 @@ fun GlassSurface(
         GlassLevel.Strong -> 7.dp
     }
 
-    val animatedAccentColor = accentColor?.let {
-        animateColorAsState(
-            targetValue = it,
-            animationSpec = tween(320, easing = MotionTokens.EasingEmphasized),
-            label = "glass_surface_accent_color",
-        ).value
+    val animatedContainerColor = animateColorAsState(
+        targetValue = containerColor,
+        animationSpec = motion.colorShift,
+        label = "glass_surface_container_color",
+    ).value
+    val animatedBorderBaseColor = animateColorAsState(
+        targetValue = borderColor,
+        animationSpec = motion.colorShift,
+        label = "glass_surface_border_color",
+    ).value
+    val animatedAccentColor = animateColorAsState(
+        targetValue = accentColor ?: Color.Transparent,
+        animationSpec = motion.colorShift,
+        label = "glass_surface_accent_color",
+    ).value
+
+    val finalContainerColor = if (accentColor != null) {
+        lerp(animatedContainerColor, animatedAccentColor, 0.04f)
+    } else {
+        animatedContainerColor
     }
 
-    val finalContainerColor = if (animatedAccentColor != null) {
-        lerp(containerColor, animatedAccentColor, 0.04f)
+    val finalBorderColor = if (accentColor != null) {
+        lerp(animatedBorderBaseColor, animatedAccentColor, 0.12f)
     } else {
-        containerColor
-    }
-
-    val finalBorderColor = if (animatedAccentColor != null) {
-        lerp(borderColor, animatedAccentColor, 0.12f)
-    } else {
-        borderColor
+        animatedBorderBaseColor
     }
 
     Surface(

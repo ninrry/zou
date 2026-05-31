@@ -25,6 +25,7 @@ import luzzr.zou.app.navigation.TopLevelDestination
 import luzzr.zou.core.designsystem.theme.MonetColorTokens
 import luzzr.zou.core.designsystem.theme.ZouDesignTokens
 import luzzr.zou.core.ui.ModuleVisualStyle
+import luzzr.zou.core.ui.LocalZouMotion
 import luzzr.zou.core.ui.MotionTokens
 import luzzr.zou.core.ui.ProvideRadialExpansionController
 import luzzr.zou.core.ui.RadialExpansionController
@@ -44,6 +45,7 @@ fun ZouApp(
     modifier: Modifier = Modifier,
 ) {
     val designTokens = ZouDesignTokens.colors
+    val motion = LocalZouMotion.current
     val navController = rememberNavController()
     val radialExpansionController = rememberRadialExpansionController()
     var selectedTopLevelRoute by rememberSaveable { mutableStateOf(TopLevelDestination.TODAY.route) }
@@ -56,18 +58,12 @@ fun ZouApp(
 
     val animatedAmbientColor by animateColorAsState(
         targetValue = currentVisualStyle.ambientColor,
-        animationSpec = tween(
-            durationMillis = MotionTokens.DurationMedium,
-            easing = MotionTokens.EasingEmphasized,
-        ),
+        animationSpec = motion.colorShift,
         label = "module_ambient_color",
     )
     val animatedOverlayColor by animateColorAsState(
         targetValue = currentVisualStyle.overlayColor,
-        animationSpec = tween(
-            durationMillis = MotionTokens.DurationMedium,
-            easing = MotionTokens.EasingEmphasized,
-        ),
+        animationSpec = motion.colorShift,
         label = "module_overlay_color",
     )
     val targetOverlayAlpha = if (isTopLevelRoute) 0.004f else 0.010f
@@ -76,22 +72,22 @@ fun ZouApp(
     val targetLowerGlowAlpha = if (isTopLevelRoute) 0.010f else 0.055f
     val overlayAlpha by animateFloatAsState(
         targetValue = targetOverlayAlpha,
-        animationSpec = MotionTokens.SpringSmooth,
+        animationSpec = motion.tabSwitch,
         label = "module_overlay_alpha",
     )
     val ambientAlpha by animateFloatAsState(
         targetValue = targetAmbientAlpha,
-        animationSpec = MotionTokens.SpringSmooth,
+        animationSpec = motion.tabSwitch,
         label = "module_ambient_alpha",
     )
     val topGlowAlpha by animateFloatAsState(
         targetValue = targetTopGlowAlpha,
-        animationSpec = MotionTokens.SpringSmooth,
+        animationSpec = motion.tabSwitch,
         label = "module_top_glow_alpha",
     )
     val lowerGlowAlpha by animateFloatAsState(
         targetValue = targetLowerGlowAlpha,
-        animationSpec = MotionTokens.SpringSmooth,
+        animationSpec = motion.tabSwitch,
         label = "module_lower_glow_alpha",
     )
 

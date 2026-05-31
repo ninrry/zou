@@ -28,6 +28,8 @@ import luzzr.zou.core.designsystem.theme.ZouNoteAccent
 import luzzr.zou.core.markdown.MarkdownRenderer
 import luzzr.zou.core.ui.ZouEmptyStateCard
 import luzzr.zou.core.ui.ZouMetaChip
+import luzzr.zou.core.ui.ZouPageHeader
+import luzzr.zou.core.ui.ZouPageScaffold
 import luzzr.zou.core.ui.ZouSectionCard
 import luzzr.zou.core.ui.ZouShimmerList
 
@@ -63,7 +65,7 @@ fun NoteDetailScreen(
     onNavigateBack: () -> Unit,
     onEditNote: (String) -> Unit,
 ) {
-    Scaffold(containerColor = Color.Transparent) { innerPadding ->
+    ZouPageScaffold { innerPadding ->
         when {
             uiState.isLoading -> {
                 Column(
@@ -111,10 +113,9 @@ fun NoteDetailScreen(
                         Text("返回")
                     }
 
-                    Text(
-                        text = uiState.title,
-                        style = MaterialTheme.typography.headlineMedium,
-                        color = MaterialTheme.colorScheme.onSurface,
+                    ZouPageHeader(
+                        title = uiState.title,
+                        subtitle = "正文只读展示，编辑会回到沉浸写作区。",
                     )
                     ZouMetaChip(
                         text = "最近编辑：${uiState.updatedAtText}",

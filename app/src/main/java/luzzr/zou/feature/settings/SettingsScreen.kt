@@ -12,6 +12,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.ui.zIndex
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -51,11 +54,13 @@ import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import luzzr.zou.core.designsystem.theme.ZouTodayAccent
+import luzzr.zou.core.designsystem.theme.ZouDesignTokens
 import luzzr.zou.core.hyperos.XiaomiPowerKeeper
 import luzzr.zou.core.ui.GlassLevel
 import luzzr.zou.core.ui.GlassSurface
 import luzzr.zou.core.ui.LayoutTokens
 import luzzr.zou.core.ui.ZouPageHeader
+import luzzr.zou.core.ui.ZouPageScaffold
 import luzzr.zou.core.ui.StandardFieldRow
 import luzzr.zou.core.ui.StandardSectionCard
 import luzzr.zou.core.ui.StandardSwitchRow
@@ -139,7 +144,7 @@ fun SettingsScreen(
         "当前配置已同步，列表页会直接按这里的设置显示。"
     }
 
-    Scaffold(containerColor = Color.Transparent) { innerPadding ->
+    ZouPageScaffold { innerPadding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -351,10 +356,11 @@ private fun HyperOsOptimizationCard(
     batteryOptOk: Boolean = false,
     exactAlarmOk: Boolean = false,
 ) {
+    val designTokens = ZouDesignTokens.colors
     GlassSurface(
         modifier = Modifier.testTag("settings_hyperos_optimization"),
         shape = RoundedCornerShape(20.dp),
-        accentColor = Color(0xFFFF6B35),
+        accentColor = designTokens.warning,
         level = GlassLevel.Strong,
     ) {
         Column(
@@ -367,7 +373,7 @@ private fun HyperOsOptimizationCard(
                 Icon(
                     imageVector = Icons.Outlined.Info,
                     contentDescription = null,
-                    tint = Color(0xFFFF6B35),
+                    tint = designTokens.warning,
                     modifier = Modifier.size(22.dp),
                 )
                 Spacer(Modifier.width(8.dp))
@@ -410,7 +416,7 @@ private fun HyperOsOptimizationCard(
             Text(
                 text = if (batteryOptOk) "✅ 省电策略已就绪" else "🔔 完成上方 3 项设置后点击下方按钮",
                 style = MaterialTheme.typography.bodySmall,
-                color = if (batteryOptOk) Color(0xFF4CAF50) else MaterialTheme.colorScheme.onSurfaceVariant,
+                color = if (batteryOptOk) designTokens.success else MaterialTheme.colorScheme.onSurfaceVariant,
             )
             Button(
                 modifier = Modifier.fillMaxWidth(),
@@ -431,6 +437,7 @@ private fun OptimizeActionRow(
     onClick: () -> Unit,
     done: Boolean = false,
 ) {
+    val designTokens = ZouDesignTokens.colors
     Row(
         modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
@@ -441,7 +448,7 @@ private fun OptimizeActionRow(
             Icon(
                 imageVector = icon,
                 contentDescription = null,
-                tint = Color(0xFFFF6B35),
+                tint = designTokens.warning,
                 modifier = Modifier.size(20.dp),
             )
         }
@@ -474,13 +481,16 @@ fun TopLevelSettingsButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    GlassSurface(
-        modifier = modifier.testTag("open_settings"),
-        shape = RoundedCornerShape(20.dp),
-        accentColor = ZouTodayAccent,
-        level = GlassLevel.Weak,
+    androidx.compose.material3.Surface(
+        modifier = modifier
+            .testTag("open_settings")
+            .zIndex(100f)
+            .size(48.dp),
+        color = ZouTodayAccent.copy(alpha = 0.08f),
+        shape = CircleShape,
+        onClick = onClick,
     ) {
-        IconButton(onClick = onClick) {
+        Box(contentAlignment = Alignment.Center) {
             Icon(
                 imageVector = Icons.Outlined.Settings,
                 contentDescription = "设置",

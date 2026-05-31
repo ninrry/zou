@@ -45,7 +45,10 @@ import luzzr.zou.core.markdown.MarkdownRenderer
 import luzzr.zou.core.ui.ZouEditorSection
 import luzzr.zou.core.ui.ZouEmptyStateCard
 import luzzr.zou.core.ui.ZouPageHeader
+import luzzr.zou.core.ui.ZouPageScaffold
 import luzzr.zou.core.ui.ZouSectionCard
+import luzzr.zou.core.ui.ZouBottomActionBar
+import luzzr.zou.core.ui.ZouShimmerList
 import luzzr.zou.core.ui.LayoutTokens
 import luzzr.zou.core.ui.noteFlowButtonColors
 import luzzr.zou.core.ui.noteFlowOutlinedButtonColors
@@ -106,47 +109,20 @@ fun NoteEditorScreen(
 ) {
     var previewVisible by rememberSaveable(uiState.noteId) { mutableStateOf(false) }
 
-    Scaffold(
-        containerColor = Color.Transparent,
+    ZouPageScaffold(
         bottomBar = {
             if (!uiState.isLoading && !uiState.hasMissingContent) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(MaterialTheme.colorScheme.surface)
-                        .padding(horizontal = 20.dp, vertical = 12.dp),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    OutlinedButton(
-                        modifier = Modifier
-                            .weight(1f)
-                            .height(48.dp),
-                        onClick = onNavigateBack,
-                        enabled = !uiState.isSaving,
-                        colors = noteFlowOutlinedButtonColors(),
-                    ) {
-                        Text("放弃", maxLines = 1)
-                    }
-                    Button(
-                        modifier = Modifier
-                            .weight(1f)
-                            .height(48.dp)
-                            .testTag("note_editor_save"),
-                        onClick = onSaveClicked,
-                        enabled = !uiState.isSaving,
-                        colors = noteFlowButtonColors(ZouNoteAccent),
-                    ) {
-                        if (uiState.isSaving) {
-                            CircularProgressIndicator(
-                                color = MaterialTheme.colorScheme.onPrimary,
-                                strokeWidth = 2.dp,
-                            )
-                        } else {
-                            Text(uiState.saveButtonLabel, maxLines = 1)
-                        }
-                    }
-                }
+                ZouBottomActionBar(
+                    primaryLabel = uiState.saveButtonLabel,
+                    primaryAccentColor = ZouNoteAccent,
+                    primaryEnabled = !uiState.isSaving,
+                    primaryLoading = uiState.isSaving,
+                    primaryTestTag = "note_editor_save",
+                    secondaryLabel = "放弃",
+                    secondaryEnabled = !uiState.isSaving,
+                    onSecondaryClick = onNavigateBack,
+                    onPrimaryClick = onSaveClicked,
+                )
             }
         },
     ) { innerPadding ->
@@ -155,9 +131,9 @@ fun NoteEditorScreen(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(innerPadding),
-                verticalArrangement = Arrangement.Center,
+                verticalArrangement = Arrangement.Top,
             ) {
-                CircularProgressIndicator(modifier = Modifier.padding(horizontal = 24.dp))
+                ZouShimmerList()
             }
         } else if (uiState.hasMissingContent) {
             Column(

@@ -23,6 +23,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import luzzr.zou.core.designsystem.theme.ZouTaskAccent
 import luzzr.zou.core.ui.ZouEmptyStateCard
 import luzzr.zou.core.ui.ZouPageHeader
+import luzzr.zou.core.ui.ZouPageScaffold
 import luzzr.zou.core.ui.ZouSectionCard
 import luzzr.zou.core.ui.ZouShimmerList
 
@@ -46,7 +47,7 @@ fun TaskDetailScreen(
     onNavigateBack: () -> Unit,
     onEditTask: (String) -> Unit,
 ) {
-    Scaffold(containerColor = Color.Transparent) { innerPadding ->
+    ZouPageScaffold { innerPadding ->
         when {
             uiState.isLoading -> {
                 Column(
