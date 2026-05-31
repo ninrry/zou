@@ -28,6 +28,18 @@ object MonetColorTokens {
         @Composable get() = ZouDesignTokens.colors.textSecondary
     val textTertiary: Color
         @Composable get() = ZouDesignTokens.colors.textTertiary
+    val success: Color
+        @Composable get() = ZouDesignTokens.colors.success
+    val successSoft: Color
+        @Composable get() = ZouDesignTokens.colors.successSoft
+    val warning: Color
+        @Composable get() = ZouDesignTokens.colors.warning
+    val warningSoft: Color
+        @Composable get() = ZouDesignTokens.colors.warningSoft
+    val danger: Color
+        @Composable get() = ZouDesignTokens.colors.danger
+    val dangerSoft: Color
+        @Composable get() = ZouDesignTokens.colors.dangerSoft
 
     val today = MonetModulePalette(
         accent = ZouTodayAccent,

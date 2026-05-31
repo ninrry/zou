@@ -1,5 +1,6 @@
 package luzzr.zou.feature.today
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -34,6 +35,7 @@ import luzzr.zou.core.designsystem.theme.ZouHabitAccent
 import luzzr.zou.core.designsystem.theme.ZouTaskAccent
 import luzzr.zou.core.ui.ZouStaggeredReveal
 import luzzr.zou.core.ui.LayoutTokens
+import luzzr.zou.core.ui.ZouPageScaffold
 import luzzr.zou.domain.usecase.HabitQuickActionType
 import luzzr.zou.domain.usecase.TaskQuickActionType
 import kotlinx.coroutines.flow.Flow
@@ -106,6 +108,9 @@ fun TodayScreen(
             isQuickCreateClicked = false
         }
     }
+    BackHandler(enabled = isQuickCreateExpanded && !isQuickCreateClicked) {
+        isQuickCreateExpanded = false
+    }
     val snackbarHostState = remember { SnackbarHostState() }
     LaunchedEffect(events) {
         events.collect { event ->
@@ -127,9 +132,8 @@ fun TodayScreen(
             }
         }
     }
-    Scaffold(
-        containerColor = Color.Transparent,
-        snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
+    ZouPageScaffold(
+        snackbarHostState = snackbarHostState,
         floatingActionButton = {
             TodayQuickCreateFab(
                 expanded = isQuickCreateExpanded && !isQuickCreateClicked,
@@ -215,36 +219,69 @@ private fun TodayDualColumnQuickArea(
             .testTag("today_dual_columns"),
     ) {
         val layoutSpec = rememberTodayCompactLayoutSpec(maxWidth)
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(layoutSpec.columnGap),
-            verticalAlignment = Alignment.Top,
-        ) {
-            TodayTasksSection(
-                modifier = Modifier
-                    .weight(1f)
-                    .testTag("today_tasks_column"),
-                tasks = uiState.tasks,
-                layoutSpec = layoutSpec,
-                onOpenTask = onOpenTask,
-                onEditTask = onEditTask,
-                onOpenTasks = onOpenTasks,
-                onTaskAction = onTaskAction,
-                onCreateTask = onCreateTask,
-            )
-            TodayHabitsSection(
-                modifier = Modifier
-                    .weight(1f)
-                    .testTag("today_habits_column"),
-                habits = uiState.habits,
-                layoutSpec = layoutSpec,
-                onOpenHabit = onOpenHabit,
-                onEditHabit = onEditHabit,
-                onOpenHabits = onOpenHabits,
-                onHabitPrimaryAction = onHabitPrimaryAction,
-                onHabitSecondaryAction = onHabitSecondaryAction,
-                onCreateHabit = onCreateHabit,
-            )
+        if (layoutSpec.stacked) {
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                verticalArrangement = Arrangement.spacedBy(LayoutTokens.Space20),
+            ) {
+                TodayTasksSection(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .testTag("today_tasks_column"),
+                    tasks = uiState.tasks,
+                    layoutSpec = layoutSpec,
+                    onOpenTask = onOpenTask,
+                    onEditTask = onEditTask,
+                    onOpenTasks = onOpenTasks,
+                    onTaskAction = onTaskAction,
+                    onCreateTask = onCreateTask,
+                )
+                TodayHabitsSection(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .testTag("today_habits_column"),
+                    habits = uiState.habits,
+                    layoutSpec = layoutSpec,
+                    onOpenHabit = onOpenHabit,
+                    onEditHabit = onEditHabit,
+                    onOpenHabits = onOpenHabits,
+                    onHabitPrimaryAction = onHabitPrimaryAction,
+                    onHabitSecondaryAction = onHabitSecondaryAction,
+                    onCreateHabit = onCreateHabit,
+                )
+            }
+        } else {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(layoutSpec.columnGap),
+                verticalAlignment = Alignment.Top,
+            ) {
+                TodayTasksSection(
+                    modifier = Modifier
+                        .weight(1f)
+                        .testTag("today_tasks_column"),
+                    tasks = uiState.tasks,
+                    layoutSpec = layoutSpec,
+                    onOpenTask = onOpenTask,
+                    onEditTask = onEditTask,
+                    onOpenTasks = onOpenTasks,
+                    onTaskAction = onTaskAction,
+                    onCreateTask = onCreateTask,
+                )
+                TodayHabitsSection(
+                    modifier = Modifier
+                        .weight(1f)
+                        .testTag("today_habits_column"),
+                    habits = uiState.habits,
+                    layoutSpec = layoutSpec,
+                    onOpenHabit = onOpenHabit,
+                    onEditHabit = onEditHabit,
+                    onOpenHabits = onOpenHabits,
+                    onHabitPrimaryAction = onHabitPrimaryAction,
+                    onHabitSecondaryAction = onHabitSecondaryAction,
+                    onCreateHabit = onCreateHabit,
+                )
+            }
         }
     }
 }

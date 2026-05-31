@@ -28,7 +28,9 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import luzzr.zou.core.designsystem.theme.ZouTodayAccent
 import luzzr.zou.core.ui.GlassSurface
 import luzzr.zou.core.ui.ZouEmptyStateCard
+import luzzr.zou.core.ui.ZouListHeader
 import luzzr.zou.core.ui.ZouPageHeader
+import luzzr.zou.core.ui.ZouPageScaffold
 import luzzr.zou.core.ui.noteFlowOutlinedButtonColors
 import luzzr.zou.core.ui.LayoutTokens
 
@@ -53,7 +55,7 @@ fun TrashScreen(
     onRestore: (TrashItemCardUiModel) -> Unit,
     onHardDelete: (TrashItemCardUiModel) -> Unit,
 ) {
-    Scaffold(containerColor = Color.Transparent) { innerPadding ->
+    ZouPageScaffold { innerPadding ->
         if (uiState.isEmpty) {
             Column(
                 modifier = Modifier
@@ -121,9 +123,11 @@ fun TrashScreen(
                         Icon(imageVector = Icons.AutoMirrored.Outlined.ArrowBack, contentDescription = null)
                         Text("返回", modifier = Modifier.padding(start = 8.dp))
                     }
-                    ZouPageHeader(
+                    ZouListHeader(
                         title = uiState.title,
                         subtitle = "可以恢复，也可以彻底删除。",
+                        count = uiState.items.size,
+                        accentColor = ZouTodayAccent,
                     )
                     if (uiState.isLoading) {
                         CircularProgressIndicator(modifier = Modifier.testTag("trash_loading"))

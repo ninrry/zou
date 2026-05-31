@@ -17,10 +17,11 @@ fun Modifier.noteFlowPressScale(
     interactionSource: MutableInteractionSource,
     pressedScale: Float = 0.96f,
 ): Modifier = composed {
+    val motion = LocalZouMotion.current
     val isPressed by interactionSource.collectIsPressedAsState()
     val scale by animateFloatAsState(
         targetValue = if (isPressed) pressedScale else 1f,
-        animationSpec = MotionTokens.SpringBouncy,
+        animationSpec = motion.press,
         label = "note_flow_press_scale",
     )
     graphicsLayer {

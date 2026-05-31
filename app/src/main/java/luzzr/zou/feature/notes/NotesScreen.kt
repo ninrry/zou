@@ -28,12 +28,15 @@ import luzzr.zou.core.designsystem.theme.ZouNoteAccent
 import luzzr.zou.core.ui.GlassSurface
 import luzzr.zou.core.ui.ModuleFab
 import luzzr.zou.core.ui.ZouEmptyStateCard
+import luzzr.zou.core.ui.ZouListHeader
 import luzzr.zou.core.ui.ZouMetaChip
+import luzzr.zou.core.ui.ZouPageScaffold
 import luzzr.zou.core.ui.ZouStaggeredReveal
 import luzzr.zou.core.ui.noteFlowPressScale
 import luzzr.zou.core.ui.rememberPressInteractionSource
 import luzzr.zou.core.ui.LayoutTokens
 import luzzr.zou.core.ui.ZouShimmer
+import luzzr.zou.core.ui.ZouShimmerList
 
 @Composable
 fun NotesRoute(
@@ -65,8 +68,7 @@ fun NotesScreen(
     isRefreshing: Boolean = false,
     onRefresh: () -> Unit = {},
 ) {
-    Scaffold(
-        containerColor = Color.Transparent,
+    ZouPageScaffold(
         floatingActionButton = {
             ModuleFab(
                 accentColor = ZouNoteAccent,
@@ -90,11 +92,17 @@ fun NotesScreen(
                     .padding(horizontal = LayoutTokens.ScreenHorizontalPadding, vertical = LayoutTokens.Space12),
                 verticalArrangement = Arrangement.spacedBy(LayoutTokens.Space12),
             ) {
+            item {
+                ZouListHeader(
+                    title = "笔记",
+                    subtitle = "记录想法，长按快速进入编辑。",
+                    count = if (uiState.isLoading) null else uiState.notes.size,
+                    accentColor = ZouNoteAccent,
+                )
+            }
             if (uiState.isLoading) {
                 item {
-                    ZouShimmer(
-                        modifier = Modifier.padding(vertical = LayoutTokens.Space8),
-                    )
+                    ZouShimmerList(itemCount = 3)
                 }
             } else if (uiState.notes.isEmpty()) {
                 item {

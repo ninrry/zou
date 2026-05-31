@@ -12,6 +12,7 @@ import luzzr.zou.domain.repository.SettingsRepository
 import luzzr.zou.domain.repository.TaskRepository
 import luzzr.zou.domain.usecase.ObserveReminderPreferencesUseCase
 import luzzr.zou.domain.usecase.ObserveTasksUseCase
+import luzzr.zou.domain.usecase.SoftDeleteTaskUseCase
 import luzzr.zou.domain.usecase.ToggleTaskCompletedUseCase
 import java.time.ZoneId
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -44,6 +45,7 @@ class TasksViewModelTest {
         val viewModel = TasksViewModel(
             observeReminderPreferencesUseCase = ObserveReminderPreferencesUseCase(settingsRepository),
             observeTasksUseCase = ObserveTasksUseCase(repository),
+            softDeleteTaskUseCase = SoftDeleteTaskUseCase(repository),
             toggleTaskCompletedUseCase = ToggleTaskCompletedUseCase(repository),
             timeProvider = FixedTimeProvider(),
         )
@@ -61,6 +63,34 @@ class TasksViewModelTest {
             listOf("未完成任务", "已完成任务"),
             viewModel.uiState.value.tasks.map { it.title },
         )
+
+        job.cancel()
+    }
+
+    @Test
+    fun softDeletesTaskFromList() = runTest {
+        val repository = FakeTaskRepository()
+        val settingsRepository = FakeSettingsRepository()
+        repository.tasks.value = listOf(task(id = "delete-me", title = "DeleteQA", status = TaskStatus.ACTIVE))
+
+        val viewModel = TasksViewModel(
+            observeReminderPreferencesUseCase = ObserveReminderPreferencesUseCase(settingsRepository),
+            observeTasksUseCase = ObserveTasksUseCase(repository),
+            softDeleteTaskUseCase = SoftDeleteTaskUseCase(repository),
+            toggleTaskCompletedUseCase = ToggleTaskCompletedUseCase(repository),
+            timeProvider = FixedTimeProvider(),
+        )
+        val job = backgroundScope.launch {
+            viewModel.uiState.collect { }
+        }
+
+        advanceUntilIdle()
+        assertEquals(listOf("DeleteQA"), viewModel.uiState.value.tasks.map { it.title })
+
+        viewModel.onDeleteTask("delete-me")
+        advanceUntilIdle()
+
+        assertEquals(emptyList<String>(), viewModel.uiState.value.tasks.map { it.id })
 
         job.cancel()
     }
@@ -88,7 +118,9 @@ class TasksViewModelTest {
 
         override suspend fun saveTask(task: Task, subTasks: List<SubTask>) = Unit
 
-        override suspend fun softDeleteTask(taskId: String) = Unit
+        override suspend fun softDeleteTask(taskId: String) {
+            tasks.value = tasks.value.filterNot { it.id == taskId }
+        }
 
         override suspend fun setTaskCompleted(taskId: String, completed: Boolean) = Unit
 

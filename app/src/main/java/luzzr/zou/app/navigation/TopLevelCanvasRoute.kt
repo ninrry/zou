@@ -1,7 +1,6 @@
 package luzzr.zou.app.navigation
 
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -14,13 +13,8 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.drawWithCache
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.lerp
-import luzzr.zou.core.designsystem.theme.ZouDesignTokens
 import luzzr.zou.core.ui.ModuleVisualStyle
 import luzzr.zou.core.ui.MotionTokens
 import luzzr.zou.core.ui.TopModuleTabBar
@@ -58,7 +52,6 @@ fun TopLevelCanvasRoute(
     onOpenNotes: () -> Unit,
     onOpenSettings: () -> Unit,
 ) {
-    val designTokens = ZouDesignTokens.colors
     val destinations = TopLevelDestination.entries
     val selectedIndex = destinations.indexOf(selectedDestination).coerceAtLeast(0)
     val latestSelectedDestination by rememberUpdatedState(selectedDestination)
@@ -96,24 +89,7 @@ fun TopLevelCanvasRoute(
     )
 
     Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color.Transparent)
-            .drawWithCache {
-                val canvasGlow = Brush.radialGradient(
-                    colors = listOf(
-                        motionStyle.ambientColor.copy(alpha = 0.10f),
-                        Color.Transparent,
-                    ),
-                    center = Offset(size.width * 0.46f, size.height * 0.08f),
-                    radius = size.width * 0.68f,
-                )
-                onDrawBehind {
-                    drawRect(canvasGlow)
-                    drawRect(motionStyle.overlayColor.copy(alpha = 0.004f))
-                    drawRect(designTokens.overlayAmbient.copy(alpha = 0.010f))
-                }
-            },
+        modifier = Modifier.fillMaxSize(),
     ) {
         Column(
             modifier = Modifier.fillMaxSize(),

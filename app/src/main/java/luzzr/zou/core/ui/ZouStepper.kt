@@ -34,6 +34,7 @@ fun ZouStepBar(
     modifier: Modifier = Modifier,
     onStepSelected: ((Int) -> Unit)? = null,
 ) {
+    val motion = LocalZouMotion.current
     Row(
         modifier = modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(LayoutTokens.Space8),
@@ -42,7 +43,7 @@ fun ZouStepBar(
             val selected = index == currentStep
             val selectionProgress by animateFloatAsState(
                 targetValue = if (selected) 1f else 0f,
-                animationSpec = MotionTokens.SpringSmooth,
+                animationSpec = motion.tabSwitch,
                 label = "step_selection_progress_$index",
             )
             val textColor by animateColorAsState(
@@ -51,10 +52,7 @@ fun ZouStepBar(
                 } else {
                     MaterialTheme.colorScheme.onSurfaceVariant
                 },
-                animationSpec = tween(
-                    durationMillis = MotionTokens.DurationFormStep,
-                    easing = MotionTokens.EasingEmphasized,
-                ),
+                animationSpec = motion.colorShift,
                 label = "step_text_color_$index",
             )
             GlassSurface(
@@ -114,58 +112,16 @@ fun ZouStepBottomBar(
     onPrimaryClick: () -> Unit,
     primaryTestTag: String,
 ) {
-    GlassSurface(
-        modifier = modifier.fillMaxWidth(),
-        level = GlassLevel.Normal,
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = LayoutTokens.Space20, vertical = LayoutTokens.Space12),
-            horizontalArrangement = Arrangement.spacedBy(LayoutTokens.Space12),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            if (previousVisible) {
-                OutlinedButton(
-                    modifier = Modifier
-                        .weight(1f)
-                        .height(LayoutTokens.Space24 + LayoutTokens.Space20),
-                    onClick = onPreviousClick,
-                    enabled = previousEnabled,
-                    colors = noteFlowOutlinedButtonColors(),
-                ) {
-                    Text(previousLabel, maxLines = 1)
-                }
-            } else {
-                OutlinedButton(
-                    modifier = Modifier
-                        .weight(1f)
-                        .height(LayoutTokens.Space28 + LayoutTokens.Space20),
-                    onClick = onCancelClick,
-                    enabled = cancelEnabled,
-                    colors = noteFlowOutlinedButtonColors(),
-                ) {
-                    Text(cancelLabel, maxLines = 1)
-                }
-            }
-            Button(
-                modifier = Modifier
-                    .weight(1f)
-                    .height(LayoutTokens.Space28 + LayoutTokens.Space20)
-                    .testTag(primaryTestTag),
-                onClick = onPrimaryClick,
-                enabled = primaryEnabled,
-                colors = noteFlowButtonColors(primaryAccentColor),
-            ) {
-                if (primaryLoading) {
-                    CircularProgressIndicator(
-                        color = MaterialTheme.colorScheme.onPrimary,
-                        strokeWidth = LayoutTokens.Space8 / 4,
-                    )
-                } else {
-                    Text(primaryLabel, maxLines = 1)
-                }
-            }
-        }
-    }
+    ZouBottomActionBar(
+        modifier = modifier,
+        primaryLabel = primaryLabel,
+        primaryAccentColor = primaryAccentColor,
+        primaryEnabled = primaryEnabled,
+        primaryLoading = primaryLoading,
+        primaryTestTag = primaryTestTag,
+        secondaryLabel = if (previousVisible) previousLabel else cancelLabel,
+        secondaryEnabled = if (previousVisible) previousEnabled else cancelEnabled,
+        onSecondaryClick = if (previousVisible) onPreviousClick else onCancelClick,
+        onPrimaryClick = onPrimaryClick,
+    )
 }

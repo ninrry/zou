@@ -61,6 +61,7 @@ import luzzr.zou.core.ui.ZouEmptyStateCard
 import luzzr.zou.core.ui.ZouPageHeader
 import luzzr.zou.core.ui.ZouStepBar
 import luzzr.zou.core.ui.ZouStepBottomBar
+import luzzr.zou.core.ui.ZouShimmerList
 import luzzr.zou.core.ui.LayoutTokens
 import luzzr.zou.core.ui.StandardFieldRow
 import luzzr.zou.core.ui.noteFlowButtonColors
@@ -226,9 +227,9 @@ fun HabitEditorScreen(
         if (uiState.isLoading) {
             Column(
                 modifier = Modifier.fillMaxSize().padding(innerPadding),
-                verticalArrangement = Arrangement.Center,
+                verticalArrangement = Arrangement.Top,
             ) {
-                CircularProgressIndicator(modifier = Modifier.padding(horizontal = 24.dp))
+                ZouShimmerList()
             }
         } else if (uiState.hasMissingContent) {
             Column(

@@ -9,6 +9,7 @@ import luzzr.zou.domain.model.TaskPriority
 import luzzr.zou.domain.model.TaskStatus
 import luzzr.zou.domain.usecase.ObserveReminderPreferencesUseCase
 import luzzr.zou.domain.usecase.ObserveTasksUseCase
+import luzzr.zou.domain.usecase.SoftDeleteTaskUseCase
 import luzzr.zou.domain.usecase.ToggleTaskCompletedUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import java.time.Instant
@@ -27,6 +28,7 @@ import kotlinx.coroutines.launch
 class TasksViewModel @Inject constructor(
     observeReminderPreferencesUseCase: ObserveReminderPreferencesUseCase,
     private val observeTasksUseCase: ObserveTasksUseCase,
+    private val softDeleteTaskUseCase: SoftDeleteTaskUseCase,
     private val toggleTaskCompletedUseCase: ToggleTaskCompletedUseCase,
     private val timeProvider: TimeProvider,
 ) : ViewModel() {
@@ -67,6 +69,12 @@ class TasksViewModel @Inject constructor(
                 taskId = taskId,
                 completed = completed,
             )
+        }
+    }
+
+    fun onDeleteTask(taskId: String) {
+        viewModelScope.launch {
+            softDeleteTaskUseCase(taskId)
         }
     }
 

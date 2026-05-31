@@ -65,6 +65,7 @@ import luzzr.zou.core.designsystem.theme.ZouTodayAccent
 import luzzr.zou.core.designsystem.theme.ZouTodayAccentSoft
 import luzzr.zou.core.ui.GlassLevel
 import luzzr.zou.core.ui.GlassSurface
+import luzzr.zou.core.ui.LocalZouMotion
 import luzzr.zou.core.ui.LocalRadialExpansionController
 import luzzr.zou.core.ui.ModuleFab
 import luzzr.zou.core.ui.MotionTokens
@@ -78,6 +79,7 @@ import luzzr.zou.domain.usecase.TaskQuickActionType
 import luzzr.zou.feature.settings.TopLevelSettingsButton
 
 internal data class TodayCompactLayoutSpec(
+    val stacked: Boolean,
     val columnGap: Dp,
     val sectionGap: Dp,
     val cardGap: Dp,
@@ -96,8 +98,10 @@ internal data class TodayCompactLayoutSpec(
 internal fun rememberTodayCompactLayoutSpec(totalWidth: Dp): TodayCompactLayoutSpec {
     val typography = MaterialTheme.typography
     val dense = totalWidth < 360.dp
+    val stacked = totalWidth < 560.dp
     return if (dense) {
         TodayCompactLayoutSpec(
+            stacked = true,
             columnGap = 10.dp,
             sectionGap = 8.dp,
             cardGap = LayoutTokens.Space8,
@@ -113,6 +117,7 @@ internal fun rememberTodayCompactLayoutSpec(totalWidth: Dp): TodayCompactLayoutS
         )
     } else {
         TodayCompactLayoutSpec(
+            stacked = stacked,
             columnGap = 12.dp,
             sectionGap = LayoutTokens.Space12,
             cardGap = LayoutTokens.Space12,
@@ -649,6 +654,7 @@ private fun TodayStatusPill(
 @Composable
 private fun TodayCompletionBar(summary: TodaySummaryUiModel) {
     val designTokens = ZouDesignTokens.colors
+    val motion = LocalZouMotion.current
     val progress = remember(summary) {
         val total = summary.pendingTaskCount + summary.dueHabitCount + summary.completedCount
         if (total == 0) 0f else summary.completedCount / total.toFloat()
@@ -656,7 +662,7 @@ private fun TodayCompletionBar(summary: TodaySummaryUiModel) {
     val clampedProgress = progress.coerceIn(0f, 1f)
     val animatedProgress by animateFloatAsState(
         targetValue = clampedProgress.coerceAtLeast(0.06f),
-        animationSpec = MotionTokens.SpringSmooth,
+        animationSpec = motion.tabSwitch,
         label = "today_progress_bar",
     )
     val completedPercent = (clampedProgress * 100).toInt()
@@ -792,44 +798,27 @@ private fun StaggeredQuickCreateAction(
     onClick: () -> Unit,
 ) {
     val interactionSource = rememberPressInteractionSource()
+    val motion = LocalZouMotion.current
     val radialExpansionController = LocalRadialExpansionController.current
     val actionCenter = remember { mutableStateOf<Offset?>(null) }
     AnimatedVisibility(
         visible = visible,
         enter = fadeIn(
-            animationSpec = spring(
-                dampingRatio = Spring.DampingRatioNoBouncy,
-                stiffness = 180f,
-            ),
+            animationSpec = motion.fabMenu,
         ) + slideInVertically(
-            animationSpec = spring(
-                dampingRatio = 0.76f, // 重塑为奶油级温润阻尼，彻底消除多余摆动
-                stiffness = 160f,
-            ),
+            animationSpec = motion.fabMenuOffset,
             initialOffsetY = { it },
         ) + scaleIn(
-            animationSpec = spring(
-                dampingRatio = 0.76f,
-                stiffness = 180f,
-            ),
+            animationSpec = motion.fabMenu,
             initialScale = 0.80f,
         ),
         exit = fadeOut(
-            animationSpec = spring(
-                dampingRatio = Spring.DampingRatioNoBouncy,
-                stiffness = 180f,
-            ),
+            animationSpec = motion.fabMenu,
         ) + slideOutVertically(
-            animationSpec = spring(
-                dampingRatio = 0.76f,
-                stiffness = 160f,
-            ),
+            animationSpec = motion.fabMenuOffset,
             targetOffsetY = { it },
         ) + scaleOut(
-            animationSpec = spring(
-                dampingRatio = 0.76f,
-                stiffness = 180f,
-            ),
+            animationSpec = motion.fabMenu,
             targetScale = 0.80f,
         ),
     ) {
