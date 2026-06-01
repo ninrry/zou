@@ -13,7 +13,11 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.ui.Alignment
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
@@ -197,40 +201,6 @@ fun TaskEditorScreen(
     Scaffold(
         containerColor = Color.Transparent,
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
-        bottomBar = {
-            if (!uiState.isLoading && !uiState.hasMissingContent) {
-                ZouStepBottomBar(
-                    primaryLabel = if (uiState.isSaving) {
-                        "保存中"
-                    } else if (currentStep == taskEditorSteps.lastIndex) {
-                        uiState.saveButtonLabel
-                    } else {
-                        "下一步"
-                    },
-                    primaryAccentColor = ZouTaskAccent,
-                    previousVisible = currentStep > 0,
-                    previousEnabled = !uiState.isSaving,
-                    primaryEnabled = !uiState.isSaving,
-                    primaryLoading = uiState.isSaving,
-                    onCancelClick = onNavigateBack,
-                    onPreviousClick = {
-                        if (!uiState.isSaving) {
-                            scope.launch { pagerState.animateScrollToPage(currentStep - 1) }
-                        }
-                    },
-                    onPrimaryClick = {
-                        if (uiState.isSaving) {
-                            Unit
-                        } else if (currentStep == taskEditorSteps.lastIndex) {
-                            onSaveClicked()
-                        } else {
-                            scope.launch { pagerState.animateScrollToPage(currentStep + 1) }
-                        }
-                    },
-                    primaryTestTag = "task_editor_save",
-                )
-            }
-        },
     ) { innerPadding ->
         when {
             uiState.isLoading -> {
@@ -268,18 +238,14 @@ fun TaskEditorScreen(
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(innerPadding)
+                        .padding(
+                            top = innerPadding.calculateTopPadding(),
+                            bottom = 0.dp
+                        )
                         .padding(horizontal = 20.dp, vertical = 16.dp),
                     verticalArrangement = Arrangement.spacedBy(18.dp),
                 ) {
-                    TextButton(onClick = onNavigateBack, enabled = !uiState.isSaving) {
-                        Icon(imageVector = Icons.AutoMirrored.Outlined.ArrowBack, contentDescription = null)
-                        Text("返回", modifier = Modifier.padding(start = LayoutTokens.Space8))
-                    }
-                    ZouPageHeader(
-                        title = uiState.screenTitle,
-                        subtitle = "先完成主信息，再补充时间和完成方式。",
-                    )
+
                     ZouStepBar(
                         steps = taskEditorSteps,
                         currentStep = currentStep,
@@ -291,61 +257,103 @@ fun TaskEditorScreen(
                         },
                     )
 
-                    HorizontalPager(
-                        state = pagerState,
+                    // 🌟 使用 Box 包裹 HorizontalPager，实现底部按钮稳定悬浮且内容自由穿透下潜！
+                    Box(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .weight(1f),
-                        userScrollEnabled = !uiState.isSaving,
-                        beyondViewportPageCount = 1,
-                    ) { step ->
-                        Column(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .verticalScroll(rememberScrollState())
-                                .padding(bottom = LayoutTokens.Space24),
-                            verticalArrangement = Arrangement.spacedBy(18.dp),
-                        ) {
-                            when (step) {
-                                0 -> TaskBasicStep(
-                                    uiState = uiState,
-                                    onTitleChanged = onTitleChanged,
-                                    onContentChanged = onContentChanged,
-                                    onPrioritySelected = onPrioritySelected,
-                                    onUrgentChanged = onUrgentChanged,
-                                )
+                            .weight(1f)
+                    ) {
+                        HorizontalPager(
+                            state = pagerState,
+                            modifier = Modifier.fillMaxSize(),
+                            userScrollEnabled = !uiState.isSaving,
+                            beyondViewportPageCount = 1,
+                        ) { step ->
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .verticalScroll(rememberScrollState()),
+                                verticalArrangement = Arrangement.spacedBy(18.dp),
+                            ) {
+                                when (step) {
+                                    0 -> TaskBasicStep(
+                                        uiState = uiState,
+                                        onTitleChanged = onTitleChanged,
+                                        onContentChanged = onContentChanged,
+                                        onPrioritySelected = onPrioritySelected,
+                                        onUrgentChanged = onUrgentChanged,
+                                    )
 
-                                1 -> TaskScheduleStep(
-                                    uiState = uiState,
-                                    formatter = formatter,
-                                    zoneId = zoneId,
-                                    onDueDateSelected = onDueDateSelected,
-                                    onDueTimeSelected = onDueTimeSelected,
-                                    onClearDueAt = onClearDueAt,
-                                    onStartReminderMinuteChanged = onStartReminderMinuteChanged,
-                                    onWindowEndMinuteChanged = onWindowEndMinuteChanged,
-                                    onRepeatIntervalChanged = onRepeatIntervalChanged,
-                                    onAddExactReminder = onAddExactReminder,
-                                    onRemoveExactReminder = onRemoveExactReminder,
-                                    onReminderNotificationTitleChanged = onReminderNotificationTitleChanged,
-                                    onReminderNotificationBodyChanged = onReminderNotificationBodyChanged,
-                                    onReminderActiveFromChanged = onReminderActiveFromChanged,
-                                    onReminderActiveToChanged = onReminderActiveToChanged,
-                                    onShowPicker = { pickerRequest = it },
-                                )
+                                    1 -> TaskScheduleStep(
+                                        uiState = uiState,
+                                        formatter = formatter,
+                                        zoneId = zoneId,
+                                        onDueDateSelected = onDueDateSelected,
+                                        onDueTimeSelected = onDueTimeSelected,
+                                        onClearDueAt = onClearDueAt,
+                                        onStartReminderMinuteChanged = onStartReminderMinuteChanged,
+                                        onWindowEndMinuteChanged = onWindowEndMinuteChanged,
+                                        onRepeatIntervalChanged = onRepeatIntervalChanged,
+                                        onAddExactReminder = onAddExactReminder,
+                                        onRemoveExactReminder = onRemoveExactReminder,
+                                        onReminderNotificationTitleChanged = onReminderNotificationTitleChanged,
+                                        onReminderNotificationBodyChanged = onReminderNotificationBodyChanged,
+                                        onReminderActiveFromChanged = onReminderActiveFromChanged,
+                                        onReminderActiveToChanged = onReminderActiveToChanged,
+                                        onShowPicker = { pickerRequest = it },
+                                    )
 
-                                else -> TaskCompletionStep(
-                                    uiState = uiState,
-                                    onCompletionRuleSelected = onCompletionRuleSelected,
-                                    onTaskCompletedChanged = onTaskCompletedChanged,
-                                    onAddSubTask = onAddSubTask,
-                                    onSubTaskTitleChanged = onSubTaskTitleChanged,
-                                    onSubTaskCompletedChanged = onSubTaskCompletedChanged,
-                                    onRemoveSubTask = onRemoveSubTask,
-                                    onDeleteClicked = onDeleteClicked,
+                                    else -> TaskCompletionStep(
+                                        uiState = uiState,
+                                        onCompletionRuleSelected = onCompletionRuleSelected,
+                                        onTaskCompletedChanged = onTaskCompletedChanged,
+                                        onAddSubTask = onAddSubTask,
+                                        onSubTaskTitleChanged = onSubTaskTitleChanged,
+                                        onSubTaskCompletedChanged = onSubTaskCompletedChanged,
+                                        onRemoveSubTask = onRemoveSubTask,
+                                        onDeleteClicked = onDeleteClicked,
+                                    )
+                                }
+
+                                // 🌟 垫高垫片，防止底部卡片内容被悬浮按钮遮挡
+                                androidx.compose.foundation.layout.Spacer(
+                                    modifier = Modifier.navigationBarsPadding().height(92.dp)
                                 )
                             }
                         }
+
+                        // 🌟 悬浮在 Box 最底部的透明胶囊按键！
+                        ZouStepBottomBar(
+                            modifier = Modifier.align(Alignment.BottomCenter),
+                            primaryLabel = if (uiState.isSaving) {
+                                "保存中"
+                            } else if (currentStep == taskEditorSteps.lastIndex) {
+                                uiState.saveButtonLabel
+                            } else {
+                                "下一步"
+                            },
+                            primaryAccentColor = ZouTaskAccent,
+                            previousVisible = currentStep > 0,
+                            previousEnabled = !uiState.isSaving,
+                            primaryEnabled = !uiState.isSaving,
+                            primaryLoading = uiState.isSaving,
+                            onCancelClick = onNavigateBack,
+                            onPreviousClick = {
+                                if (!uiState.isSaving) {
+                                    scope.launch { pagerState.animateScrollToPage(currentStep - 1) }
+                                }
+                            },
+                            onPrimaryClick = {
+                                if (uiState.isSaving) {
+                                    Unit
+                                } else if (currentStep == taskEditorSteps.lastIndex) {
+                                    onSaveClicked()
+                                } else {
+                                    scope.launch { pagerState.animateScrollToPage(currentStep + 1) }
+                                }
+                            },
+                            primaryTestTag = "task_editor_save",
+                        )
                     }
                 }
             }

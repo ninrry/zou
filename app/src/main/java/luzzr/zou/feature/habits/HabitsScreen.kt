@@ -30,16 +30,13 @@ import luzzr.zou.core.designsystem.theme.ZouHabitAccent
 import luzzr.zou.core.ui.GlassSurface
 import luzzr.zou.core.ui.ModuleFab
 import luzzr.zou.core.ui.ZouEmptyStateCard
-import luzzr.zou.core.ui.ZouListHeader
 import luzzr.zou.core.ui.ZouMetaChip
-import luzzr.zou.core.ui.ZouPageScaffold
 import luzzr.zou.core.ui.ZouStaggeredReveal
 import luzzr.zou.core.ui.noteFlowButtonColors
 import luzzr.zou.core.ui.noteFlowPressScale
 import luzzr.zou.core.ui.rememberPressInteractionSource
 import luzzr.zou.core.ui.LayoutTokens
 import luzzr.zou.core.ui.ZouShimmer
-import luzzr.zou.core.ui.ZouShimmerList
 
 @Composable
 fun HabitsRoute(
@@ -75,16 +72,8 @@ fun HabitsScreen(
     isRefreshing: Boolean = false,
     onRefresh: () -> Unit = {},
 ) {
-    ZouPageScaffold(
-        floatingActionButton = {
-            ModuleFab(
-                accentColor = ZouHabitAccent,
-                contentDescription = "新建习惯",
-                icon = Icons.Default.Add,
-                testTag = "habits_fab",
-                onClick = onCreateHabit,
-            )
-        },
+    Scaffold(
+        containerColor = Color.Transparent,
     ) { innerPadding ->
         PullToRefreshBox(
             isRefreshing = isRefreshing,
@@ -99,17 +88,11 @@ fun HabitsScreen(
                     .padding(horizontal = LayoutTokens.ScreenHorizontalPadding, vertical = LayoutTokens.Space12),
                 verticalArrangement = Arrangement.spacedBy(LayoutTokens.Space12),
             ) {
-            item {
-                ZouListHeader(
-                    title = "习惯",
-                    subtitle = "查看今日频率命中、快速打卡和恢复已删除习惯。",
-                    count = if (uiState.isLoading) null else uiState.activeHabits.size,
-                    accentColor = ZouHabitAccent,
-                )
-            }
             if (uiState.isLoading) {
                 item {
-                    ZouShimmerList(itemCount = 3)
+                    ZouShimmer(
+                        modifier = Modifier.padding(vertical = LayoutTokens.Space8),
+                    )
                 }
             } else if (uiState.activeHabits.isEmpty() && uiState.deletedHabits.isEmpty()) {
                 item {

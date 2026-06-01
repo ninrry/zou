@@ -1,4 +1,4 @@
-﻿package luzzr.zou.feature.habits
+package luzzr.zou.feature.habits
 
 import android.Manifest
 import android.content.Context
@@ -13,7 +13,11 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.ui.Alignment
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
@@ -189,40 +193,6 @@ fun HabitEditorScreen(
     Scaffold(
         containerColor = Color.Transparent,
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
-        bottomBar = {
-            if (!uiState.isLoading && !uiState.hasMissingContent) {
-                ZouStepBottomBar(
-                    primaryLabel = if (uiState.isSaving) {
-                        "保存中"
-                    } else if (currentStep == habitEditorSteps.lastIndex) {
-                        uiState.saveButtonLabel
-                    } else {
-                        "下一步"
-                    },
-                    primaryAccentColor = ZouHabitAccent,
-                    previousVisible = currentStep > 0,
-                    previousEnabled = !uiState.isSaving,
-                    primaryEnabled = !uiState.isSaving,
-                    primaryLoading = uiState.isSaving,
-                    onCancelClick = onNavigateBack,
-                    onPreviousClick = {
-                        if (!uiState.isSaving) {
-                            scope.launch { pagerState.animateScrollToPage(currentStep - 1) }
-                        }
-                    },
-                    onPrimaryClick = {
-                        if (uiState.isSaving) {
-                            Unit
-                        } else if (currentStep == habitEditorSteps.lastIndex) {
-                            onSaveClicked()
-                        } else {
-                            scope.launch { pagerState.animateScrollToPage(currentStep + 1) }
-                        }
-                    },
-                    primaryTestTag = "habit_editor_save",
-                )
-            }
-        },
     ) { innerPadding ->
         if (uiState.isLoading) {
             Column(
@@ -253,18 +223,14 @@ fun HabitEditorScreen(
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(innerPadding)
+                    .padding(
+                        top = innerPadding.calculateTopPadding(),
+                        bottom = 0.dp
+                    )
                     .padding(horizontal = 20.dp, vertical = 16.dp),
                 verticalArrangement = Arrangement.spacedBy(18.dp),
             ) {
-                TextButton(onClick = onNavigateBack, enabled = !uiState.isSaving) {
-                    Icon(imageVector = Icons.AutoMirrored.Outlined.ArrowBack, contentDescription = null)
-                    Text("返回", modifier = Modifier.padding(start = LayoutTokens.Space8))
-                }
-                ZouPageHeader(
-                    title = uiState.screenTitle,
-                    subtitle = "先定义执行方式，再设置频率和提醒。",
-                )
+
                 ZouStepBar(
                     steps = habitEditorSteps,
                     currentStep = currentStep,
@@ -276,61 +242,103 @@ fun HabitEditorScreen(
                     },
                 )
 
-                HorizontalPager(
-                    state = pagerState,
+                // 🌟 使用 Box 包裹 HorizontalPager，实现底部按钮稳定悬浮且内容自由穿透下潜！
+                Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .weight(1f),
-                    userScrollEnabled = !uiState.isSaving,
-                    beyondViewportPageCount = 1,
-                ) { step ->
-                    Column(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .verticalScroll(rememberScrollState())
-                            .padding(bottom = LayoutTokens.Space24),
-                        verticalArrangement = Arrangement.spacedBy(18.dp),
-                    ) {
-                        when (step) {
-                            0 -> HabitBasicStep(
-                                uiState = uiState,
-                                onTitleChanged = onTitleChanged,
-                                onContentChanged = onContentChanged,
-                                onCheckInModeSelected = onCheckInModeSelected,
-                            )
+                        .weight(1f)
+                ) {
+                    HorizontalPager(
+                        state = pagerState,
+                        modifier = Modifier.fillMaxSize(),
+                        userScrollEnabled = !uiState.isSaving,
+                        beyondViewportPageCount = 1,
+                    ) { step ->
+                        Column(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .verticalScroll(rememberScrollState()),
+                            verticalArrangement = Arrangement.spacedBy(18.dp),
+                        ) {
+                            when (step) {
+                                0 -> HabitBasicStep(
+                                    uiState = uiState,
+                                    onTitleChanged = onTitleChanged,
+                                    onContentChanged = onContentChanged,
+                                    onCheckInModeSelected = onCheckInModeSelected,
+                                )
 
-                            1 -> HabitFrequencyStep(
-                                uiState = uiState,
-                                dateFormatter = dateFormatter,
-                                zoneId = zoneId,
-                                onFrequencySelected = onFrequencySelected,
-                                onWeekdayToggled = onWeekdayToggled,
-                                onIntervalDaysChanged = onIntervalDaysChanged,
-                                onIntervalAnchorDateChanged = onIntervalAnchorDateChanged,
-                                onMonthlyDaysChanged = onMonthlyDaysChanged,
-                                onShowPicker = { pickerRequest = it },
-                            )
+                                1 -> HabitFrequencyStep(
+                                    uiState = uiState,
+                                    dateFormatter = dateFormatter,
+                                    zoneId = zoneId,
+                                    onFrequencySelected = onFrequencySelected,
+                                    onWeekdayToggled = onWeekdayToggled,
+                                    onIntervalDaysChanged = onIntervalDaysChanged,
+                                    onIntervalAnchorDateChanged = onIntervalAnchorDateChanged,
+                                    onMonthlyDaysChanged = onMonthlyDaysChanged,
+                                    onShowPicker = { pickerRequest = it },
+                                )
 
-                            else -> HabitReminderStep(
-                                uiState = uiState,
-                                timeFormatter = timeFormatter,
-                                zoneId = zoneId,
-                                onRemindWindowStartChanged = onRemindWindowStartChanged,
-                                onRemindWindowEndChanged = onRemindWindowEndChanged,
-                                onRepeatIntervalChanged = onRepeatIntervalChanged,
-                                onAddExactReminder = onAddExactReminder,
-                                onRemoveExactReminder = onRemoveExactReminder,
-                                onReminderNotificationTitleChanged = onReminderNotificationTitleChanged,
-                                onReminderNotificationBodyChanged = onReminderNotificationBodyChanged,
-                                onTargetDurationChanged = onTargetDurationChanged,
-                                onAddStep = onAddStep,
-                                onStepTitleChanged = onStepTitleChanged,
-                                onRemoveStep = onRemoveStep,
-                                onDeleteClicked = onDeleteClicked,
-                                onShowPicker = { pickerRequest = it },
+                                else -> HabitReminderStep(
+                                    uiState = uiState,
+                                    timeFormatter = timeFormatter,
+                                    zoneId = zoneId,
+                                    onRemindWindowStartChanged = onRemindWindowStartChanged,
+                                    onRemindWindowEndChanged = onRemindWindowEndChanged,
+                                    onRepeatIntervalChanged = onRepeatIntervalChanged,
+                                    onAddExactReminder = onAddExactReminder,
+                                    onRemoveExactReminder = onRemoveExactReminder,
+                                    onReminderNotificationTitleChanged = onReminderNotificationTitleChanged,
+                                    onReminderNotificationBodyChanged = onReminderNotificationBodyChanged,
+                                    onTargetDurationChanged = onTargetDurationChanged,
+                                    onAddStep = onAddStep,
+                                    onStepTitleChanged = onStepTitleChanged,
+                                    onRemoveStep = onRemoveStep,
+                                    onDeleteClicked = onDeleteClicked,
+                                    onShowPicker = { pickerRequest = it },
+                                )
+                            }
+
+                            // 🌟 垫高垫片，防止底部卡片内容被悬浮按钮遮挡
+                            androidx.compose.foundation.layout.Spacer(
+                                modifier = Modifier.navigationBarsPadding().height(92.dp)
                             )
                         }
                     }
+
+                    // 🌟 悬浮在 Box 最底部的透明胶囊按键！
+                    ZouStepBottomBar(
+                        modifier = Modifier.align(Alignment.BottomCenter),
+                        primaryLabel = if (uiState.isSaving) {
+                            "保存中"
+                        } else if (currentStep == habitEditorSteps.lastIndex) {
+                            uiState.saveButtonLabel
+                        } else {
+                            "下一步"
+                        },
+                        primaryAccentColor = ZouHabitAccent,
+                        previousVisible = currentStep > 0,
+                        previousEnabled = !uiState.isSaving,
+                        primaryEnabled = !uiState.isSaving,
+                        primaryLoading = uiState.isSaving,
+                        onCancelClick = onNavigateBack,
+                        onPreviousClick = {
+                            if (!uiState.isSaving) {
+                                scope.launch { pagerState.animateScrollToPage(currentStep - 1) }
+                            }
+                        },
+                        onPrimaryClick = {
+                            if (uiState.isSaving) {
+                                Unit
+                            } else if (currentStep == habitEditorSteps.lastIndex) {
+                                onSaveClicked()
+                            } else {
+                                scope.launch { pagerState.animateScrollToPage(currentStep + 1) }
+                            }
+                        },
+                        primaryTestTag = "habit_editor_save",
+                    )
                 }
             }
         }

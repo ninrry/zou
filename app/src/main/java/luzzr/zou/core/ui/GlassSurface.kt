@@ -42,11 +42,7 @@ fun GlassSurface(
         GlassLevel.Normal -> designTokens.glassBorderSoft
         GlassLevel.Strong -> designTokens.glassBorder
     }
-    val shadowElevation = when (resolvedLevel) {
-        GlassLevel.Weak -> 2.dp
-        GlassLevel.Normal -> 4.dp
-        GlassLevel.Strong -> 7.dp
-    }
+    val shadowElevation = 0.dp
 
     val animatedContainerColor = animateColorAsState(
         targetValue = containerColor,

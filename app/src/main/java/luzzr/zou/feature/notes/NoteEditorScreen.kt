@@ -1,4 +1,4 @@
-﻿package luzzr.zou.feature.notes
+package luzzr.zou.feature.notes
 
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -8,7 +8,9 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -45,10 +47,8 @@ import luzzr.zou.core.markdown.MarkdownRenderer
 import luzzr.zou.core.ui.ZouEditorSection
 import luzzr.zou.core.ui.ZouEmptyStateCard
 import luzzr.zou.core.ui.ZouPageHeader
-import luzzr.zou.core.ui.ZouPageScaffold
 import luzzr.zou.core.ui.ZouSectionCard
-import luzzr.zou.core.ui.ZouBottomActionBar
-import luzzr.zou.core.ui.ZouShimmerList
+import luzzr.zou.core.ui.ZouStepBottomBar
 import luzzr.zou.core.ui.LayoutTokens
 import luzzr.zou.core.ui.noteFlowButtonColors
 import luzzr.zou.core.ui.noteFlowOutlinedButtonColors
@@ -109,31 +109,17 @@ fun NoteEditorScreen(
 ) {
     var previewVisible by rememberSaveable(uiState.noteId) { mutableStateOf(false) }
 
-    ZouPageScaffold(
-        bottomBar = {
-            if (!uiState.isLoading && !uiState.hasMissingContent) {
-                ZouBottomActionBar(
-                    primaryLabel = uiState.saveButtonLabel,
-                    primaryAccentColor = ZouNoteAccent,
-                    primaryEnabled = !uiState.isSaving,
-                    primaryLoading = uiState.isSaving,
-                    primaryTestTag = "note_editor_save",
-                    secondaryLabel = "放弃",
-                    secondaryEnabled = !uiState.isSaving,
-                    onSecondaryClick = onNavigateBack,
-                    onPrimaryClick = onSaveClicked,
-                )
-            }
-        },
+    Scaffold(
+        containerColor = Color.Transparent,
     ) { innerPadding ->
         if (uiState.isLoading) {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(innerPadding),
-                verticalArrangement = Arrangement.Top,
+                verticalArrangement = Arrangement.Center,
             ) {
-                ZouShimmerList()
+                CircularProgressIndicator(modifier = Modifier.padding(horizontal = 24.dp))
             }
         } else if (uiState.hasMissingContent) {
             Column(
@@ -156,130 +142,150 @@ fun NoteEditorScreen(
                 )
             }
         } else {
-            Column(
+            // 🌟 使用 Box 包裹滚动 Column，实现底部按钮稳定悬浮且内容自由穿透下潜！
+            Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(innerPadding)
-                    .verticalScroll(rememberScrollState())
-                    .padding(horizontal = 20.dp, vertical = 16.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp),
             ) {
-                TextButton(onClick = onNavigateBack, enabled = !uiState.isSaving) {
-                    Icon(imageVector = Icons.AutoMirrored.Outlined.ArrowBack, contentDescription = null)
-                    Text("返回", modifier = Modifier.padding(start = LayoutTokens.Space8))
-                }
-                ZouPageHeader(
-                    title = uiState.screenTitle,
-                    subtitle = "编辑优先，预览按需展开。",
-                )
-
-                ZouEditorSection(
-                    title = "正文",
-                    subtitle = "先写内容，需要时再展开预览。",
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(
+                            top = innerPadding.calculateTopPadding(),
+                            bottom = 0.dp
+                        )
+                        .verticalScroll(rememberScrollState())
+                        .padding(horizontal = 20.dp, vertical = 16.dp),
+                    verticalArrangement = Arrangement.spacedBy(16.dp),
                 ) {
-                    OutlinedTextField(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .testTag("note_editor_title_input"),
-                        value = uiState.title,
-                        onValueChange = onTitleChanged,
-                        label = { Text("标题") },
-                        singleLine = true,
-                        enabled = !uiState.isSaving,
-                        isError = uiState.titleError != null,
-                        supportingText = { uiState.titleError?.let { Text(it) } },
-                        colors = noteFlowOutlinedTextFieldColors(),
-                    )
-
-                    OutlinedTextField(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .testTag("note_editor_content_input"),
-                        value = uiState.content,
-                        onValueChange = onContentChanged,
-                        enabled = !uiState.isSaving,
-                        label = { Text("正文（Markdown 原文）") },
-                        minLines = 12,
-                        visualTransformation = NoteImageReferenceVisualTransformation,
-                        colors = noteFlowOutlinedTextFieldColors(),
-                    )
-
-                    Column(
-                        modifier = Modifier.fillMaxWidth(),
-                        verticalArrangement = Arrangement.spacedBy(12.dp),
-                    ) {
-                        Button(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .testTag("note_editor_insert_image"),
-                            onClick = onPickImage,
-                            enabled = !uiState.isSaving,
-                            colors = noteFlowButtonColors(ZouNoteAccent),
-                        ) {
-                            Icon(imageVector = Icons.Default.Image, contentDescription = null)
-                            Text(text = "插入图片", modifier = Modifier.padding(start = 8.dp))
-                        }
-                        OutlinedButton(
-                            modifier = Modifier.fillMaxWidth(),
-                            onClick = { previewVisible = !previewVisible },
-                            enabled = !uiState.isSaving,
-                            colors = noteFlowOutlinedButtonColors(),
-                        ) {
-                            Text(if (previewVisible) "收起实时预览" else "展开实时预览")
-                        }
-                    }
-                }
-
-                if (previewVisible) {
-                    ZouSectionCard(
-                        title = "实时预览",
-                        subtitle = "只读渲染，不影响原文。",
-                        modifier = Modifier.testTag("note_markdown_preview"),
-                    ) {
-                        if (uiState.content.text.isBlank()) {
-                            Text(
-                                text = "输入 Markdown 后会在这里预览。",
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            )
-                        } else {
-                            MarkdownRenderer(
-                                markdown = uiState.content.text,
-                                mediaLookup = uiState.images.associate { it.mediaId to it.localPath },
-                            )
-                        }
-                    }
-                }
-
-                if (uiState.canDelete) {
                     ZouEditorSection(
-                        title = "危险操作",
-                        subtitle = "删除后会进入回收站，不影响底部主动作区。",
+                        title = "正文",
+                        subtitle = "先写内容，需要时再展开预览。",
                     ) {
-                        HorizontalDivider()
-                        TextButton(
+                        OutlinedTextField(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .testTag("note_editor_delete"),
-                            onClick = onDeleteClicked,
+                                .testTag("note_editor_title_input"),
+                            value = uiState.title,
+                            onValueChange = onTitleChanged,
+                            label = { Text("标题") },
+                            singleLine = true,
                             enabled = !uiState.isSaving,
+                            isError = uiState.titleError != null,
+                            supportingText = { uiState.titleError?.let { Text(it) } },
+                            colors = noteFlowOutlinedTextFieldColors(),
+                        )
+
+                        OutlinedTextField(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .testTag("note_editor_content_input"),
+                            value = uiState.content,
+                            onValueChange = onContentChanged,
+                            enabled = !uiState.isSaving,
+                            label = { Text("正文（Markdown 原文）") },
+                            minLines = 12,
+                            visualTransformation = NoteImageReferenceVisualTransformation,
+                            colors = noteFlowOutlinedTextFieldColors(),
+                        )
+
+                        Column(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalArrangement = Arrangement.spacedBy(12.dp),
                         ) {
-                            Text(
-                                text = "软删除笔记",
-                                color = MaterialTheme.colorScheme.error,
-                            )
+                            Button(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .testTag("note_editor_insert_image"),
+                                onClick = onPickImage,
+                                enabled = !uiState.isSaving,
+                                colors = noteFlowButtonColors(ZouNoteAccent),
+                            ) {
+                                Icon(imageVector = Icons.Default.Image, contentDescription = null)
+                                Text(text = "插入图片", modifier = Modifier.padding(start = 8.dp))
+                            }
+                            OutlinedButton(
+                                modifier = Modifier.fillMaxWidth(),
+                                onClick = { previewVisible = !previewVisible },
+                                enabled = !uiState.isSaving,
+                                colors = noteFlowOutlinedButtonColors(),
+                            ) {
+                                Text(if (previewVisible) "收起实时预览" else "展开实时预览")
+                            }
                         }
                     }
-                }
 
-                uiState.saveErrorMessage?.let {
-                    Text(
-                        text = it,
-                        modifier = Modifier.testTag("note_editor_save_error"),
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.error,
+                    if (previewVisible) {
+                        ZouSectionCard(
+                            title = "实时预览",
+                            subtitle = "只读渲染，不影响原文。",
+                            modifier = Modifier.testTag("note_markdown_preview"),
+                        ) {
+                            if (uiState.content.text.isBlank()) {
+                                Text(
+                                    text = "输入 Markdown 后会在这里预览。",
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                )
+                            } else {
+                                MarkdownRenderer(
+                                    markdown = uiState.content.text,
+                                    mediaLookup = uiState.images.associate { it.mediaId to it.localPath },
+                                )
+                            }
+                        }
+                    }
+
+                    if (uiState.canDelete) {
+                        ZouEditorSection(
+                            title = "危险操作",
+                            subtitle = "删除后会进入回收站，不影响底部主动作区。",
+                        ) {
+                            HorizontalDivider()
+                            TextButton(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .testTag("note_editor_delete"),
+                                onClick = onDeleteClicked,
+                                enabled = !uiState.isSaving,
+                            ) {
+                                Text(
+                                    text = "软删除笔记",
+                                    color = MaterialTheme.colorScheme.error,
+                                )
+                            }
+                        }
+                    }
+
+                    uiState.saveErrorMessage?.let {
+                        Text(
+                            text = it,
+                            modifier = Modifier.testTag("note_editor_save_error"),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.error,
+                        )
+                    }
+
+                    // 🌟 垫高垫片，防止底部卡片内容被悬浮按钮遮挡
+                    androidx.compose.foundation.layout.Spacer(
+                        modifier = Modifier.navigationBarsPadding().height(92.dp)
                     )
                 }
+
+                // 🌟 悬浮在 Box 最底部的透明胶囊按键！
+                ZouStepBottomBar(
+                    modifier = Modifier.align(Alignment.BottomCenter),
+                    primaryLabel = uiState.saveButtonLabel,
+                    primaryAccentColor = ZouNoteAccent,
+                    previousVisible = false,
+                    primaryEnabled = !uiState.isSaving,
+                    primaryLoading = uiState.isSaving,
+                    cancelLabel = "放弃",
+                    cancelEnabled = !uiState.isSaving,
+                    onCancelClick = onNavigateBack,
+                    onPrimaryClick = onSaveClicked,
+                    primaryTestTag = "note_editor_save",
+                )
             }
         }
     }

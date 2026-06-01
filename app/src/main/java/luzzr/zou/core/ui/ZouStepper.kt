@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
@@ -34,7 +35,6 @@ fun ZouStepBar(
     modifier: Modifier = Modifier,
     onStepSelected: ((Int) -> Unit)? = null,
 ) {
-    val motion = LocalZouMotion.current
     Row(
         modifier = modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(LayoutTokens.Space8),
@@ -43,7 +43,7 @@ fun ZouStepBar(
             val selected = index == currentStep
             val selectionProgress by animateFloatAsState(
                 targetValue = if (selected) 1f else 0f,
-                animationSpec = motion.tabSwitch,
+                animationSpec = MotionTokens.SpringSmooth,
                 label = "step_selection_progress_$index",
             )
             val textColor by animateColorAsState(
@@ -52,7 +52,10 @@ fun ZouStepBar(
                 } else {
                     MaterialTheme.colorScheme.onSurfaceVariant
                 },
-                animationSpec = motion.colorShift,
+                animationSpec = tween(
+                    durationMillis = MotionTokens.DurationFormStep,
+                    easing = MotionTokens.EasingEmphasized,
+                ),
                 label = "step_text_color_$index",
             )
             GlassSurface(
@@ -105,23 +108,61 @@ fun ZouStepBottomBar(
     primaryEnabled: Boolean = true,
     primaryLoading: Boolean = false,
     previousLabel: String = "上一步",
-    cancelLabel: String = "取消",
+    cancelLabel: String = "放弃",
     cancelEnabled: Boolean = true,
     onCancelClick: () -> Unit = {},
     onPreviousClick: () -> Unit = {},
     onPrimaryClick: () -> Unit,
     primaryTestTag: String,
 ) {
-    ZouBottomActionBar(
-        modifier = modifier,
-        primaryLabel = primaryLabel,
-        primaryAccentColor = primaryAccentColor,
-        primaryEnabled = primaryEnabled,
-        primaryLoading = primaryLoading,
-        primaryTestTag = primaryTestTag,
-        secondaryLabel = if (previousVisible) previousLabel else cancelLabel,
-        secondaryEnabled = if (previousVisible) previousEnabled else cancelEnabled,
-        onSecondaryClick = if (previousVisible) onPreviousClick else onCancelClick,
-        onPrimaryClick = onPrimaryClick,
-    )
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .navigationBarsPadding()
+            .padding(horizontal = LayoutTokens.Space20, vertical = LayoutTokens.Space16),
+        horizontalArrangement = Arrangement.spacedBy(LayoutTokens.Space12),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        if (previousVisible) {
+            OutlinedButton(
+                modifier = Modifier
+                    .weight(1f)
+                    .height(LayoutTokens.Space28 + LayoutTokens.Space20),
+                onClick = onPreviousClick,
+                enabled = previousEnabled,
+                colors = noteFlowOutlinedButtonColors(),
+            ) {
+                Text(previousLabel, maxLines = 1)
+            }
+        } else {
+            OutlinedButton(
+                modifier = Modifier
+                    .weight(1f)
+                    .height(LayoutTokens.Space28 + LayoutTokens.Space20),
+                onClick = onCancelClick,
+                enabled = cancelEnabled,
+                colors = noteFlowOutlinedButtonColors(),
+            ) {
+                Text(cancelLabel, maxLines = 1)
+            }
+        }
+        Button(
+            modifier = Modifier
+                .weight(1f)
+                .height(LayoutTokens.Space28 + LayoutTokens.Space20)
+                .testTag(primaryTestTag),
+            onClick = onPrimaryClick,
+            enabled = primaryEnabled,
+            colors = noteFlowButtonColors(primaryAccentColor),
+        ) {
+            if (primaryLoading) {
+                CircularProgressIndicator(
+                    color = MaterialTheme.colorScheme.onPrimary,
+                    strokeWidth = LayoutTokens.Space8 / 4,
+                )
+            } else {
+                Text(primaryLabel, maxLines = 1)
+            }
+        }
+    }
 }

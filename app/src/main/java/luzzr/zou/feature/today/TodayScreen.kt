@@ -1,6 +1,5 @@
 package luzzr.zou.feature.today
 
-import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -35,7 +34,6 @@ import luzzr.zou.core.designsystem.theme.ZouHabitAccent
 import luzzr.zou.core.designsystem.theme.ZouTaskAccent
 import luzzr.zou.core.ui.ZouStaggeredReveal
 import luzzr.zou.core.ui.LayoutTokens
-import luzzr.zou.core.ui.ZouPageScaffold
 import luzzr.zou.domain.usecase.HabitQuickActionType
 import luzzr.zou.domain.usecase.TaskQuickActionType
 import kotlinx.coroutines.flow.Flow
@@ -100,17 +98,6 @@ fun TodayScreen(
     isRefreshing: Boolean = false,
     onRefresh: () -> Unit = {},
 ) {
-    var isQuickCreateExpanded by rememberSaveable { mutableStateOf(false) }
-    var isQuickCreateClicked by remember { mutableStateOf(false) }
-
-    LaunchedEffect(isQuickCreateExpanded) {
-        if (!isQuickCreateExpanded) {
-            isQuickCreateClicked = false
-        }
-    }
-    BackHandler(enabled = isQuickCreateExpanded && !isQuickCreateClicked) {
-        isQuickCreateExpanded = false
-    }
     val snackbarHostState = remember { SnackbarHostState() }
     LaunchedEffect(events) {
         events.collect { event ->
@@ -132,24 +119,9 @@ fun TodayScreen(
             }
         }
     }
-    ZouPageScaffold(
-        snackbarHostState = snackbarHostState,
-        floatingActionButton = {
-            TodayQuickCreateFab(
-                expanded = isQuickCreateExpanded && !isQuickCreateClicked,
-                onToggleExpanded = { isQuickCreateExpanded = !isQuickCreateExpanded },
-                onCreateTask = {
-                    isQuickCreateClicked = true
-                    isQuickCreateExpanded = false
-                    onCreateTask()
-                },
-                onCreateHabit = {
-                    isQuickCreateClicked = true
-                    isQuickCreateExpanded = false
-                    onCreateHabit()
-                },
-            )
-        },
+    Scaffold(
+        containerColor = Color.Transparent,
+        snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
     ) { innerPadding ->
         PullToRefreshBox(
             isRefreshing = isRefreshing,
@@ -219,69 +191,36 @@ private fun TodayDualColumnQuickArea(
             .testTag("today_dual_columns"),
     ) {
         val layoutSpec = rememberTodayCompactLayoutSpec(maxWidth)
-        if (layoutSpec.stacked) {
-            Column(
-                modifier = Modifier.fillMaxWidth(),
-                verticalArrangement = Arrangement.spacedBy(LayoutTokens.Space20),
-            ) {
-                TodayTasksSection(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .testTag("today_tasks_column"),
-                    tasks = uiState.tasks,
-                    layoutSpec = layoutSpec,
-                    onOpenTask = onOpenTask,
-                    onEditTask = onEditTask,
-                    onOpenTasks = onOpenTasks,
-                    onTaskAction = onTaskAction,
-                    onCreateTask = onCreateTask,
-                )
-                TodayHabitsSection(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .testTag("today_habits_column"),
-                    habits = uiState.habits,
-                    layoutSpec = layoutSpec,
-                    onOpenHabit = onOpenHabit,
-                    onEditHabit = onEditHabit,
-                    onOpenHabits = onOpenHabits,
-                    onHabitPrimaryAction = onHabitPrimaryAction,
-                    onHabitSecondaryAction = onHabitSecondaryAction,
-                    onCreateHabit = onCreateHabit,
-                )
-            }
-        } else {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(layoutSpec.columnGap),
-                verticalAlignment = Alignment.Top,
-            ) {
-                TodayTasksSection(
-                    modifier = Modifier
-                        .weight(1f)
-                        .testTag("today_tasks_column"),
-                    tasks = uiState.tasks,
-                    layoutSpec = layoutSpec,
-                    onOpenTask = onOpenTask,
-                    onEditTask = onEditTask,
-                    onOpenTasks = onOpenTasks,
-                    onTaskAction = onTaskAction,
-                    onCreateTask = onCreateTask,
-                )
-                TodayHabitsSection(
-                    modifier = Modifier
-                        .weight(1f)
-                        .testTag("today_habits_column"),
-                    habits = uiState.habits,
-                    layoutSpec = layoutSpec,
-                    onOpenHabit = onOpenHabit,
-                    onEditHabit = onEditHabit,
-                    onOpenHabits = onOpenHabits,
-                    onHabitPrimaryAction = onHabitPrimaryAction,
-                    onHabitSecondaryAction = onHabitSecondaryAction,
-                    onCreateHabit = onCreateHabit,
-                )
-            }
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(layoutSpec.columnGap),
+            verticalAlignment = Alignment.Top,
+        ) {
+            TodayTasksSection(
+                modifier = Modifier
+                    .weight(1f)
+                    .testTag("today_tasks_column"),
+                tasks = uiState.tasks,
+                layoutSpec = layoutSpec,
+                onOpenTask = onOpenTask,
+                onEditTask = onEditTask,
+                onOpenTasks = onOpenTasks,
+                onTaskAction = onTaskAction,
+                onCreateTask = onCreateTask,
+            )
+            TodayHabitsSection(
+                modifier = Modifier
+                    .weight(1f)
+                    .testTag("today_habits_column"),
+                habits = uiState.habits,
+                layoutSpec = layoutSpec,
+                onOpenHabit = onOpenHabit,
+                onEditHabit = onEditHabit,
+                onOpenHabits = onOpenHabits,
+                onHabitPrimaryAction = onHabitPrimaryAction,
+                onHabitSecondaryAction = onHabitSecondaryAction,
+                onCreateHabit = onCreateHabit,
+            )
         }
     }
 }
@@ -313,12 +252,9 @@ private fun TodayTasksSection(
             ZouStaggeredReveal(revealKey = "today_tasks_empty", index = 1) {
                 TodayEmptySectionCard(
                     title = "暂无待办",
-                    description = "创建一条任务。",
-                    actionLabel = "新建任务",
-                    actionTestTag = "today_empty_create_task",
+                    description = "今天没有待推进的任务，享受当下吧。点按底部的 '+' 开启新任务。",
                     accentColor = ZouTaskAccent,
                     layoutSpec = layoutSpec,
-                    onActionClick = onCreateTask,
                 )
             }
         } else {
@@ -366,12 +302,9 @@ private fun TodayHabitsSection(
             ZouStaggeredReveal(revealKey = "today_habits_empty", index = 2) {
                 TodayEmptySectionCard(
                     title = "暂无习惯",
-                    description = "创建一个习惯。",
-                    actionLabel = "新建习惯",
-                    actionTestTag = "today_empty_create_habit",
+                    description = "空山新雨，静听松风。点按底部的 '+' 开启今日打卡吧。",
                     accentColor = ZouHabitAccent,
                     layoutSpec = layoutSpec,
-                    onActionClick = onCreateHabit,
                 )
             }
         } else {

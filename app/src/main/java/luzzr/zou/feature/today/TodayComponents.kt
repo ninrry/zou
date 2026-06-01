@@ -65,7 +65,6 @@ import luzzr.zou.core.designsystem.theme.ZouTodayAccent
 import luzzr.zou.core.designsystem.theme.ZouTodayAccentSoft
 import luzzr.zou.core.ui.GlassLevel
 import luzzr.zou.core.ui.GlassSurface
-import luzzr.zou.core.ui.LocalZouMotion
 import luzzr.zou.core.ui.LocalRadialExpansionController
 import luzzr.zou.core.ui.ModuleFab
 import luzzr.zou.core.ui.MotionTokens
@@ -79,7 +78,6 @@ import luzzr.zou.domain.usecase.TaskQuickActionType
 import luzzr.zou.feature.settings.TopLevelSettingsButton
 
 internal data class TodayCompactLayoutSpec(
-    val stacked: Boolean,
     val columnGap: Dp,
     val sectionGap: Dp,
     val cardGap: Dp,
@@ -98,10 +96,8 @@ internal data class TodayCompactLayoutSpec(
 internal fun rememberTodayCompactLayoutSpec(totalWidth: Dp): TodayCompactLayoutSpec {
     val typography = MaterialTheme.typography
     val dense = totalWidth < 360.dp
-    val stacked = totalWidth < 560.dp
     return if (dense) {
         TodayCompactLayoutSpec(
-            stacked = true,
             columnGap = 10.dp,
             sectionGap = 8.dp,
             cardGap = LayoutTokens.Space8,
@@ -117,7 +113,6 @@ internal fun rememberTodayCompactLayoutSpec(totalWidth: Dp): TodayCompactLayoutS
         )
     } else {
         TodayCompactLayoutSpec(
-            stacked = stacked,
             columnGap = 12.dp,
             sectionGap = LayoutTokens.Space12,
             cardGap = LayoutTokens.Space12,
@@ -457,17 +452,14 @@ private fun TodayQuickActionButton(
 internal fun TodayEmptySectionCard(
     title: String,
     description: String,
-    actionLabel: String,
-    actionTestTag: String,
     accentColor: Color,
     layoutSpec: TodayCompactLayoutSpec,
-    onActionClick: () -> Unit,
 ) {
     GlassSurface(
         modifier = Modifier
             .fillMaxWidth()
             .heightIn(min = layoutSpec.emptyCardMinHeight)
-            .testTag("${actionTestTag}_card"),
+            .testTag("${accentColor.value}_empty_card"),
         accentColor = accentColor,
         level = GlassLevel.Normal,
         shape = RoundedCornerShape(28.dp),
@@ -491,25 +483,9 @@ internal fun TodayEmptySectionCard(
                 text = description,
                 style = layoutSpec.supportStyle,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
-                maxLines = 2,
+                maxLines = 3,
                 overflow = TextOverflow.Ellipsis,
             )
-            OutlinedButton(
-                modifier = Modifier
-                    .widthIn(min = 120.dp)
-                    .height(layoutSpec.controlHeight + 4.dp)
-                    .testTag(actionTestTag),
-                onClick = onActionClick,
-                colors = noteFlowOutlinedButtonColors(),
-                shape = RoundedCornerShape(18.dp),
-                contentPadding = PaddingValues(horizontal = 12.dp, vertical = 0.dp),
-            ) {
-                Text(
-                    text = actionLabel,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                )
-            }
         }
     }
 }
@@ -654,7 +630,6 @@ private fun TodayStatusPill(
 @Composable
 private fun TodayCompletionBar(summary: TodaySummaryUiModel) {
     val designTokens = ZouDesignTokens.colors
-    val motion = LocalZouMotion.current
     val progress = remember(summary) {
         val total = summary.pendingTaskCount + summary.dueHabitCount + summary.completedCount
         if (total == 0) 0f else summary.completedCount / total.toFloat()
@@ -662,7 +637,7 @@ private fun TodayCompletionBar(summary: TodaySummaryUiModel) {
     val clampedProgress = progress.coerceIn(0f, 1f)
     val animatedProgress by animateFloatAsState(
         targetValue = clampedProgress.coerceAtLeast(0.06f),
-        animationSpec = motion.tabSwitch,
+        animationSpec = MotionTokens.SpringSmooth,
         label = "today_progress_bar",
     )
     val completedPercent = (clampedProgress * 100).toInt()
@@ -748,139 +723,4 @@ private fun todayActiveItemCount(summary: TodaySummaryUiModel): Int {
     return summary.pendingTaskCount + summary.dueHabitCount
 }
 
-@Composable
-fun TodayQuickCreateFab(
-    expanded: Boolean,
-    onToggleExpanded: () -> Unit,
-    onCreateTask: () -> Unit,
-    onCreateHabit: () -> Unit,
-) {
-    Column(
-        horizontalAlignment = Alignment.End,
-        verticalArrangement = Arrangement.spacedBy(12.dp),
-    ) {
-        StaggeredQuickCreateAction(
-            visible = expanded,
-            delayMillis = 0,
-            testTag = "today_quick_create_task",
-            text = "新建任务",
-            accentColor = ZouTaskAccentSoft,
-            onClick = onCreateTask,
-        )
-        StaggeredQuickCreateAction(
-            visible = expanded,
-            delayMillis = 80,
-            testTag = "today_quick_create_habit",
-            text = "新建习惯",
-            accentColor = ZouHabitAccentSoft,
-            onClick = onCreateHabit,
-        )
 
-        ModuleFab(
-            accentColor = ZouTodayAccent,
-            contentDescription = if (expanded) "收起快速新建" else "展开快速新建",
-            icon = Icons.Default.Add,
-            testTag = "today_quick_create_main",
-            enableRadialExpansion = false,
-            isRotated = expanded,
-            onClick = onToggleExpanded,
-        )
-    }
-}
-
-@Composable
-private fun StaggeredQuickCreateAction(
-    visible: Boolean,
-    delayMillis: Int,
-    testTag: String,
-    text: String,
-    accentColor: Color,
-    onClick: () -> Unit,
-) {
-    val interactionSource = rememberPressInteractionSource()
-    val motion = LocalZouMotion.current
-    val radialExpansionController = LocalRadialExpansionController.current
-    val actionCenter = remember { mutableStateOf<Offset?>(null) }
-    AnimatedVisibility(
-        visible = visible,
-        enter = fadeIn(
-            animationSpec = motion.fabMenu,
-        ) + slideInVertically(
-            animationSpec = motion.fabMenuOffset,
-            initialOffsetY = { it },
-        ) + scaleIn(
-            animationSpec = motion.fabMenu,
-            initialScale = 0.80f,
-        ),
-        exit = fadeOut(
-            animationSpec = motion.fabMenu,
-        ) + slideOutVertically(
-            animationSpec = motion.fabMenuOffset,
-            targetOffsetY = { it },
-        ) + scaleOut(
-            animationSpec = motion.fabMenu,
-            targetScale = 0.80f,
-        ),
-    ) {
-        TodayQuickCreateActionSurface(
-            testTag = testTag,
-            interactionSource = interactionSource,
-            accentColor = accentColor,
-            onClick = {
-                radialExpansionController?.launch(
-                    color = accentColor,
-                    origin = actionCenter.value,
-                    onNavigate = onClick,
-                ) ?: onClick()
-            },
-            onPositioned = { center -> actionCenter.value = center },
-        ) {
-            Text(
-                text = text,
-                style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.onSurface,
-                maxLines = 1,
-            )
-        }
-    }
-}
-
-@Composable
-private fun TodayQuickCreateActionSurface(
-    testTag: String,
-    interactionSource: MutableInteractionSource,
-    accentColor: Color,
-    onClick: () -> Unit,
-    onPositioned: (Offset) -> Unit,
-    content: @Composable RowScope.() -> Unit,
-) {
-    GlassSurface(
-        modifier = Modifier
-            .testTag(testTag)
-            .noteFlowPressScale(interactionSource = interactionSource)
-            .onGloballyPositioned { coordinates ->
-                val position = coordinates.positionInWindow()
-                val size = coordinates.size
-                onPositioned(
-                    Offset(
-                        x = position.x + size.width / 2f,
-                        y = position.y + size.height / 2f
-                    )
-                )
-            }
-            .clickable(
-                interactionSource = interactionSource,
-                onClick = onClick,
-            ),
-        accentColor = accentColor,
-        level = GlassLevel.Normal,
-        shape = RoundedCornerShape(22.dp),
-    ) {
-        Row(
-            modifier = Modifier.padding(horizontal = LayoutTokens.Space16, vertical = LayoutTokens.Space12),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(LayoutTokens.Space12),
-            content = content,
-        )
-    }
-}

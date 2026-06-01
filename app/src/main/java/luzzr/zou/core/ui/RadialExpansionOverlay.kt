@@ -33,12 +33,11 @@ class RadialExpansionController {
         origin: Offset?,
         onNavigate: () -> Unit,
     ) {
-        if (origin != null) {
-            lastAnchor = RadialExpansionAnchor(
-                color = color,
-                origin = origin,
-            )
-        }
+        // 强制覆盖 lastAnchor，防止被前一次其他页面的老旧 FAB 起爆坐标所污染
+        lastAnchor = RadialExpansionAnchor(
+            color = color,
+            origin = origin ?: Offset.Unspecified
+        )
         // Immediately navigate; the destination screen will circular reveal itself.
         onNavigate()
     }
@@ -81,10 +80,14 @@ fun Modifier.circularReveal(
     backgroundColor: Color = Color.Unspecified,
 ) = this.then(
     Modifier.drawWithContent {
-        val resolvedOrigin = origin ?: Offset(
-            x = size.width - 56.dp.toPx(),
-            y = size.height - 96.dp.toPx(),
-        )
+        val resolvedOrigin = if (origin == null || origin == Offset.Unspecified) {
+            Offset(
+                x = size.width / 2f,
+                y = size.height - 64.dp.toPx(),
+            )
+        } else {
+            origin
+        }
         val safeProgress = progress.coerceIn(0f, 1f)
         if (safeProgress == 0f) return@drawWithContent
         if (safeProgress >= 1f) {
