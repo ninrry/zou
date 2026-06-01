@@ -160,7 +160,6 @@ fun NoteEditorScreen(
                 ) {
                     ZouEditorSection(
                         title = "正文",
-                        subtitle = "先写内容，需要时再展开预览。",
                     ) {
                         OutlinedTextField(
                             modifier = Modifier
@@ -218,7 +217,6 @@ fun NoteEditorScreen(
                     if (previewVisible) {
                         ZouSectionCard(
                             title = "实时预览",
-                            subtitle = "只读渲染，不影响原文。",
                             modifier = Modifier.testTag("note_markdown_preview"),
                         ) {
                             if (uiState.content.text.isBlank()) {
@@ -239,7 +237,6 @@ fun NoteEditorScreen(
                     if (uiState.canDelete) {
                         ZouEditorSection(
                             title = "危险操作",
-                            subtitle = "删除后会进入回收站，不影响底部主动作区。",
                         ) {
                             HorizontalDivider()
                             TextButton(

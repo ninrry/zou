@@ -1,4 +1,4 @@
-﻿package luzzr.zou.core.ui
+package luzzr.zou.core.ui
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -61,11 +61,11 @@ fun StandardFieldRow(
 @Composable
 fun StandardSwitchRow(
     title: String,
-    description: String,
     checked: Boolean,
     onCheckedChange: (Boolean) -> Unit,
-    accentColor: Color = MaterialTheme.colorScheme.primary,
     modifier: Modifier = Modifier,
+    description: String? = null,
+    accentColor: Color = MaterialTheme.colorScheme.primary,
     enabled: Boolean = true,
 ) {
     Row(
@@ -81,11 +81,13 @@ fun StandardSwitchRow(
                 style = MaterialTheme.typography.titleMedium,
                 color = MaterialTheme.colorScheme.onSurface,
             )
-            Text(
-                text = description,
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
+            if (!description.isNullOrBlank()) {
+                Text(
+                    text = description,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
         }
         Switch(
             checked = checked,

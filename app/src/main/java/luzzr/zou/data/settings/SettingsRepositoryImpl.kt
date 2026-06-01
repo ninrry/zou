@@ -7,6 +7,7 @@ import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.longPreferencesKey
+import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import luzzr.zou.domain.repository.SettingsRepository
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -55,6 +56,7 @@ class SettingsRepositoryImpl @Inject constructor(
             showCompletedTasks = preferences[showCompletedTasksKey] ?: false,
             showOnlyTodayHabits = preferences[showOnlyTodayHabitsKey] ?: false,
             showDeletedHabits = preferences[showDeletedHabitsKey] ?: false,
+            defaultStartDestination = preferences[defaultStartDestinationKey] ?: "today",
             settingsUpdatedAt = preferences[settingsUpdatedAtKey] ?: 0L,
         )
     }
@@ -68,6 +70,7 @@ class SettingsRepositoryImpl @Inject constructor(
         mutablePreferences[showCompletedTasksKey] = preferences.showCompletedTasks
         mutablePreferences[showOnlyTodayHabitsKey] = preferences.showOnlyTodayHabits
         mutablePreferences[showDeletedHabitsKey] = preferences.showDeletedHabits
+        mutablePreferences[defaultStartDestinationKey] = preferences.defaultStartDestination
         mutablePreferences[settingsUpdatedAtKey] = preferences.settingsUpdatedAt
     }
 
@@ -77,6 +80,7 @@ class SettingsRepositoryImpl @Inject constructor(
         val showCompletedTasksKey = booleanPreferencesKey("show_completed_tasks")
         val showOnlyTodayHabitsKey = booleanPreferencesKey("show_only_today_habits")
         val showDeletedHabitsKey = booleanPreferencesKey("show_deleted_habits")
+        val defaultStartDestinationKey = stringPreferencesKey("default_start_destination")
         val settingsUpdatedAtKey = longPreferencesKey("settings_updated_at")
     }
 }

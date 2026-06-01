@@ -452,6 +452,7 @@ class BackupRepositoryImpl @Inject constructor(
         showCompletedTasks = showCompletedTasks,
         showOnlyTodayHabits = showOnlyTodayHabits,
         showDeletedHabits = showDeletedHabits,
+        defaultStartDestination = defaultStartDestination,
         settingsUpdatedAt = settingsUpdatedAt,
     )
 
@@ -571,6 +572,7 @@ class BackupRepositoryImpl @Inject constructor(
         showCompletedTasks = showCompletedTasks,
         showOnlyTodayHabits = showOnlyTodayHabits,
         showDeletedHabits = showDeletedHabits,
+        defaultStartDestination = defaultStartDestination,
         settingsUpdatedAt = settingsUpdatedAt,
     )
 
@@ -713,6 +715,7 @@ class BackupRepositoryImpl @Inject constructor(
         val showCompletedTasks: Boolean = false,
         val showOnlyTodayHabits: Boolean = false,
         val showDeletedHabits: Boolean = false,
+        val defaultStartDestination: String = "today",
         val settingsUpdatedAt: Long = 0L,
     )
 

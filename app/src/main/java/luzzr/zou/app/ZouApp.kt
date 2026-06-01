@@ -38,6 +38,7 @@ import luzzr.zou.feature.tasks.TaskRoutes
 
 @Composable
 fun ZouApp(
+    defaultStartDestination: String,
     pendingTaskDetailId: String? = null,
     pendingHabitDetailId: String? = null,
     onPendingTaskDetailConsumed: () -> Unit = {},
@@ -48,7 +49,17 @@ fun ZouApp(
     val motion = LocalZouMotion.current
     val navController = rememberNavController()
     val radialExpansionController = rememberRadialExpansionController()
-    var selectedTopLevelRoute by rememberSaveable { mutableStateOf(TopLevelDestination.TODAY.route) }
+    var selectedTopLevelRoute by rememberSaveable(defaultStartDestination) {
+        val defaultRoute = when (defaultStartDestination) {
+            "today" -> TopLevelDestination.TODAY.route
+            "tasks" -> TopLevelDestination.TASKS.route
+            "habits" -> TopLevelDestination.HABITS.route
+            "notes" -> TopLevelDestination.NOTES.route
+            else -> TopLevelDestination.TODAY.route
+        }
+        mutableStateOf(defaultRoute)
+    }
+
     val backStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = backStackEntry?.destination
     val currentTopLevel = TopLevelDestination.entries.firstOrNull { it.route == selectedTopLevelRoute }

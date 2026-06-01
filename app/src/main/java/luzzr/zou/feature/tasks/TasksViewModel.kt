@@ -51,7 +51,7 @@ class TasksViewModel @Inject constructor(
                         emptyDescription = if (includeCompleted) {
                             "完成任务后会在这里显示，方便你随时恢复。"
                         } else {
-                            "点击右下角 + 创建第一条任务，设置截止时间与提醒。"
+                            "点击底部 + 创建待办。"
                         },
                         isLoading = false,
                     )

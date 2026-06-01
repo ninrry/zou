@@ -1,9 +1,124 @@
 package luzzr.zou.core.ui
 
+import androidx.compose.animation.core.Easing
 import androidx.compose.animation.core.CubicBezierEasing
+import androidx.compose.animation.core.FiniteAnimationSpec
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
+import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.staticCompositionLocalOf
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.Dp
+
+@Immutable
+data class ZouMotionSpec(
+    val press: FiniteAnimationSpec<Float>,
+    val pressDp: FiniteAnimationSpec<Dp>,
+    val colorShift: FiniteAnimationSpec<Color>,
+    val listEnter: FiniteAnimationSpec<Float>,
+    val listEnterOffset: FiniteAnimationSpec<IntOffset>,
+    val listExit: FiniteAnimationSpec<Float>,
+    val listExitSize: FiniteAnimationSpec<IntSize>,
+    val pageEnter: FiniteAnimationSpec<Float>,
+    val pageEnterOffset: FiniteAnimationSpec<IntOffset>,
+    val pageExit: FiniteAnimationSpec<Float>,
+    val pageExitOffset: FiniteAnimationSpec<IntOffset>,
+    val tabSwitch: FiniteAnimationSpec<Float>,
+    val tabSwitchDp: FiniteAnimationSpec<Dp>,
+    val fabReveal: FiniteAnimationSpec<Float>,
+    val fabCollapse: FiniteAnimationSpec<Float>,
+    val fabMenu: FiniteAnimationSpec<Float>,
+    val fabMenuOffset: FiniteAnimationSpec<IntOffset>,
+    val formStep: FiniteAnimationSpec<Float>,
+    val shimmerDurationMillis: Int,
+    val listStaggerMillis: Int,
+    val listEnterOffsetDp: Dp,
+) {
+    companion object {
+        val Default = ZouMotionSpec(
+            press = spring(
+                dampingRatio = 0.46f,
+                stiffness = 300f,
+            ),
+            pressDp = spring(
+                dampingRatio = 0.62f,
+                stiffness = 300f,
+            ),
+            colorShift = tween(
+                durationMillis = 360,
+                easing = MotionTokens.EasingEmphasized,
+            ),
+            listEnter = tween(
+                durationMillis = 380,
+                easing = MotionTokens.EasingEmphasized,
+            ),
+            listEnterOffset = tween(
+                durationMillis = 380,
+                easing = MotionTokens.EasingEmphasized,
+            ),
+            listExit = tween(
+                durationMillis = 260,
+                easing = MotionTokens.EasingStandard,
+            ),
+            listExitSize = tween(
+                durationMillis = 260,
+                easing = MotionTokens.EasingStandard,
+            ),
+            pageEnter = tween(
+                durationMillis = 360,
+                easing = MotionTokens.EasingEmphasized,
+            ),
+            pageEnterOffset = tween(
+                durationMillis = 360,
+                easing = MotionTokens.EasingEmphasized,
+            ),
+            pageExit = tween(
+                durationMillis = 220,
+                easing = MotionTokens.EasingStandard,
+            ),
+            pageExitOffset = tween(
+                durationMillis = 220,
+                easing = MotionTokens.EasingStandard,
+            ),
+            tabSwitch = spring(
+                dampingRatio = Spring.DampingRatioNoBouncy,
+                stiffness = 280f,
+            ),
+            tabSwitchDp = spring(
+                dampingRatio = Spring.DampingRatioNoBouncy,
+                stiffness = 280f,
+            ),
+            fabReveal = tween(
+                durationMillis = 420,
+                easing = MotionTokens.EasingEmphasizedDecelerate,
+            ),
+            fabCollapse = tween(
+                durationMillis = 420,
+                easing = MotionTokens.EasingAccelerate,
+            ),
+            fabMenu = spring(
+                dampingRatio = 0.76f,
+                stiffness = 170f,
+            ),
+            fabMenuOffset = spring(
+                dampingRatio = 0.76f,
+                stiffness = 170f,
+            ),
+            formStep = tween(
+                durationMillis = 340,
+                easing = MotionTokens.EasingEmphasized,
+            ),
+            shimmerDurationMillis = 1200,
+            listStaggerMillis = 36,
+            listEnterOffsetDp = LayoutTokens.Space24,
+        )
+    }
+}
+
+val LocalZouMotion = staticCompositionLocalOf { ZouMotionSpec.Default }
 
 object MotionTokens {
     // ─── Spring (弹性) ─────────────────────────────────────

@@ -371,7 +371,6 @@ private fun HabitBasicStep(
     Column(verticalArrangement = Arrangement.spacedBy(20.dp)) {
         ZouEditorSection(
             title = "习惯标题与说明",
-            subtitle = "标题说明要做什么，正文只保留执行提示。",
         ) {
             OutlinedTextField(
                 modifier = Modifier.fillMaxWidth().testTag("habit_editor_title_input"),
@@ -397,7 +396,6 @@ private fun HabitBasicStep(
 
         ZouEditorSection(
             title = "执行方式",
-            subtitle = "决定今天如何算完成，后续字段会跟随这个模式变化。",
         ) {
             StandardFieldRow(label = "打卡模式") {
                 FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -463,7 +461,6 @@ private fun HabitFrequencyStep(
 
         ZouEditorSection(
             title = "频率细节",
-            subtitle = "只展示当前频率类型需要的字段。",
         ) {
             when (uiState.frequencyType) {
                 HabitFrequencyType.DAILY -> {
@@ -563,7 +560,6 @@ private fun HabitReminderStep(
     Column(verticalArrangement = Arrangement.spacedBy(20.dp)) {
         ZouEditorSection(
             title = "执行目标",
-            subtitle = "先决定今天如何完成，再补充提醒细节。",
         ) {
             when (uiState.checkInMode) {
                 HabitCheckInMode.CHECK -> {
@@ -616,7 +612,7 @@ private fun HabitReminderStep(
         ZouEditorSection(
             title = "提醒策略",
             subtitle = if (showAdvancedReminder) {
-                "默认显示常用提醒，特别提醒和通知文案放进高级区。"
+                null
             } else {
                 uiState.advancedReminderSummary()
             },
@@ -744,7 +740,6 @@ private fun HabitReminderStep(
         if (uiState.canDelete) {
             ZouEditorSection(
                 title = "危险操作",
-                subtitle = "删除后会进入回收站，不影响底部主动作区。",
             ) {
                 TextButton(modifier = Modifier.fillMaxWidth().testTag("habit_editor_delete"), onClick = onDeleteClicked) {
                     Text(text = "软删除习惯", color = MaterialTheme.colorScheme.error)

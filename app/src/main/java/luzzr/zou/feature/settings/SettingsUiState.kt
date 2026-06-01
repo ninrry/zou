@@ -1,4 +1,4 @@
-﻿package luzzr.zou.feature.settings
+package luzzr.zou.feature.settings
 
 import luzzr.zou.core.hyperos.XiaomiPowerKeeper
 
@@ -9,6 +9,7 @@ data class SettingsUiState(
     val showCompletedTasks: Boolean = false,
     val showOnlyTodayHabits: Boolean = false,
     val showDeletedHabits: Boolean = false,
+    val defaultStartDestination: String = "today",
     val hasPendingChanges: Boolean = false,
     val notificationPermissionGranted: Boolean = false,
     val isHyperOS: Boolean = false,

@@ -60,6 +60,7 @@ class SettingsViewModel @Inject constructor(
                             showCompletedTasks = preferences.showCompletedTasks,
                             showOnlyTodayHabits = preferences.showOnlyTodayHabits,
                             showDeletedHabits = preferences.showDeletedHabits,
+                            defaultStartDestination = preferences.defaultStartDestination,
                             hasPendingChanges = false,
                             notificationPermissionGranted = notificationPermissionChecker.canPostNotifications(),
                             isLoading = false,
@@ -135,6 +136,14 @@ class SettingsViewModel @Inject constructor(
         }
     }
 
+    fun onDefaultStartDestinationChanged(value: String) {
+        updateEditableState {
+            copy(
+                defaultStartDestination = value,
+            )
+        }
+    }
+
     fun saveDefaultIntervals() {
         if (!uiState.value.hasPendingChanges) {
             _uiState.update {
@@ -165,6 +174,7 @@ class SettingsViewModel @Inject constructor(
                 showCompletedTasks = uiState.value.showCompletedTasks,
                 showOnlyTodayHabits = uiState.value.showOnlyTodayHabits,
                 showDeletedHabits = uiState.value.showDeletedHabits,
+                defaultStartDestination = uiState.value.defaultStartDestination,
                 settingsUpdatedAt = timeProvider.nowMillis(),
             )
         }
@@ -187,7 +197,8 @@ class SettingsViewModel @Inject constructor(
             state.defaultHabitRepeatIntervalText != baseline.defaultHabitRepeatIntervalMinutes.toString() ||
             state.showCompletedTasks != baseline.showCompletedTasks ||
             state.showOnlyTodayHabits != baseline.showOnlyTodayHabits ||
-            state.showDeletedHabits != baseline.showDeletedHabits
+            state.showDeletedHabits != baseline.showDeletedHabits ||
+            state.defaultStartDestination != baseline.defaultStartDestination
     }
 
     private fun updatePreferences(

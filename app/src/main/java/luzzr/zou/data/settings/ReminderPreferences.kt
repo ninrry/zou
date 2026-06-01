@@ -6,5 +6,6 @@ data class ReminderPreferences(
     val showCompletedTasks: Boolean = false,
     val showOnlyTodayHabits: Boolean = false,
     val showDeletedHabits: Boolean = false,
+    val defaultStartDestination: String = "today",
     val settingsUpdatedAt: Long = 0L,
 )

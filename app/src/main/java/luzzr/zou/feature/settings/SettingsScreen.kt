@@ -37,6 +37,8 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.FilterChip
+import luzzr.zou.core.ui.noteFlowFilterChipColors
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.Alignment
@@ -98,6 +100,7 @@ fun SettingsRoute(
         onShowCompletedTasksChanged = viewModel::onShowCompletedTasksChanged,
         onShowOnlyTodayHabitsChanged = viewModel::onShowOnlyTodayHabitsChanged,
         onShowDeletedHabitsChanged = viewModel::onShowDeletedHabitsChanged,
+        onDefaultStartDestinationChanged = viewModel::onDefaultStartDestinationChanged,
         onSaveDefaults = viewModel::saveDefaultIntervals,
         onHyperOsOptimizationDone = viewModel::onHyperOsOptimizationDone,
         onOpenNotificationSettings = {
@@ -124,6 +127,7 @@ fun SettingsScreen(
     onShowCompletedTasksChanged: (Boolean) -> Unit,
     onShowOnlyTodayHabitsChanged: (Boolean) -> Unit,
     onShowDeletedHabitsChanged: (Boolean) -> Unit,
+    onDefaultStartDestinationChanged: (String) -> Unit,
     onSaveDefaults: () -> Unit,
     onHyperOsOptimizationDone: () -> Unit = {},
     onOpenNotificationSettings: () -> Unit,
@@ -135,13 +139,13 @@ fun SettingsScreen(
 ) {
     val saveButtonLabel = when {
         uiState.isSaving -> "保存中"
-        uiState.hasPendingChanges -> "保存界面与提醒配置"
-        else -> "当前已同步"
+        uiState.hasPendingChanges -> "保存配置"
+        else -> "已同步"
     }
     val saveHint = if (uiState.hasPendingChanges) {
-        "有未保存的界面配置，保存后会立即同步到待办区和习惯区的显示逻辑。"
+        "偏好已变更，请保存。"
     } else {
-        "当前配置已同步，列表页会直接按这里的设置显示。"
+        "已同步。"
     }
 
     ZouPageScaffold { innerPadding ->
@@ -167,7 +171,6 @@ fun SettingsScreen(
             }
             ZouPageHeader(
                 title = uiState.title,
-                subtitle = "统一管理提醒节奏、列表显示和数据工具。",
             )
 
             if (uiState.isLoading) {
@@ -189,10 +192,9 @@ fun SettingsScreen(
             // ── 提醒偏好 ──────────────────────────────────────────
             StandardSectionCard(
                 title = "提醒偏好",
-                subtitle = "这些配置会同时作用于任务、习惯和今日页的提醒节奏。",
                 accentColor = ZouTodayAccent,
             ) {
-                StandardFieldRow(label = "任务默认重复提醒间隔（分钟）") {
+                StandardFieldRow(label = "任务重复间隔（分钟）") {
                     OutlinedTextField(
                         value = uiState.defaultTaskRepeatIntervalText,
                         onValueChange = onTaskDefaultIntervalChanged,
@@ -205,7 +207,7 @@ fun SettingsScreen(
                         colors = noteFlowOutlinedTextFieldColors(),
                     )
                 }
-                StandardFieldRow(label = "习惯默认重复提醒间隔（分钟）") {
+                StandardFieldRow(label = "习惯重复间隔（分钟）") {
                     OutlinedTextField(
                         value = uiState.defaultHabitRepeatIntervalText,
                         onValueChange = onHabitDefaultIntervalChanged,
@@ -220,18 +222,14 @@ fun SettingsScreen(
                 }
                 StandardFieldRow(
                     label = "通知权限",
-                    description = if (uiState.notificationPermissionGranted) {
-                        "当前已授予通知权限"
-                    } else {
-                        "当前未授予通知权限"
-                    },
+                    description = if (uiState.notificationPermissionGranted) "已授予" else "未授予",
                 ) {
                     OutlinedButton(
                         onClick = onOpenNotificationSettings,
                         enabled = !uiState.isSaving,
                         colors = noteFlowOutlinedButtonColors(),
                     ) {
-                        Text("系统设置")
+                        Text("去设置")
                     }
                 }
             }
@@ -239,12 +237,33 @@ fun SettingsScreen(
             // ── 显示偏好 ──────────────────────────────────────────
             StandardSectionCard(
                 title = "显示偏好",
-                subtitle = "列表筛选统一收拢到这里，不再占用待办区和习惯区顶部空间。",
                 accentColor = ZouTodayAccent,
             ) {
+                StandardFieldRow(
+                    label = "启动首页"
+                ) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        listOf(
+                            "today" to "今日",
+                            "tasks" to "待办",
+                            "habits" to "习惯",
+                            "notes" to "笔记"
+                        ).forEach { (dest, label) ->
+                            FilterChip(
+                                selected = uiState.defaultStartDestination == dest,
+                                onClick = { onDefaultStartDestinationChanged(dest) },
+                                label = { Text(label) },
+                                enabled = !uiState.isSaving,
+                                colors = noteFlowFilterChipColors(ZouTodayAccent),
+                            )
+                        }
+                    }
+                }
                 StandardSwitchRow(
-                    title = "待办显示已完成任务",
-                    description = "开启后，待办列表会保留已完成任务。",
+                    title = "待办显示已完成",
                     checked = uiState.showCompletedTasks,
                     onCheckedChange = onShowCompletedTasksChanged,
                     enabled = !uiState.isSaving,
@@ -252,7 +271,6 @@ fun SettingsScreen(
                 )
                 StandardSwitchRow(
                     title = "习惯仅看今日应执行",
-                    description = "只显示今天命中频率规则的习惯，已完成项仍保留显示。",
                     checked = uiState.showOnlyTodayHabits,
                     onCheckedChange = onShowOnlyTodayHabitsChanged,
                     enabled = !uiState.isSaving,
@@ -260,7 +278,6 @@ fun SettingsScreen(
                 )
                 StandardSwitchRow(
                     title = "习惯显示已删除",
-                    description = "在习惯列表中显示已软删除项，便于恢复。",
                     checked = uiState.showDeletedHabits,
                     onCheckedChange = onShowDeletedHabitsChanged,
                     enabled = !uiState.isSaving,
@@ -271,7 +288,6 @@ fun SettingsScreen(
             // ── 配置同步 ──────────────────────────────────────────
             StandardSectionCard(
                 title = "配置同步",
-                subtitle = "只在有变更时保存，避免重复操作。",
                 accentColor = ZouTodayAccent,
             ) {
                 Text(
@@ -385,36 +401,36 @@ private fun HyperOsOptimizationCard(
                 )
             }
             Text(
-                text = "为确保提醒准时弹出，建议完成以下设置：",
+                text = "为确保提醒准时，建议完成以下设置：",
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
 
             OptimizeActionRow(
                 icon = Icons.Outlined.BatterySaver,
-                label = "省电策略 → 无限制",
-                desc = "防止系统自动限制后台提醒",
+                label = "省电策略设为无限制",
+                desc = "防止系统后台限制提醒",
                 onClick = onOpenBatterySettings,
                 done = batteryOptOk,
             )
             OptimizeActionRow(
                 icon = Icons.Outlined.PlayArrow,
-                label = "允许自启动",
-                desc = "重启手机后仍可接收提醒广播",
+                label = "允许应用自启动",
+                desc = "手机重启后能接收提醒",
                 onClick = onOpenAutoStart,
                 done = false, // 无法自动检测
             )
             OptimizeActionRow(
                 icon = Icons.Outlined.Lock,
-                label = "锁屏通知 → 显示所有内容",
-                desc = "锁屏时也能看到提醒详情",
+                label = "锁屏通知显示所有内容",
+                desc = "锁屏时也能显示提醒详情",
                 onClick = onOpenLockScreenSettings,
                 done = false, // 无法自动检测
             )
 
             Spacer(Modifier.height(4.dp))
             Text(
-                text = if (batteryOptOk) "✅ 省电策略已就绪" else "🔔 完成上方 3 项设置后点击下方按钮",
+                text = if (batteryOptOk) "✅ 省电策略已就绪" else "🔔 完成上述设置后点击下方按钮",
                 style = MaterialTheme.typography.bodySmall,
                 color = if (batteryOptOk) designTokens.success else MaterialTheme.colorScheme.onSurfaceVariant,
             )

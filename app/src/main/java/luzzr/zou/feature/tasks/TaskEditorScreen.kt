@@ -388,7 +388,6 @@ private fun TaskBasicStep(
     Column(verticalArrangement = Arrangement.spacedBy(20.dp)) {
         ZouEditorSection(
             title = "任务标题与说明",
-            subtitle = "标题负责辨识，正文只补充必要上下文。",
         ) {
             OutlinedTextField(
                 modifier = Modifier.fillMaxWidth().testTag("task_editor_title_input"),
@@ -414,7 +413,6 @@ private fun TaskBasicStep(
 
         ZouEditorSection(
             title = "优先级与状态",
-            subtitle = "只保留会影响排序和处理节奏的配置。",
         ) {
             StandardFieldRow(label = "优先级") {
                 ChoiceRow {
@@ -479,7 +477,6 @@ private fun TaskScheduleStep(
     Column(verticalArrangement = Arrangement.spacedBy(20.dp)) {
         ZouEditorSection(
             title = "截止时间",
-            subtitle = "先确定完成时点，再决定提醒强度。",
         ) {
             ReadOnlyDateTimeField(
                 label = "截止时间",
@@ -526,7 +523,6 @@ private fun TaskScheduleStep(
 
         ZouEditorSection(
             title = "提醒窗口",
-            subtitle = "只保留当天有效的提醒时间范围。",
         ) {
             StandardFieldRow(label = "开始提醒时间") {
                 ReadOnlyDateTimeField(label = "开始提醒时间", value = uiState.startReminderMinuteOfDay.toDisplayTime())
@@ -583,7 +579,6 @@ private fun TaskScheduleStep(
 
         ZouEditorSection(
             title = "提醒日期范围",
-            subtitle = "设置后只在此日期范围内发送提醒，范围外自动静默。",
         ) {
             StandardFieldRow(label = "开始提醒日期") {
                 ReadOnlyDateTimeField(
@@ -669,7 +664,7 @@ private fun TaskScheduleStep(
         ZouEditorSection(
             title = "高级提醒",
             subtitle = if (showAdvancedReminder) {
-                "收起后只保留摘要，适合不常改的提醒配置。"
+                null
             } else {
                 uiState.advancedReminderSummary()
             },
@@ -778,7 +773,6 @@ private fun TaskCompletionStep(
     Column(verticalArrangement = Arrangement.spacedBy(20.dp)) {
         ZouEditorSection(
             title = "完成规则",
-            subtitle = "决定任务是手动结束，还是跟随子任务自动完成。",
         ) {
             ChoiceRow {
                 TaskCompletionRule.entries.forEach { rule ->
@@ -817,7 +811,6 @@ private fun TaskCompletionStep(
 
         ZouEditorSection(
             title = "子任务拆解",
-            subtitle = "只添加真正会影响完成判断的步骤。",
         ) {
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                 Text(
@@ -853,7 +846,6 @@ private fun TaskCompletionStep(
         if (uiState.canDelete) {
             ZouEditorSection(
                 title = "危险操作",
-                subtitle = "删除后会进入回收站，不影响底部主动作区。",
             ) {
                 TextButton(
                     modifier = Modifier.fillMaxWidth().testTag("task_editor_delete"),

@@ -23,6 +23,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.background
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.core.content.ContextCompat
 import luzzr.zou.app.ZouApp
@@ -30,9 +32,14 @@ import luzzr.zou.core.designsystem.theme.ZouTheme
 import luzzr.zou.core.reminder.ReminderConstants
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
+import javax.inject.Inject
+import androidx.compose.runtime.collectAsState
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+
+    @Inject
+    lateinit var observeReminderPreferencesUseCase: luzzr.zou.domain.usecase.ObserveReminderPreferencesUseCase
 
     private var pendingTaskDetailId by mutableStateOf<String?>(null)
     private var pendingHabitDetailId by mutableStateOf<String?>(null)
@@ -55,14 +62,24 @@ class MainActivity : ComponentActivity() {
         }
         handleReminderIntent(intent)
         setContent {
+            val preferences by observeReminderPreferencesUseCase().collectAsState(initial = null)
             ZouTheme {
                 StartupPermissionCoordinator()
-                ZouApp(
-                    pendingTaskDetailId = pendingTaskDetailId,
-                    pendingHabitDetailId = pendingHabitDetailId,
-                    onPendingTaskDetailConsumed = { pendingTaskDetailId = null },
-                    onPendingHabitDetailConsumed = { pendingHabitDetailId = null },
-                )
+                if (preferences != null) {
+                    ZouApp(
+                        defaultStartDestination = preferences!!.defaultStartDestination,
+                        pendingTaskDetailId = pendingTaskDetailId,
+                        pendingHabitDetailId = pendingHabitDetailId,
+                        onPendingTaskDetailConsumed = { pendingTaskDetailId = null },
+                        onPendingHabitDetailConsumed = { pendingHabitDetailId = null },
+                    )
+                } else {
+                    androidx.compose.foundation.layout.Box(
+                        modifier = androidx.compose.ui.Modifier
+                            .fillMaxSize()
+                            .background(luzzr.zou.core.designsystem.theme.MonetColorTokens.canvas)
+                    )
+                }
             }
         }
     }
