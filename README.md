@@ -1,196 +1,136 @@
-# Zou — 个人多功能记事本
+# Zou — 极致动效与莫奈配色的极简效率工具
 
-> **本地优先 · 自建设计规范 · 动画驱动**  
-> 用 Android 原生 Kotlin + Jetpack Compose 打造的个人效率工具，聚合任务、习惯、笔记与今日概览。
-
-[![Kotlin](https://img.shields.io/badge/Kotlin-2.1+-7F52FF?logo=kotlin)](https://kotlinlang.org)
-[![Compose](https://img.shields.io/badge/Compose-1.7+-4285F4?logo=jetpackcompose)](https://developer.android.com/jetpack/compose)
-[![API](https://img.shields.io/badge/minSdk-29-3DDC84?logo=android)](https://developer.android.com/studio)
-[![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
+> **本地优先 · 莫奈色彩流转 · 高阶空气悬浮 · 极致物理动效**  
+> Zou 是一款使用 Android 原生 Kotlin 与 Jetpack Compose 倾力打造的极简个人效率工具。它完美聚合了**今日概览、待办任务、习惯追踪与 Markdown 笔记**四大核心模块，以微交互与动态色彩为灵魂，带来指尖流淌般的唯美交互体验。
 
 ---
 
-## ✨ 特性
+## 🎨 现代视觉与高阶交互革命（最新升级）
 
-### 🗂 四大模块
+Zou 拒绝千篇一律的刻板原生界面，在最新版本中，我们对整个视觉骨架与动力学进行了史诗级的重构：
 
-| 模块 | 功能 |
+### 1. 全域组件“阴影消噪”极简美学
+*   **消灭阴影杂噪**：我们对核心卡片渲染组件 `GlassSurface.kt` 进行了底层重构，将全域卡片（今日进度面板、待办/习惯卡片、笔记卡片等）的 `shadowElevation` **全部降为 0.dp**。
+*   **透亮磨砂质感**：彻底蒸发灰黑色模糊投影，只保留极其细腻的 `1.dp` 描边与微透明莫奈色面板，呈现出空气般纯净、扁平、透亮的纯正磨砂玻璃美学。
+
+### 2. 高阶“空气感”固定悬浮控制栏
+*   **完美固定不抖动**：新建与编辑界面的“放弃”与“创建/下一步”胶囊控制栏，被绝对固定悬浮于最外层容器底部。在多步骤横向滑屏切换时，控制栏稳如磐石，仅表单卡片左右滑移，带来原生大厂级的视差安稳感。
+*   **100% 透明下潜穿透**：彻底废除了生硬的大白块底座背景，背景完全透明。在上下拖拽表单时，文字卡片将以极富未来感的方式**直接从两个悬浮胶囊实体的下方、周围的缝隙里穿梭而过**。
+
+### 3. 92.dp 智能防遮挡垫高安全盾
+*   **不阻挡最后一项**：为避免悬浮按钮永久遮挡底层设置，我们在滚动容器末尾精准计算并注入了 `92.dp` 高的避让垫高 Spacer。
+*   **完美沉底效果**：当用户滑到最底端时，最后一项配置（如软删除按钮、提醒输入等）将无任何遮挡地清爽排列在悬浮胶囊的上方。此时按钮下方呈现大面积空白，使按钮看起来就像是妥帖安稳地躺在卡片底部的空白处一样自然。
+
+### 4. 主 FAB 莫奈专属色动态流转
+*   **高精 Material You 联动**：引入 `MonetColorTokens` 配色系统，实时监听底部主 Tab 页签的滑动。
+*   **丝滑奶油般变色**：在「今日（蓝紫）、任务（暖橙）、习惯（青绿）、笔记（淡黄）」间切换时，中央大 FAB（加号按钮）的**外圈微光呼吸边框**、**微透莫奈填充底色**及**加号图标 tint 色**，会在 350ms 内以高度线性的 `EasingEmphasized` 物理阻尼曲线平滑渐变流转，水乳交融。
+
+---
+
+## ✨ 核心特性
+
+### 🗂 四大功能版图
+
+| 模块 | 精致体验 |
 |------|------|
-| **今日概览** | 聚合当天待办和习惯，快速创建 FAB，Pill 卡片展示 |
-| **待办任务** | 列表 / 详情 / 三步创建向导 / 子任务 / 到期提醒 / 优先级别 |
-| **习惯追踪** | 列表 / 详情 / 三步创建向导 / 自定义步骤 / 重复提醒 |
-| **笔记** | Markdown 编辑与渲染 / 图片内嵌引用 / 本地路径映射 |
+| **今日概览** | 聚合当天待办与打卡习惯，Pill 型卡片进度展示，莫奈色气泡轮廓 |
+| **待办任务** | 支持三步优雅创建向导、子任务拓展、精确到分钟的到期提醒、优先级过滤 |
+| **习惯追踪** | 支持自定义细分步骤打卡、自定义高频间隔、多维度提醒时间窗口 |
+| **记事笔记** | 支持标准 Markdown 原生高精渲染、本地图片插入引用与路径安全映射 |
 
-### 🎨 动画系统
+### 🎬 六大满分物理动效路径
 
-经过严苛的 6 条动画路径审核与迭代优化，每条动画均为满分水准：
-
-- **Pill 弹簧入场** — 物理弹簧阻尼 0.30，缩放 0.80→1.00 弹性显现
-- **RadialExpansion** — 径向圆展开过渡，`key()` 强制重置确保无起始跳跃
-- **StaggeredReveal** — 列表交错显现，支持正向 / 反向 / 同时三种模式
-- **Tab 切换** — 视差缩放 + 透明度渐变 + 水平滑动惯性
-- **复选框弹跳** — 旧圆缩小 30%，新圆弹簧弹出
-- **SwipeToDismiss** — 列表滑动删除带阻尼回弹
-- **向导步骤过渡** — HorizontalPager 原生滑动 + 指示器递进
-- **返回退出动画** — 自定义 `popExitTransition`（Scale + FadeOut + Clip）
-
-### 🎯 设计系统
-
-- **自建设计规范** — 精心定制的全局主题与交互组件库
-- **温暖色调** — 默认底色盘 `#FFFBF7`，深暖灰文本
-- **圆角语言** — 大一统的 CornerRadius 体系（4dp / 8dp / 12dp / 16dp）
-- **间距系统** — 基于 4dp 倍数的层级间距（4 / 8 / 12 / 16 / 24 / 32 / 48dp）
-- **排版** — 字重 + 行高 + 字距统一 token
-- **Easing 曲线** — 自定义加速 / 减速 / 弹性曲线
-
-### 🔧 实用功能
-
-- **重复提醒** — 支持一次性、每日、每周、每月、自定义间隔
-- **回收站** — 软删除，保留数据以便随时恢复或彻底删除
-- **备份与恢复** — 本地 JSON 格式导入导出
-- **数据持久化** — Room 本地数据库 + DataStore 设置
+- **Pill 弹簧入场** — 采用物理阻尼 0.30 弹簧系统，缩放 `0.80 -> 1.00` 弹性温润入场。
+- **FAB 同心圆镜像倒带** — 点击 FAB 新建时，呈现同心圆徐徐从小圆向全屏扩散的自然膨胀感，并与返回时的镜像收缩动效完美闭环。
+- **列表 Staggered 交错显现** — 智能列表入场，支持正向、反向、同时等多种瀑布流逐个显现。
+- **Tab 滚动切换视差** — 指标滑轨跳跃跨越机制，伴随 Tab 文字 4% 视差缩放与 2dp 水平惯性偏置。
+- **复选框弹簧 bounce 弹跳** — 点击打卡时，圆环缩小 30%，新状态如水珠弹跳般弹出。
+- **滑动删除阻尼回弹 (SwipeToDismiss)** — 列表滑动手势带动态物理阻尼感，支持松手快速撤销与平滑删除。
 
 ---
 
-## 🏗 技术栈
+## 🏗 技术栈与架构体系
 
-| 层 | 技术 |
+| 分层 | 技术栈与架构 |
 |----|------|
-| **语言** | Kotlin 2.1+ |
-| **UI** | Jetpack Compose（Material 3）+ 自定义动画 |
-| **架构** | MVVM + UseCase + Repository 模式 |
-| **DI** | Hilt |
-| **导航** | Navigation Compose（类型安全路由） |
-| **数据库** | Room（KAPT） |
-| **异步** | Kotlin Coroutines + Flow |
-| **序列化** | Kotlin Serialization |
-| **后台** | WorkManager / AlarmManager |
-| **构建** | Gradle KTS + Version Catalog |
+| **语言规范** | Kotlin 2.1+ (100% 严格类型安全，完全消除 null 隐患) |
+| **UI 框架** | Jetpack Compose (Material 3) + 纯声明式高度自定义 Canvas / 动效体系 |
+| **应用架构** | MVVM + UseCase (Clean Architecture) + Repository 经典模式 |
+| **依赖注入** | Hilt |
+| **类型安全导航** | Navigation Compose (基于 Kotlin Serialization 深度安全路由，无硬编码 String) |
+| **数据持久化** | Room 数据库 (本地强力缓存) + DataStore 用户偏好设置 |
+| **异步与流** | Kotlin Coroutines (协程并发) + Flow (响应式数据响应流) |
+| **后台与提醒** | WorkManager (自适应调度) + AlarmManager (精准毫秒级推送) |
 
 ---
 
-## 📁 项目结构
+## 📁 目录结构
 
 ```
 app/src/main/java/luzzr/zou/
-├── app/                    # 应用入口、Hilt 模块、导航（ZouNavHost）
+├── app/                    # 应用启动入口、Hilt 依赖配置、全局安全路由 (ZouNavHost)
 ├── core/
-│   ├── designsystem/       # 主题与基础设计系统
-│   ├── hyperos/            # 澎湃OS 系统兼容层
-│   ├── markdown/           # Markdown 渲染核心
-│   ├── reminder/           # 提醒调度（AlarmScheduler）
-│   ├── time/               # 时间处理工具
-│   └── ui/                 # UI 通用控件与组件库
-├── data/                   # Room 数据库、DataStore 设置、Repository 实现与备份逻辑
-├── domain/                 # 领域模型、仓储接口、UseCase
+│   ├── designsystem/       # 主题色彩规范 (MonetColorTokens) 与全局设计系统 Tokens
+│   ├── hyperos/            # 澎湃OS 深度兼容适配层
+│   ├── markdown/           # Markdown 原生高精渲染引擎
+│   ├── reminder/           # AlarmManager 精准提醒通知调度核心
+│   ├── time/               # 契合效率工具的时间计算处理工具
+│   └── ui/                 # 核心交互通用控件与去阴影空气感组件库 (GlassSurface, ZouStepBottomBar)
+├── data/                   # Room 数据库模型实体、Repository 仓储实现与本地 JSON 备份恢复逻辑
+├── domain/                 # 领域层：纯净 Entity 数据模型、UseCase 商业逻辑封装
 └── feature/
-    ├── backup/             # 备份与恢复
-    ├── habits/             # 习惯追踪模块
-    ├── notes/              # 笔记模块
-    ├── settings/           # 设置
-    ├── tasks/              # 待办任务模块
-    ├── today/              # 今日概览模块
-    └── trash/              # 回收站
+    ├── backup/             # 本地 JSON 安全备份与还原
+    ├── habits/             # 习惯追踪大模块
+    ├── notes/              # 记事笔记大模块 (含 Markdown 与本地图片管理)
+    ├── settings/           # 应用偏好设置
+    ├── tasks/              # 待办任务大模块
+    ├── today/              # 今日概览大模块
+    └── trash/              # 回收站 (软删除安全恢复区)
 ```
 
 ---
 
-## 🚀 快速开始
+## 🚀 快速开始与构建部署
 
-### 环境要求
+### 开发环境要求
+*   **Android Studio** Ladybug (2024.2.1) 或更新版本
+*   **Java Development Kit (JDK)** 17 或更新版本
+*   **Android SDK Platform** API Level 36 (最低支持 API Level 29 Android 10)
+*   **推荐真机设备** Android 13+ (API 33+) 以在系统层面获得最完美的动态莫奈配色与物理触感反馈。
 
-- **Android Studio** Ladybug 或更新版本
-- **JDK** 17+
-- **Android SDK** 36
-- **最低支持** Android 10（API 29）
-- **推荐设备** Android 13+（API 33+）以获得最佳交互体验
-
-### 构建
-
+### 构建与安装
+在项目根目录下通过 PowerShell 或者是 Bash 运行：
 ```bash
-# Debug 构建
+# 1. 编译 Debug 开发包
 ./gradlew assembleDebug
 
-# Release 构建（需要签名密钥）
+# 2. 编译终极优化混淆 Release 正式包 (包体大小约 5.23 MB)
 ./gradlew assembleRelease
 
-# 安装 Debug 到设备
+# 3. 光速推送安装 Debug 包到已连接的模拟器或真机
 ./gradlew installDebug
 ```
 
-### 产物
-
-| 类型 | 路径 |
-|------|------|
-| Debug APK | `app/build/outputs/apk/debug/app-arm64-v8a-debug.apk` |
-| Release APK | `app/build/outputs/apk/release/app-arm64-v8a-release.apk` |
-
 ---
 
-## 📖 文档
+## 📦 版本历史与代号
 
-| 文档 | 说明 |
-|------|------|
-| `docs/prd.md` | 产品需求文档 |
-| `docs/tech-spec.md` | 技术方案设计 |
-| `docs/db-schema.md` | 数据库模型 |
-| `docs/information-architecture.md` | 信息架构 |
-| `docs/ui-style-guide.md` | UI 风格指南 |
-| `docs/ui-design-spec.md` | UI 设计规格（页面清单、色彩系统、动画规格） |
-| `docs/ui-upgrade-plan.md` | UI 升级计划 v1（动画打磨） |
-| `docs/ui-upgrade-plan-v2.md` | UI 升级计划 v2（全面视觉审计） |
-| `docs/animation-polish-plan.md` | 动画打磨计划 |
-| `docs/hyperos-notification-plan.md` | 澎湃OS 通知优化方案 |
-| `docs/notification-optimization-plan.md` | 通知优化方案 |
-| `docs/build-conventions.md` | 构建约定（签名、版本、产物） |
-| `docs/agents.md` | AI 开发规范 |
-
----
-
-## 🧩 设计原则
-
-1. **本地优先** — 不依赖云服务，数据 100% 在设备上
-2. **离线可用** — 全功能离线，无需网络
-3. **动画驱动** — 微交互是体验的核心，每条动画路径独立审核
-4. **独立视觉语言** — 抛弃原生刻板印象，打造专属设计规范
-5. **渐进式构建** — 功能按里程碑交付，保持可编译可运行
-
----
-
-## 📦 版本历史
-
-| 版本 | 代号 | 说明 |
+| 版本 | 代号 | 重大视觉与特性变革 |
 |------|------|------|
-| v0.1.0 | NoteFlow | 初始版本，任务 + 习惯 + 笔记基础模块 |
-| v0.2.0 | Zou | 重构命名，引入动画系统，UI 设计系统 |
-| v0.3.0 | Polished | 动画路径满分打磨，RadialExpansion 修复，Spring 增强 |
-| v0.3.1 | UI 打磨 R1-R3 | 底部栏优化、进度条视觉增强、空状态图标规范化 |
-| v0.3.2 | UI 打磨 R4-R6 | 底部栏平衡方案、进度条 10dp/轨道透明度修正、AutoMirrored 修复 |
-| v0.3.3 | HyperOS | 澎湃OS 通知优化：USE_EXACT_ALARM、4 频道、XiaomiPowerKeeper 检测 |
-| v0.3.4 | DateRange | 任务提醒日期范围控制：支持指定提醒的起止日期，仅在范围内发送提醒 |
+| **v0.1.0** | NoteFlow | 初始版本。发布待办、习惯与 Markdown 笔记核心底色。 |
+| **v0.2.0** | Zou | 统一重构为 Zou。引入全局设计系统与基础微交互动画。 |
+| **v0.3.0** | Polished | 动效路径全域打磨，RadialExpansion 径向动画重大纠偏，Spring 物理系数精调。 |
+| **v0.3.3** | HyperOS | 澎湃OS 深度兼容：加入 `USE_EXACT_ALARM`、4 类独立提醒通知频道、XiaomiPowerKeeper 省电检测。 |
+| **v0.3.4** | DateRange | 提醒起止时间过滤：限制待办与打卡提醒的有效区间，减少非必要打扰。 |
+| **v0.3.5** | AirFloat | **高阶空气感透明悬浮控制栏 + 0.dp 全域组件阴影消噪 + 主 FAB 莫奈专属色平滑变色流转！视觉美学登峰造极。** |
 
 ---
 
-## ⚠️ 已知限制
+## 📄 开源许可证
 
-- **提醒功能** 依赖 Android 后台权限，不同厂商 ROM 行为可能存在差异
-- **云同步** 暂不支持，计划未来加入
-- **Widget** 暂不支持
-
----
-
-## 🤝 贡献
-
-本项目为个人效率工具，欢迎 Fork 和 Issue 反馈。
-
----
-
-## 📄 许可证
-
-[MIT License](LICENSE)
+本项目基于 **[MIT License](LICENSE)** 开源。
 
 Copyright © 2026 季札
 
 ---
-
 <p align="center">Made with ❤️ by <a href="https://github.com/ninrry">ninrry</a></p>
