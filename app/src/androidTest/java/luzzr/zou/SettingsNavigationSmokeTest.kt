@@ -23,7 +23,7 @@ class SettingsNavigationSmokeTest {
 
     @Test
     fun navigatesFromTodayToSettingsTrashAndBackup() {
-        composeRule.onNodeWithTag("nav_today").performClick()
+        composeRule.onNodeWithTag("nav_today", useUnmergedTree = true).performClick()
         assertTagExists("top_level_today")
         composeRule.onNodeWithTag("open_settings").performClick()
         composeRule.onNodeWithTag("settings_content").performTouchInput { swipeUp() }

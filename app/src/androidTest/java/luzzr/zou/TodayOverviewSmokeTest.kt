@@ -21,7 +21,7 @@ class TodayOverviewSmokeTest {
 
     @Test
     fun quickCreateFabOpensAllCreateScreensFromToday() {
-        composeRule.onNodeWithTag("nav_today").performClick()
+        composeRule.onNodeWithTag("nav_today", useUnmergedTree = true).performClick()
         assertTagExists("top_level_today")
         composeRule.onNodeWithTag("top_level_create_fab").performClick()
 

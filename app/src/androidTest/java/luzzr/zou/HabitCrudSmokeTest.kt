@@ -23,7 +23,7 @@ class HabitCrudSmokeTest {
     fun opensCreateHabitScreen() {
         val title = "HabitSmoke${System.currentTimeMillis()}"
 
-        composeRule.onNodeWithTag("nav_habits").performClick()
+        composeRule.onNodeWithTag("nav_habits", useUnmergedTree = true).performClick()
         composeRule.waitUntil(timeoutMillis = 5_000) {
             composeRule.onAllNodes(hasTestTag("top_level_habits"))
                 .fetchSemanticsNodes().isNotEmpty()

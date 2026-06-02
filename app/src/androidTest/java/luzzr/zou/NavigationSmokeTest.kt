@@ -21,20 +21,20 @@ class NavigationSmokeTest {
 
     @Test
     fun switchesAcrossAllTopLevelTabs() {
-        composeRule.onNodeWithTag("nav_today").performClick()
+        composeRule.onNodeWithTag("nav_today", useUnmergedTree = true).performClick()
         assertTagExists("top_level_today")
 
-        composeRule.onNodeWithTag("nav_tasks").performClick()
+        composeRule.onNodeWithTag("nav_tasks", useUnmergedTree = true).performClick()
         assertTagExists("top_level_tasks")
         assertTagExists("top_level_create_fab")
 
-        composeRule.onNodeWithTag("nav_habits").performClick()
+        composeRule.onNodeWithTag("nav_habits", useUnmergedTree = true).performClick()
         assertTagExists("top_level_habits")
 
-        composeRule.onNodeWithTag("nav_notes").performClick()
+        composeRule.onNodeWithTag("nav_notes", useUnmergedTree = true).performClick()
         assertTagExists("top_level_notes")
 
-        composeRule.onNodeWithTag("nav_today").performClick()
+        composeRule.onNodeWithTag("nav_today", useUnmergedTree = true).performClick()
         composeRule.onNodeWithTag("open_settings").performClick()
         assertTagExists("settings_show_completed_tasks")
         assertTagExists("settings_show_today_habits")
@@ -46,13 +46,13 @@ class NavigationSmokeTest {
 
     @Test
     fun returnsToTodayWithoutBouncingBackToPreviousTab() {
-        composeRule.onNodeWithTag("nav_today").performClick()
+        composeRule.onNodeWithTag("nav_today", useUnmergedTree = true).performClick()
         assertTagExists("top_level_today")
 
-        composeRule.onNodeWithTag("nav_tasks").performClick()
+        composeRule.onNodeWithTag("nav_tasks", useUnmergedTree = true).performClick()
         assertTagExists("top_level_tasks")
 
-        composeRule.onNodeWithTag("nav_today").performClick()
+        composeRule.onNodeWithTag("nav_today", useUnmergedTree = true).performClick()
         assertTagExists("top_level_today")
         composeRule.onNodeWithTag("open_settings").performClick()
         assertTagExists("settings_show_completed_tasks")

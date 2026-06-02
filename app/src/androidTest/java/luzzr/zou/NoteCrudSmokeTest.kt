@@ -26,7 +26,7 @@ class NoteCrudSmokeTest {
     fun createsReadsAndEditsNote() {
         val title = "NoteSmoke${System.currentTimeMillis()}"
 
-        composeRule.onNodeWithTag("nav_notes").performClick()
+        composeRule.onNodeWithTag("nav_notes", useUnmergedTree = true).performClick()
         assertTagExists("top_level_notes")
 
         composeRule.onNodeWithTag("top_level_create_fab").performClick()

@@ -1,13 +1,11 @@
 plugins {
     alias(libs.plugins.android.application)
-    alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.hilt.android)
     alias(libs.plugins.ksp)
 }
 
-import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import java.util.Properties
 import java.util.UUID
 import org.gradle.api.tasks.testing.Test
@@ -22,12 +20,12 @@ val hasReleaseSigning = keystorePropertiesFile.exists()
 
 android {
     namespace = "luzzr.zou"
-    compileSdk = 36
+    compileSdk = 37
 
     defaultConfig {
         applicationId = "luzzr.zou"
         minSdk = 29
-        targetSdk = 36
+        targetSdk = 37
         versionCode = 7
         versionName = "0.3.5"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -96,7 +94,7 @@ android {
     }
 
     sourceSets {
-        getByName("androidTest").assets.srcDir("$projectDir/schemas")
+        getByName("androidTest").assets.directories.add("$projectDir/schemas")
     }
 
     lint {
@@ -123,12 +121,6 @@ android {
 
     testOptions {
         animationsDisabled = true
-    }
-}
-
-kotlin {
-    compilerOptions {
-        jvmTarget.set(JvmTarget.JVM_17)
     }
 }
 

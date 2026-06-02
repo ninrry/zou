@@ -335,7 +335,7 @@ fun TopLevelCanvasRoute(
                                 onNavigate = onCreateNote
                             ) ?: onCreateNote()
                         }
-                        else -> {}
+                        TopLevelDestination.TODAY -> Unit
                     }
                 }
             },

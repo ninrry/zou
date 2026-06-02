@@ -22,7 +22,7 @@ class TaskCrudSmokeTest {
 
     @Test
     fun opensTaskEditorAndReturnsToList() {
-        composeRule.onNodeWithTag("nav_tasks").performClick()
+        composeRule.onNodeWithTag("nav_tasks", useUnmergedTree = true).performClick()
         assertTagExists("top_level_tasks")
 
         composeRule.onNodeWithTag("top_level_create_fab").performClick()
