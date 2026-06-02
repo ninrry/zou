@@ -1,8 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">周</string>
-    <string name="nav_today">今日</string>
-    <string name="nav_tasks">待办</string>
-    <string name="nav_habits">习惯</string>
-    <string name="nav_notes">笔记</string>
 </resources>

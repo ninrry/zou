@@ -67,12 +67,12 @@ android {
         }
     }
 
-    // APK 分离打包：仅 arm64-v8a（适配小米15 Pro 等主流设备）
+    // APK 分离打包：arm64 覆盖主流手机，x86_64 覆盖 ChromeOS 与模拟器安装场景
     splits {
         abi {
             isEnable = true
             reset()
-            include("arm64-v8a")
+            include("arm64-v8a", "x86_64")
             isUniversalApk = false
         }
     }

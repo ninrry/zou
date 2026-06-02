@@ -2,7 +2,7 @@ package luzzr.zou
 
 import android.content.Intent
 import androidx.compose.ui.test.assertTextEquals
-import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.junit4.v2.createAndroidComposeRule
 import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithText
 import luzzr.zou.core.reminder.ReminderConstants
