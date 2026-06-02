@@ -35,7 +35,7 @@ interface NoteImageStorage {
 
 @Singleton
 class LocalNoteImageStorage @Inject constructor(
-    @ApplicationContext private val context: Context,
+    @param:ApplicationContext private val context: Context,
 ) : NoteImageStorage {
 
     override suspend fun importImage(

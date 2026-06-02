@@ -23,7 +23,7 @@ private val Context.noteflowPreferencesDataStore: DataStore<Preferences> by pref
 
 @Singleton
 class SettingsRepositoryImpl @Inject constructor(
-    @ApplicationContext private val context: Context,
+    @param:ApplicationContext private val context: Context,
 ) : SettingsRepository {
 
     override fun observeReminderPreferences(): Flow<ReminderPreferences> {

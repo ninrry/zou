@@ -457,6 +457,7 @@ private fun MonthCalendar(
                         val cellDate = month.atDay(day)
                         val selected = cellDate == selectedDate
                         val enabled = minimumDate == null || !cellDate.isBefore(minimumDate)
+                        val interactionSource = remember(cellDate) { MutableInteractionSource() }
                         Box(
                             modifier = Modifier
                                 .weight(1f)
@@ -464,7 +465,7 @@ private fun MonthCalendar(
                                 .clip(CircleShape)
                                 .background(if (selected) accentColor.copy(alpha = 0.24f) else Color.Transparent)
                                 .clickable(
-                                    interactionSource = MutableInteractionSource(),
+                                    interactionSource = interactionSource,
                                     enabled = enabled,
                                 ) { onDateSelected(cellDate) },
                             contentAlignment = Alignment.Center,
@@ -654,13 +655,14 @@ private fun WheelPicker(
         ) {
             itemsIndexed(values) { _, value ->
                 val selected = value == selectedValue
+                val interactionSource = remember(value) { MutableInteractionSource() }
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
                         .animateItem()
                         .height(itemHeight)
                         .clickable(
-                            interactionSource = MutableInteractionSource(),
+                            interactionSource = interactionSource,
                         ) { onValueChanged(value) },
                     contentAlignment = Alignment.Center,
                 ) {

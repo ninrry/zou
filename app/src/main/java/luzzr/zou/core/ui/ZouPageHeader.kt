@@ -16,8 +16,8 @@ import luzzr.zou.core.designsystem.theme.ZouDesignTokens
 @Composable
 fun ZouPageHeader(
     title: String,
-    subtitle: String? = null,
     modifier: Modifier = Modifier,
+    subtitle: String? = null,
     trailingContent: @Composable (() -> Unit)? = null,
 ) {
     val designTokens = ZouDesignTokens.colors

@@ -1,6 +1,8 @@
 package luzzr.zou.core.designsystem.theme
 
 import android.os.Build
+import android.annotation.SuppressLint
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
@@ -61,10 +63,10 @@ fun ZouTheme(
     val noteFlowUiColors = noteFlowUiColors(useDarkTheme = useDarkTheme)
     val colorScheme = when {
         dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && useDarkTheme -> {
-            dynamicDarkColorScheme(LocalContext.current)
+            zouDynamicDarkColorScheme()
         }
         dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
-            dynamicLightColorScheme(LocalContext.current)
+            zouDynamicLightColorScheme()
         }
         useDarkTheme -> DarkColorScheme
         else -> LightColorScheme
@@ -82,3 +84,13 @@ fun ZouTheme(
         )
     }
 }
+
+@RequiresApi(Build.VERSION_CODES.S)
+@SuppressLint("NewApi")
+@Composable
+private fun zouDynamicDarkColorScheme() = dynamicDarkColorScheme(LocalContext.current)
+
+@RequiresApi(Build.VERSION_CODES.S)
+@SuppressLint("NewApi")
+@Composable
+private fun zouDynamicLightColorScheme() = dynamicLightColorScheme(LocalContext.current)

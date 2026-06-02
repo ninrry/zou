@@ -11,7 +11,7 @@ import kotlinx.coroutines.launch
 
 @Singleton
 class ReminderDispatchQueueImpl @Inject constructor(
-    @ApplicationScope private val applicationScope: CoroutineScope,
+    @param:ApplicationScope private val applicationScope: CoroutineScope,
     private val reminderScheduler: ReminderScheduler,
 ) : ReminderDispatchQueue {
 

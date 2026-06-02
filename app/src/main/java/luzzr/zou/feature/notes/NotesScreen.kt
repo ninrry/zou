@@ -1,5 +1,6 @@
 package luzzr.zou.feature.notes
 
+import android.content.Intent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -37,11 +38,14 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -57,6 +61,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import kotlinx.coroutines.flow.collect
 import luzzr.zou.core.designsystem.theme.ZouNoteAccent
 import luzzr.zou.core.ui.GlassLevel
 import luzzr.zou.core.ui.GlassSurface
@@ -100,9 +105,28 @@ fun NotesScreen(
     isRefreshing: Boolean = false,
     onRefresh: () -> Unit = {},
 ) {
+    val context = LocalContext.current
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    LaunchedEffect(viewModel, context) {
+        viewModel.events.collect { event ->
+            when (event) {
+                is NotesUiEvent.ShareNotes -> {
+                    context.startActivity(
+                        Intent.createChooser(event.request.toSendIntent(), "导出笔记到..."),
+                    )
+                }
+                is NotesUiEvent.ShowMessage -> {
+                    snackbarHostState.showSnackbar(event.message)
+                }
+            }
+        }
+    }
+
     Scaffold(
         modifier = Modifier.testTag("notes_screen"),
         containerColor = Color.Transparent,
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             AnimatedVisibility(
                 visible = uiState.isSelectMode,
@@ -296,7 +320,6 @@ fun NotesScreen(
                     .padding(bottom = 24.dp)
                     .zIndex(99f)
             ) {
-                val context = LocalContext.current
                 val isAllPinned = uiState.notes
                     .filter { uiState.selectedNoteIds.contains(it.id) }
                     .all { it.isPinned }
@@ -323,7 +346,7 @@ fun NotesScreen(
                         BulkActionButton(
                             icon = Icons.Outlined.FolderZip,
                             label = "导出",
-                            onClick = { viewModel.bulkExportNotes(context) }
+                            onClick = { viewModel.bulkExportNotes() }
                         )
 
                         var showDeleteConfirm by remember { mutableStateOf(false) }
@@ -418,4 +441,13 @@ private fun NotesDeleteConfirmDialog(
         containerColor = MaterialTheme.colorScheme.surfaceVariant,
         shape = RoundedCornerShape(28.dp),
     )
+}
+
+private fun NoteExportShareRequest.toSendIntent(): Intent {
+    return Intent(Intent.ACTION_SEND).apply {
+        type = mimeType
+        putExtra(Intent.EXTRA_STREAM, uri)
+        putExtra(Intent.EXTRA_SUBJECT, subject)
+        addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+    }
 }

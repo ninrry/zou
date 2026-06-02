@@ -124,8 +124,8 @@ fun ZouShimmerCard(
 
 @Composable
 fun ZouShimmerList(
-    itemCount: Int = 4,
     modifier: Modifier = Modifier,
+    itemCount: Int = 4,
 ) {
     Column(
         modifier = modifier

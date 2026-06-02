@@ -2,6 +2,7 @@ package luzzr.zou.core.markdown
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -25,11 +26,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
@@ -142,14 +145,20 @@ private fun MarkdownText(
     ).isNotEmpty()
 
     if (hasLink) {
-        androidx.compose.foundation.text.ClickableText(
+        var textLayoutResult by remember { mutableStateOf<TextLayoutResult?>(null) }
+        Text(
             text = annotated,
             style = style.copy(color = MaterialTheme.colorScheme.onSurface),
-            onClick = { offset ->
-                annotated.getStringAnnotations(linkTag, offset, offset)
-                    .firstOrNull()
-                    ?.let { uriHandler.openUri(it.item) }
+            modifier = Modifier.pointerInput(annotated) {
+                detectTapGestures { position ->
+                    val layoutResult = textLayoutResult ?: return@detectTapGestures
+                    val offset = layoutResult.getOffsetForPosition(position)
+                    annotated.getStringAnnotations(linkTag, offset, offset)
+                        .firstOrNull()
+                        ?.let { uriHandler.openUri(it.item) }
+                }
             },
+            onTextLayout = { textLayoutResult = it },
         )
     } else {
         Text(

@@ -3,8 +3,8 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.kotlin.serialization)
-    alias(libs.plugins.kotlin.kapt)
     alias(libs.plugins.hilt.android)
+    alias(libs.plugins.ksp)
 }
 
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
@@ -95,9 +95,13 @@ android {
         localeFilters += setOf("zh", "en")
     }
 
+    sourceSets {
+        getByName("androidTest").assets.srcDir("$projectDir/schemas")
+    }
+
     lint {
-        checkReleaseBuilds = false
-        abortOnError = false
+        checkReleaseBuilds = true
+        abortOnError = true
     }
 
 
@@ -128,11 +132,8 @@ kotlin {
     }
 }
 
-kapt {
-    correctErrorTypes = true
-    arguments {
-        arg("room.schemaLocation", "$projectDir/schemas")
-    }
+ksp {
+    arg("room.schemaLocation", "$projectDir/schemas")
 }
 
 dependencies {
@@ -160,9 +161,9 @@ dependencies {
     implementation(libs.com.google.android.material)
     implementation(libs.kotlinx.serialization.json)
 
-    kapt(libs.androidx.hilt.compiler)
-    kapt(libs.androidx.room.compiler)
-    kapt(libs.com.google.dagger.hilt.compiler)
+    ksp(libs.androidx.hilt.compiler)
+    ksp(libs.com.google.dagger.hilt.compiler)
+    ksp(libs.androidx.room.compiler)
 
     testImplementation(libs.junit4)
     testImplementation(libs.kotlinx.coroutines.test)
@@ -170,6 +171,7 @@ dependencies {
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
     androidTestImplementation(libs.androidx.test.espresso.core)
     androidTestImplementation(libs.androidx.test.ext.junit.ktx)
+    androidTestImplementation(libs.androidx.room.testing)
     androidTestImplementation(libs.androidx.work.testing)
 
     debugImplementation(libs.androidx.compose.ui.test.manifest)

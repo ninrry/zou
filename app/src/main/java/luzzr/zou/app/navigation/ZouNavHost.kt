@@ -79,7 +79,7 @@ fun ZouNavHost(
         },
         exitTransition = {
             val targetRoute = targetState.destination.route
-            if (targetRoute == TaskRoutes.createRoute || targetRoute == HabitRoutes.createRoute || targetRoute == NoteRoutes.createRoute) {
+            if (targetRoute.isCreateRoute()) {
                 ExitTransition.None
             } else {
                 fadeOut(
@@ -104,7 +104,7 @@ fun ZouNavHost(
         },
         popEnterTransition = {
             val initialRoute = initialState.destination.route
-            if (initialRoute == TaskRoutes.createRoute || initialRoute == HabitRoutes.createRoute || initialRoute == NoteRoutes.createRoute) {
+            if (initialRoute.isCreateRoute()) {
                 EnterTransition.None
             } else {
                 fadeIn(
@@ -222,41 +222,10 @@ fun ZouNavHost(
             popEnterTransition = { EnterTransition.None },
             popExitTransition = { ExitTransition.None },
         ) {
-            val scope = rememberCoroutineScope()
-            val revealProgress = remember { Animatable(0f) }
-
-            LaunchedEffect(Unit) {
-                revealProgress.animateTo(
-                    targetValue = 1f,
-                    animationSpec = tween(
-                        durationMillis = MotionTokens.DurationFabRadial,
-                        easing = MotionTokens.EasingFabExpand,
-                    ),
-                )
-            }
-
-            val navigateBackWithCollapse: () -> Unit = {
-                scope.launch {
-                    revealProgress.animateTo(
-                        targetValue = 0f,
-                        animationSpec = tween(
-                            durationMillis = MotionTokens.DurationFabRadial,
-                            easing = MotionTokens.EasingAccelerate,
-                        ),
-                    )
-                    navController.navigateUp()
-                }
-            }
-
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .circularReveal(
-                        progress = revealProgress.value,
-                        origin = radialExpansionController.lastAnchor?.origin,
-                        backgroundColor = MaterialTheme.colorScheme.background,
-                    ),
-            ) {
+            FabRevealDestination(
+                navController = navController,
+                radialExpansionController = radialExpansionController,
+            ) { navigateBackWithCollapse ->
                 TaskEditorRoute(
                     onNavigateBack = navigateBackWithCollapse,
                 )
@@ -307,41 +276,10 @@ fun ZouNavHost(
             popEnterTransition = { EnterTransition.None },
             popExitTransition = { ExitTransition.None },
         ) {
-            val scope = rememberCoroutineScope()
-            val revealProgress = remember { Animatable(0f) }
-
-            LaunchedEffect(Unit) {
-                revealProgress.animateTo(
-                    targetValue = 1f,
-                    animationSpec = tween(
-                        durationMillis = MotionTokens.DurationFabRadial,
-                        easing = MotionTokens.EasingFabExpand,
-                    ),
-                )
-            }
-
-            val navigateBackWithCollapse: () -> Unit = {
-                scope.launch {
-                    revealProgress.animateTo(
-                        targetValue = 0f,
-                        animationSpec = tween(
-                            durationMillis = MotionTokens.DurationFabRadial,
-                            easing = MotionTokens.EasingAccelerate,
-                        ),
-                    )
-                    navController.navigateUp()
-                }
-            }
-
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .circularReveal(
-                        progress = revealProgress.value,
-                        origin = radialExpansionController.lastAnchor?.origin,
-                        backgroundColor = MaterialTheme.colorScheme.background,
-                    ),
-            ) {
+            FabRevealDestination(
+                navController = navController,
+                radialExpansionController = radialExpansionController,
+            ) { navigateBackWithCollapse ->
                 HabitEditorRoute(
                     onNavigateBack = navigateBackWithCollapse,
                 )
@@ -392,41 +330,10 @@ fun ZouNavHost(
             popEnterTransition = { EnterTransition.None },
             popExitTransition = { ExitTransition.None },
         ) {
-            val scope = rememberCoroutineScope()
-            val revealProgress = remember { Animatable(0f) }
-
-            LaunchedEffect(Unit) {
-                revealProgress.animateTo(
-                    targetValue = 1f,
-                    animationSpec = tween(
-                        durationMillis = MotionTokens.DurationFabRadial,
-                        easing = MotionTokens.EasingFabExpand,
-                    ),
-                )
-            }
-
-            val navigateBackWithCollapse: () -> Unit = {
-                scope.launch {
-                    revealProgress.animateTo(
-                        targetValue = 0f,
-                        animationSpec = tween(
-                            durationMillis = MotionTokens.DurationFabRadial,
-                            easing = MotionTokens.EasingAccelerate,
-                        ),
-                    )
-                    navController.navigateUp()
-                }
-            }
-
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .circularReveal(
-                        progress = revealProgress.value,
-                        origin = radialExpansionController.lastAnchor?.origin,
-                        backgroundColor = MaterialTheme.colorScheme.background,
-                    ),
-            ) {
+            FabRevealDestination(
+                navController = navController,
+                radialExpansionController = radialExpansionController,
+            ) { navigateBackWithCollapse ->
                 NoteEditorRoute(
                     onNavigateBack = navigateBackWithCollapse,
                 )
@@ -477,4 +384,55 @@ fun ZouNavHost(
             )
         }
     }
+}
+
+@Composable
+private fun FabRevealDestination(
+    navController: NavHostController,
+    radialExpansionController: RadialExpansionController,
+    content: @Composable (onNavigateBack: () -> Unit) -> Unit,
+) {
+    val scope = rememberCoroutineScope()
+    val revealProgress = remember { Animatable(0f) }
+
+    LaunchedEffect(Unit) {
+        revealProgress.animateTo(
+            targetValue = 1f,
+            animationSpec = tween(
+                durationMillis = MotionTokens.DurationFabRadial,
+                easing = MotionTokens.EasingFabExpand,
+            ),
+        )
+    }
+
+    val navigateBackWithCollapse: () -> Unit = {
+        scope.launch {
+            revealProgress.animateTo(
+                targetValue = 0f,
+                animationSpec = tween(
+                    durationMillis = MotionTokens.DurationFabRadial,
+                    easing = MotionTokens.EasingAccelerate,
+                ),
+            )
+            navController.navigateUp()
+        }
+    }
+
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .circularReveal(
+                progress = revealProgress.value,
+                origin = radialExpansionController.lastAnchor?.origin,
+                backgroundColor = MaterialTheme.colorScheme.background,
+            ),
+    ) {
+        content(navigateBackWithCollapse)
+    }
+}
+
+private fun String?.isCreateRoute(): Boolean {
+    return this == TaskRoutes.createRoute ||
+        this == HabitRoutes.createRoute ||
+        this == NoteRoutes.createRoute
 }

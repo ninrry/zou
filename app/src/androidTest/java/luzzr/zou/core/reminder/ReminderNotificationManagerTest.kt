@@ -12,6 +12,9 @@ class ReminderNotificationManagerTest {
 
     private val manager = ReminderNotificationManager(
         context = ApplicationProvider.getApplicationContext(),
+        notificationPermissionChecker = NotificationPermissionChecker(
+            context = ApplicationProvider.getApplicationContext(),
+        ),
     )
 
     @Test

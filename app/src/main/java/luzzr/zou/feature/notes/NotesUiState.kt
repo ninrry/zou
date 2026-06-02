@@ -17,3 +17,7 @@ data class NoteCardUiModel(
     val isPinned: Boolean = false,
 )
 
+sealed interface NotesUiEvent {
+    data class ShareNotes(val request: NoteExportShareRequest) : NotesUiEvent
+    data class ShowMessage(val message: String) : NotesUiEvent
+}

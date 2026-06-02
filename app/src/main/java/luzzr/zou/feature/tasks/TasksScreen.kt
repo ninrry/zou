@@ -37,10 +37,10 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -55,7 +55,6 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import luzzr.zou.core.designsystem.theme.ZouTaskAccent
 import luzzr.zou.core.ui.GlassSurface
 import luzzr.zou.core.ui.ModuleFab
@@ -107,7 +106,6 @@ fun TasksScreen(
     onRefresh: () -> Unit = {},
 ) {
     var removingIds by remember { mutableStateOf(emptySet<String>()) }
-    val coroutineScope = rememberCoroutineScope()
     Scaffold(
         modifier = Modifier.testTag("tasks_screen"),
         containerColor = Color.Transparent,
@@ -144,25 +142,22 @@ fun TasksScreen(
                     }
                 } else {
                     items(uiState.tasks, key = { it.id }) { task ->
-                        val dismissState = rememberSwipeToDismissBoxState(
-                            confirmValueChange = { dismissValue ->
-                                when (dismissValue) {
-                                    SwipeToDismissBoxValue.StartToEnd -> {
-                                        onTaskCompletionToggle(task.id, true)
-                                        false // snap back
-                                    }
-                                    SwipeToDismissBoxValue.EndToStart -> {
-                                        coroutineScope.launch {
-                                            removingIds = removingIds + task.id
-                                            delay(300)
-                                            onDeleteTask(task.id)
-                                        }
-                                        false // snap back
-                                    }
-                                    else -> false
+                        val dismissState = rememberSwipeToDismissBoxState()
+                        LaunchedEffect(dismissState.currentValue) {
+                            when (dismissState.currentValue) {
+                                SwipeToDismissBoxValue.StartToEnd -> {
+                                    onTaskCompletionToggle(task.id, true)
+                                    dismissState.reset()
                                 }
-                            },
-                        )
+                                SwipeToDismissBoxValue.EndToStart -> {
+                                    removingIds = removingIds + task.id
+                                    dismissState.reset()
+                                    delay(300)
+                                    onDeleteTask(task.id)
+                                }
+                                else -> Unit
+                            }
+                        }
                         AnimatedVisibility(
                             visible = task.id !in removingIds,
                             exit = fadeOut(animationSpec = tween(300)) +

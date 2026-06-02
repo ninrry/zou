@@ -9,6 +9,7 @@ import android.content.Intent
 import android.media.AudioAttributes
 import android.media.RingtoneManager
 import android.os.Build
+import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import luzzr.zou.MainActivity
@@ -22,7 +23,8 @@ import javax.inject.Singleton
 
 @Singleton
 class ReminderNotificationManager @Inject constructor(
-    @ApplicationContext private val context: Context,
+    @param:ApplicationContext private val context: Context,
+    private val notificationPermissionChecker: NotificationPermissionChecker,
 ) {
     private val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm", Locale.getDefault())
 
@@ -87,7 +89,7 @@ class ReminderNotificationManager @Inject constructor(
             ),
         ).build()
 
-        NotificationManagerCompat.from(context).notify(notificationId, notification)
+        notifySafely(notificationId, notification)
     }
 
     fun showHabitReminder(
@@ -116,11 +118,20 @@ class ReminderNotificationManager @Inject constructor(
             ),
         ).build()
 
-        NotificationManagerCompat.from(context).notify(notificationId, notification)
+        notifySafely(notificationId, notification)
     }
 
     fun cancelNotification(notificationId: Int) {
         NotificationManagerCompat.from(context).cancel(notificationId)
+    }
+
+    private fun notifySafely(notificationId: Int, notification: Notification) {
+        if (!notificationPermissionChecker.canPostNotifications()) return
+        try {
+            NotificationManagerCompat.from(context).notify(notificationId, notification)
+        } catch (exception: SecurityException) {
+            Log.w(TAG, "Notification permission was revoked before notify($notificationId)", exception)
+        }
     }
 
     // ── 频道选择 ──────────────────────────────────────────────
@@ -273,5 +284,9 @@ class ReminderNotificationManager @Inject constructor(
             ),
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
         )
+    }
+
+    private companion object {
+        const val TAG = "ReminderNotificationManager"
     }
 }

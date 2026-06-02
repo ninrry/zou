@@ -41,6 +41,7 @@ import androidx.compose.ui.layout.positionInWindow
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import luzzr.zou.app.navigation.TopLevelDestination
 import luzzr.zou.core.designsystem.theme.ZouDesignTokens
@@ -54,12 +55,12 @@ fun TopModuleTabBar(
     destinations: List<TopLevelDestination>,
     selectedDestination: TopLevelDestination,
     onDestinationSelected: (TopLevelDestination) -> Unit,
+    modifier: Modifier = Modifier,
     onFabClick: () -> Unit = {},
     fabExpanded: Boolean = false,
     fabPositioned: (Offset) -> Unit = {},
     selectionPosition: Float = destinations.indexOf(selectedDestination).coerceAtLeast(0).toFloat(),
     motionStyle: ModuleVisualStyle = selectedDestination.visualStyle,
-    modifier: Modifier = Modifier,
 ) {
     val motion = LocalZouMotion.current
     val designTokens = ZouDesignTokens.colors
@@ -137,7 +138,12 @@ fun TopModuleTabBar(
             // 滑动指示器
             TopTabHighlight(
                 modifier = Modifier
-                    .offset(x = animatedHighlightOffset, y = 8.dp)
+                    .offset {
+                        IntOffset(
+                            x = animatedHighlightOffset.roundToPx(),
+                            y = 8.dp.roundToPx(),
+                        )
+                    }
                     .height(58.dp),
                 width = highlightWidth,
                 accentColor = animatedAccentColor,

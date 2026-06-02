@@ -39,11 +39,11 @@ import luzzr.zou.feature.tasks.TaskRoutes
 @Composable
 fun ZouApp(
     defaultStartDestination: String,
+    modifier: Modifier = Modifier,
     pendingTaskDetailId: String? = null,
     pendingHabitDetailId: String? = null,
     onPendingTaskDetailConsumed: () -> Unit = {},
     onPendingHabitDetailConsumed: () -> Unit = {},
-    modifier: Modifier = Modifier,
 ) {
     val designTokens = ZouDesignTokens.colors
     val motion = LocalZouMotion.current

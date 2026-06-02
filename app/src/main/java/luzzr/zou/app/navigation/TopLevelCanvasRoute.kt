@@ -31,6 +31,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.mutableStateOf
@@ -125,8 +126,12 @@ fun TopLevelCanvasRoute(
             }
     }
 
-    val canvasPosition = (pagerState.currentPage + pagerState.currentPageOffsetFraction)
-        .coerceIn(0f, (destinations.size - 1).toFloat())
+    val canvasPosition by remember(pagerState, destinations.size) {
+        derivedStateOf {
+            (pagerState.currentPage + pagerState.currentPageOffsetFraction)
+                .coerceIn(0f, (destinations.size - 1).toFloat())
+        }
+    }
     val lowerIndex = canvasPosition.toInt()
     val upperIndex = min(lowerIndex + 1, destinations.lastIndex)
     val motionFraction = (canvasPosition - lowerIndex).coerceIn(0f, 1f)
@@ -178,19 +183,18 @@ fun TopLevelCanvasRoute(
                 modifier = Modifier.fillMaxSize(),
                 beyondViewportPageCount = 1,
             ) { page ->
-                val pageOffset = ((pagerState.currentPage - page) + pagerState.currentPageOffsetFraction)
-                val normalizedOffset = pageOffset.absoluteValue.coerceIn(0f, 1f)
-                val pageAlpha = MotionTokens.CanvasAdjacentAlpha +
-                    ((1f - MotionTokens.CanvasAdjacentAlpha) * (1f - normalizedOffset))
-                val pageScale = MotionTokens.CanvasAdjacentScale +
-                    ((1f - MotionTokens.CanvasAdjacentScale) * (1f - normalizedOffset))
-
                 // 为每个页面增加 92.dp 底部安全填充，防悬浮 TabBar 遮挡卡片内容
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(bottom = 92.dp)
                         .graphicsLayer {
+                            val pageOffset = ((pagerState.currentPage - page) + pagerState.currentPageOffsetFraction)
+                            val normalizedOffset = pageOffset.absoluteValue.coerceIn(0f, 1f)
+                            val pageAlpha = MotionTokens.CanvasAdjacentAlpha +
+                                ((1f - MotionTokens.CanvasAdjacentAlpha) * (1f - normalizedOffset))
+                            val pageScale = MotionTokens.CanvasAdjacentScale +
+                                ((1f - MotionTokens.CanvasAdjacentScale) * (1f - normalizedOffset))
                             translationX = -size.width * pageOffset * MotionTokens.CanvasParallaxFactor
                             alpha = pageAlpha
                             scaleX = pageScale

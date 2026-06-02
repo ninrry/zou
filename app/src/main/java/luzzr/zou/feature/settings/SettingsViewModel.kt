@@ -23,7 +23,7 @@ import kotlinx.coroutines.withContext
 
 @HiltViewModel
 class SettingsViewModel @Inject constructor(
-    @ApplicationContext private val context: Context,
+    @param:ApplicationContext private val context: Context,
     observeReminderPreferencesUseCase: ObserveReminderPreferencesUseCase,
     private val updateReminderPreferencesUseCase: UpdateReminderPreferencesUseCase,
     private val notificationPermissionChecker: NotificationPermissionChecker,

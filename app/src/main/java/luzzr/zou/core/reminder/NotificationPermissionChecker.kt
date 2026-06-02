@@ -12,7 +12,7 @@ import javax.inject.Singleton
 
 @Singleton
 open class NotificationPermissionChecker @Inject constructor(
-    @ApplicationContext private val context: Context,
+    @param:ApplicationContext private val context: Context,
 ) {
     open fun canPostNotifications(): Boolean {
         val notificationsEnabled = NotificationManagerCompat.from(context).areNotificationsEnabled()

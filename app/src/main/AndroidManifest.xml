@@ -30,10 +30,11 @@
         </provider>
 
         <activity
-            android:name=".MainActivity"
+            android:name="luzzr.zou.MainActivity"
             android:exported="true"
             android:launchMode="singleTop"
-            android:theme="@style/Theme.Zou">
+            android:theme="@style/Theme.Zou"
+            tools:ignore="Instantiatable">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -42,13 +43,14 @@
         </activity>
 
         <activity
-            android:name=".core.reminder.ReminderAlertActivity"
+            android:name="luzzr.zou.core.reminder.ReminderAlertActivity"
             android:excludeFromRecents="true"
             android:exported="false"
             android:launchMode="singleTop"
             android:showOnLockScreen="true"
             android:taskAffinity=""
-            android:theme="@style/Theme.Zou" />
+            android:theme="@style/Theme.Zou"
+            tools:ignore="Instantiatable" />
 
         <receiver
             android:name=".core.reminder.ReminderRecoveryReceiver"
