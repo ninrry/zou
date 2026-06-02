@@ -219,6 +219,10 @@ class TrashViewModelTest {
         override suspend fun importImage(noteId: String, sourceUri: String) =
             throw UnsupportedOperationException()
 
+        override suspend fun bulkPinNotes(noteIds: List<String>, isPinned: Boolean) = Unit
+
+        override suspend fun bulkSoftDeleteNotes(noteIds: List<String>) = Unit
+
         override suspend fun discardDraft(noteId: String) = Unit
     }
 }

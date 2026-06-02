@@ -23,4 +23,6 @@ data class NoteEntity(
     val deletedAt: Long? = null,
     val tags: String? = null,
     val archived: Boolean = false,
+    val isPinned: Boolean = false,
+    val pinnedAt: Long? = null,
 )

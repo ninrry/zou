@@ -21,16 +21,18 @@ class NavigationSmokeTest {
 
     @Test
     fun switchesAcrossAllTopLevelTabs() {
-        assertTagExists("today_summary_card")
+        composeRule.onNodeWithTag("nav_today").performClick()
+        assertTagExists("top_level_today")
 
         composeRule.onNodeWithTag("nav_tasks").performClick()
-        assertTagExists("tasks_fab")
+        assertTagExists("top_level_tasks")
+        assertTagExists("top_level_create_fab")
 
         composeRule.onNodeWithTag("nav_habits").performClick()
-        assertTagExists("habits_fab")
+        assertTagExists("top_level_habits")
 
         composeRule.onNodeWithTag("nav_notes").performClick()
-        assertTagExists("notes_fab")
+        assertTagExists("top_level_notes")
 
         composeRule.onNodeWithTag("nav_today").performClick()
         composeRule.onNodeWithTag("open_settings").performClick()
@@ -39,22 +41,24 @@ class NavigationSmokeTest {
         assertTagExists("settings_show_deleted_habits")
 
         composeRule.onNodeWithTag("settings_back").performClick()
-        assertTagExists("today_summary_card")
+        assertTagExists("top_level_today")
     }
 
     @Test
     fun returnsToTodayWithoutBouncingBackToPreviousTab() {
-        assertTagExists("today_summary_card")
+        composeRule.onNodeWithTag("nav_today").performClick()
+        assertTagExists("top_level_today")
 
         composeRule.onNodeWithTag("nav_tasks").performClick()
-        assertTagExists("tasks_fab")
+        assertTagExists("top_level_tasks")
 
         composeRule.onNodeWithTag("nav_today").performClick()
+        assertTagExists("top_level_today")
         composeRule.onNodeWithTag("open_settings").performClick()
         assertTagExists("settings_show_completed_tasks")
 
         composeRule.onNodeWithTag("settings_back").performClick()
-        assertTagExists("today_summary_card")
+        assertTagExists("top_level_today")
     }
 
     private fun assertTagExists(tag: String) {

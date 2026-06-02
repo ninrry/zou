@@ -24,7 +24,11 @@ class HabitCrudSmokeTest {
         val title = "HabitSmoke${System.currentTimeMillis()}"
 
         composeRule.onNodeWithTag("nav_habits").performClick()
-        composeRule.onNodeWithTag("habits_fab").performClick()
+        composeRule.waitUntil(timeoutMillis = 5_000) {
+            composeRule.onAllNodes(hasTestTag("top_level_habits"))
+                .fetchSemanticsNodes().isNotEmpty()
+        }
+        composeRule.onNodeWithTag("top_level_create_fab").performClick()
         composeRule.waitUntil(timeoutMillis = 5_000) {
             composeRule.onAllNodes(hasTestTag("habit_editor_title_input"))
                 .fetchSemanticsNodes().isNotEmpty()

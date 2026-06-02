@@ -109,6 +109,7 @@ fun TasksScreen(
     var removingIds by remember { mutableStateOf(emptySet<String>()) }
     val coroutineScope = rememberCoroutineScope()
     Scaffold(
+        modifier = Modifier.testTag("tasks_screen"),
         containerColor = Color.Transparent,
     ) { innerPadding ->
         PullToRefreshBox(
@@ -178,7 +179,7 @@ fun TasksScreen(
                                             modifier = Modifier
                                                 .fillMaxSize()
                                                 .clip(RoundedCornerShape(24.dp))
-                                                .background(Color(0xFF4CAF50).copy(alpha = 0.9f))
+                                                .background(ZouDesignTokens.colors.success.copy(alpha = 0.9f))
                                                 .padding(horizontal = 24.dp),
                                             contentAlignment = Alignment.CenterStart,
                                         ) {
@@ -195,7 +196,7 @@ fun TasksScreen(
                                             modifier = Modifier
                                                 .fillMaxSize()
                                                 .clip(RoundedCornerShape(24.dp))
-                                                .background(Color(0xFFE53935).copy(alpha = 0.9f))
+                                                .background(ZouDesignTokens.colors.danger.copy(alpha = 0.9f))
                                                 .padding(horizontal = 24.dp),
                                             contentAlignment = Alignment.CenterEnd,
                                         ) {

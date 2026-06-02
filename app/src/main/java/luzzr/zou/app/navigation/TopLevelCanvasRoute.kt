@@ -247,6 +247,7 @@ fun TopLevelCanvasRoute(
                     visible = isQuickCreateExpanded && isTodayPage,
                     delayMillis = 0,
                     text = "新建任务",
+                    testTag = "today_quick_create_task",
                     accentColor = ZouTaskAccentSoft,
                     onClick = {
                         isQuickCreateExpanded = false
@@ -261,6 +262,7 @@ fun TopLevelCanvasRoute(
                     visible = isQuickCreateExpanded && isTodayPage,
                     delayMillis = 80,
                     text = "新建习惯",
+                    testTag = "today_quick_create_habit",
                     accentColor = ZouHabitAccentSoft,
                     onClick = {
                         isQuickCreateExpanded = false
@@ -275,6 +277,7 @@ fun TopLevelCanvasRoute(
                     visible = isQuickCreateExpanded && isTodayPage,
                     delayMillis = 160,
                     text = "新建笔记",
+                    testTag = "today_quick_create_note",
                     accentColor = ZouNoteAccentSoft,
                     onClick = {
                         isQuickCreateExpanded = false
@@ -346,6 +349,7 @@ private fun StaggeredMenuAction(
     visible: Boolean,
     delayMillis: Int,
     text: String,
+    testTag: String,
     accentColor: Color,
     onClick: () -> Unit,
 ) {
@@ -392,6 +396,7 @@ private fun StaggeredMenuAction(
         GlassSurface(
             modifier = Modifier
                 .noteFlowPressScale(interactionSource = interactionSource, pressedScale = 0.95f)
+                .testTag(testTag)
                 .clickable(
                     interactionSource = interactionSource,
                     indication = null,

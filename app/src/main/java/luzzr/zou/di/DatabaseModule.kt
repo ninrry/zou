@@ -31,6 +31,7 @@ object DatabaseModule {
         .addMigrations(ZouMigrations.MIGRATION_1_2)
         .addMigrations(ZouMigrations.MIGRATION_2_3)
         .addMigrations(ZouMigrations.MIGRATION_3_4)
+        .addMigrations(ZouMigrations.MIGRATION_4_5)
         .build()
 
     @Provides

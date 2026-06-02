@@ -13,7 +13,7 @@ interface NoteDao {
         """
         SELECT * FROM notes
         WHERE isDeleted = 0
-        ORDER BY updatedAt DESC
+        ORDER BY isPinned DESC, pinnedAt DESC, updatedAt DESC
         """,
     )
     fun observeActiveNotes(): Flow<List<NoteEntity>>
@@ -71,4 +71,30 @@ interface NoteDao {
 
     @Query("DELETE FROM notes WHERE id = :noteId")
     suspend fun hardDeleteNote(noteId: String)
+
+    @Query(
+        """
+        UPDATE notes
+        SET isPinned = :isPinned, pinnedAt = :pinnedAt, updatedAt = :updatedAt
+        WHERE id IN (:noteIds)
+        """,
+    )
+    suspend fun updatePinnedStatus(
+        noteIds: List<String>,
+        isPinned: Boolean,
+        pinnedAt: Long?,
+        updatedAt: Long,
+    )
+
+    @Query(
+        """
+        UPDATE notes
+        SET isDeleted = 1, deletedAt = :deletedAt, updatedAt = :deletedAt
+        WHERE id IN (:noteIds)
+        """,
+    )
+    suspend fun softDeleteNotes(
+        noteIds: List<String>,
+        deletedAt: Long,
+    )
 }

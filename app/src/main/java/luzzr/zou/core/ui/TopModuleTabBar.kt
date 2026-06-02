@@ -82,6 +82,7 @@ fun TopModuleTabBar(
     BoxWithConstraints(
         modifier = modifier
             .fillMaxWidth()
+            .testTag("top_level_${selectedDestination.route}")
             .navigationBarsPadding() // 强力阻绝贴边，腾出底部安全区
             .padding(horizontal = 20.dp, vertical = 10.dp),
     ) {
@@ -210,7 +211,8 @@ fun TopModuleTabBar(
                                 interactionSource = fabInteraction,
                                 indication = null,
                                 onClick = onFabClick
-                            ),
+                            )
+                            .testTag("top_level_create_fab"),
                         accentColor = animatedFabAccentColor,
                         level = GlassLevel.Strong,
                         shape = CircleShape

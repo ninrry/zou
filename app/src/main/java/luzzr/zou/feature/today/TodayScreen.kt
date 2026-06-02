@@ -255,6 +255,7 @@ private fun TodayTasksSection(
                     description = "今天没有待推进的任务，享受当下吧。点按底部的 '+' 开启新任务。",
                     accentColor = ZouTaskAccent,
                     layoutSpec = layoutSpec,
+                    testTag = "today_empty_tasks_card",
                 )
             }
         } else {
@@ -305,6 +306,7 @@ private fun TodayHabitsSection(
                     description = "空山新雨，静听松风。点按底部的 '+' 开启今日打卡吧。",
                     accentColor = ZouHabitAccent,
                     layoutSpec = layoutSpec,
+                    testTag = "today_empty_habits_card",
                 )
             }
         } else {

@@ -21,8 +21,9 @@ class TodayOverviewSmokeTest {
 
     @Test
     fun quickCreateFabOpensAllCreateScreensFromToday() {
-        assertTagExists("today_summary_card")
-        composeRule.onNodeWithTag("today_quick_create_main").performClick()
+        composeRule.onNodeWithTag("nav_today").performClick()
+        assertTagExists("top_level_today")
+        composeRule.onNodeWithTag("top_level_create_fab").performClick()
 
         composeRule.onNodeWithTag("today_quick_create_task").performClick()
         assertTagExists("task_editor_title_input")
@@ -30,7 +31,7 @@ class TodayOverviewSmokeTest {
             it.onBackPressedDispatcher.onBackPressed()
         }
 
-        composeRule.onNodeWithTag("today_quick_create_main").performClick()
+        composeRule.onNodeWithTag("top_level_create_fab").performClick()
         composeRule.onNodeWithTag("today_quick_create_habit").performClick()
         assertTagExists("habit_editor_title_input")
         composeRule.activityRule.scenario.onActivity {

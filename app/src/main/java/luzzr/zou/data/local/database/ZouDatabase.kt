@@ -24,7 +24,7 @@ import luzzr.zou.data.local.database.entity.TaskEntity
         NoteEntity::class,
         MediaEntity::class,
     ],
-    version = 4,
+    version = 5,
     exportSchema = true,
 )
 abstract class ZouDatabase : RoomDatabase() {

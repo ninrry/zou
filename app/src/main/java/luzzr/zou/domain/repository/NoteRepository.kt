@@ -29,4 +29,8 @@ interface NoteRepository {
     suspend fun cleanupOrphanedMedia() = Unit
 
     suspend fun discardDraft(noteId: String)
+
+    suspend fun bulkPinNotes(noteIds: List<String>, isPinned: Boolean)
+
+    suspend fun bulkSoftDeleteNotes(noteIds: List<String>)
 }

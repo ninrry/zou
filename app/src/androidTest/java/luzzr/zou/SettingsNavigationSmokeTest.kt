@@ -23,6 +23,8 @@ class SettingsNavigationSmokeTest {
 
     @Test
     fun navigatesFromTodayToSettingsTrashAndBackup() {
+        composeRule.onNodeWithTag("nav_today").performClick()
+        assertTagExists("top_level_today")
         composeRule.onNodeWithTag("open_settings").performClick()
         composeRule.onNodeWithTag("settings_content").performTouchInput { swipeUp() }
         composeRule.onNodeWithTag("settings_open_trash").performClick()
@@ -46,4 +48,3 @@ class SettingsNavigationSmokeTest {
         assertTrue(composeRule.onAllNodesWithTag(tag).fetchSemanticsNodes().isNotEmpty())
     }
 }
-

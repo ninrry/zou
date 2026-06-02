@@ -27,9 +27,9 @@ class NoteCrudSmokeTest {
         val title = "NoteSmoke${System.currentTimeMillis()}"
 
         composeRule.onNodeWithTag("nav_notes").performClick()
-        assertTagExists("notes_fab")
+        assertTagExists("top_level_notes")
 
-        composeRule.onNodeWithTag("notes_fab").performClick()
+        composeRule.onNodeWithTag("top_level_create_fab").performClick()
         composeRule.onNodeWithTag("note_editor_title_input").performTextInput(title)
         composeRule.onNodeWithTag("note_editor_content_input").performTextInput("# 测试标题")
         composeRule.onNodeWithTag("note_editor_save").performClick()
@@ -56,4 +56,3 @@ class NoteCrudSmokeTest {
         assertTrue(composeRule.onAllNodesWithTag(tag).fetchSemanticsNodes().isNotEmpty())
     }
 }
-

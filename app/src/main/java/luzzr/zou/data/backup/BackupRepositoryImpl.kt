@@ -36,7 +36,7 @@ import kotlinx.serialization.json.Json
 
 @Singleton
 class BackupRepositoryImpl @Inject constructor(
-    @ApplicationContext private val context: Context,
+    @param:ApplicationContext private val context: Context,
     private val database: ZouDatabase,
     private val taskDao: TaskDao,
     private val habitDao: HabitDao,
@@ -431,6 +431,8 @@ class BackupRepositoryImpl @Inject constructor(
         deletedAt = deletedAt,
         tags = tags,
         archived = archived,
+        isPinned = isPinned,
+        pinnedAt = pinnedAt,
     )
 
     private fun MediaEntity.toPayload() = MediaPayload(
@@ -552,6 +554,8 @@ class BackupRepositoryImpl @Inject constructor(
         deletedAt = deletedAt,
         tags = tags,
         archived = archived,
+        isPinned = isPinned,
+        pinnedAt = pinnedAt,
     )
 
     private fun MediaPayload.toEntity(localPath: String) = MediaEntity(
@@ -692,6 +696,8 @@ class BackupRepositoryImpl @Inject constructor(
         val deletedAt: Long? = null,
         val tags: String? = null,
         val archived: Boolean = false,
+        val isPinned: Boolean = false,
+        val pinnedAt: Long? = null,
     )
 
     @Serializable

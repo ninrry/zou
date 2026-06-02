@@ -5,6 +5,8 @@ data class NotesUiState(
     val emptyTitle: String = "还没有笔记",
     val emptyDescription: String = "点击底部 + 创建笔记。",
     val isLoading: Boolean = true,
+    val isSelectMode: Boolean = false,
+    val selectedNoteIds: Set<String> = emptySet(),
 )
 
 data class NoteCardUiModel(
@@ -12,5 +14,6 @@ data class NoteCardUiModel(
     val title: String,
     val previewText: String,
     val updatedAtText: String,
+    val isPinned: Boolean = false,
 )
 

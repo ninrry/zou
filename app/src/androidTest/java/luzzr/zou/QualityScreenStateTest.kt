@@ -35,9 +35,6 @@ class QualityScreenStateTest {
 
     @Test
     fun todayScreenShowsDualColumnEmptyStatesAndQuickCreateActions() {
-        var taskClicked = false
-        var habitClicked = false
-
         composeRule.setContent {
             ZouTheme {
                 TodayScreen(
@@ -46,12 +43,12 @@ class QualityScreenStateTest {
                         summary = TodaySummaryUiModel(),
                         isCompletelyEmpty = true,
                     ),
-                    onCreateTask = { taskClicked = true },
+                    onCreateTask = {},
                     onOpenTask = {},
                     onEditTask = {},
                     onOpenTasks = {},
                     onTaskAction = { _, _ -> },
-                    onCreateHabit = { habitClicked = true },
+                    onCreateHabit = {},
                     onOpenHabit = {},
                     onEditHabit = {},
                     onOpenHabits = {},
@@ -68,15 +65,10 @@ class QualityScreenStateTest {
         assertTagExists("today_dual_columns")
         assertTagExists("today_tasks_column")
         assertTagExists("today_habits_column")
-        assertTagExists("today_empty_create_task_card")
-        assertTagExists("today_empty_create_habit_card")
-        composeRule.onNodeWithTag("today_empty_create_task").performClick()
-        composeRule.onNodeWithTag("today_empty_create_habit").performClick()
+        assertTagExists("today_empty_tasks_card")
+        assertTagExists("today_empty_habits_card")
         assertTagNotExists("today_empty_state")
         assertTagNotExists("today_empty_create_note")
-
-        assertTrue(taskClicked)
-        assertTrue(habitClicked)
     }
 
     @Test
@@ -181,7 +173,7 @@ class QualityScreenStateTest {
         }
 
         assertTagExists("today_dual_columns")
-        assertTagExists("today_empty_create_task_card")
+        assertTagExists("today_empty_tasks_card")
         assertTagExists("today_habit_habit-1")
         assertTagNotExists("today_empty_state")
     }
@@ -201,6 +193,7 @@ class QualityScreenStateTest {
                     onShowCompletedTasksChanged = {},
                     onShowOnlyTodayHabitsChanged = {},
                     onShowDeletedHabitsChanged = {},
+                    onDefaultStartDestinationChanged = {},
                     onSaveDefaults = {},
                     onOpenNotificationSettings = {},
                     onOpenTrash = {},

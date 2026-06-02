@@ -454,12 +454,13 @@ internal fun TodayEmptySectionCard(
     description: String,
     accentColor: Color,
     layoutSpec: TodayCompactLayoutSpec,
+    testTag: String,
 ) {
     GlassSurface(
         modifier = Modifier
             .fillMaxWidth()
             .heightIn(min = layoutSpec.emptyCardMinHeight)
-            .testTag("${accentColor.value}_empty_card"),
+            .testTag(testTag),
         accentColor = accentColor,
         level = GlassLevel.Normal,
         shape = RoundedCornerShape(28.dp),
@@ -722,5 +723,4 @@ private fun todaySummaryHeadline(summary: TodaySummaryUiModel): String {
 private fun todayActiveItemCount(summary: TodaySummaryUiModel): Int {
     return summary.pendingTaskCount + summary.dueHabitCount
 }
-
 

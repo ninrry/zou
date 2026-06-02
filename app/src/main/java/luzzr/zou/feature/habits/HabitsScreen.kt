@@ -73,6 +73,7 @@ fun HabitsScreen(
     onRefresh: () -> Unit = {},
 ) {
     Scaffold(
+        modifier = Modifier.testTag("habits_screen"),
         containerColor = Color.Transparent,
     ) { innerPadding ->
         PullToRefreshBox(

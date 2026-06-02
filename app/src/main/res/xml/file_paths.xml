@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<paths>
+    <!-- 开放 App cache 目录，用于零权限拉起 Sharesheet 导出 ZIP/MD 笔记文件 -->
+    <cache-path name="export_cache" path="." />
+</paths>

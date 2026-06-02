@@ -3,7 +3,6 @@ package luzzr.zou
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onNodeWithTag
-import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
 import org.junit.Assert.assertTrue
@@ -24,18 +23,20 @@ class TaskCrudSmokeTest {
     @Test
     fun opensTaskEditorAndReturnsToList() {
         composeRule.onNodeWithTag("nav_tasks").performClick()
-        assertTagExists("tasks_fab")
+        assertTagExists("top_level_tasks")
 
-        composeRule.onNodeWithTag("tasks_fab").performClick()
+        composeRule.onNodeWithTag("top_level_create_fab").performClick()
 
         assertTagExists("task_editor_title_input")
         assertTagExists("task_editor_content_input")
         assertTagExists("task_editor_save")
 
         composeRule.onNodeWithTag("task_editor_title_input").performTextInput("任务编辑页冒烟测试")
-        composeRule.onNodeWithText("返回").performClick()
+        composeRule.activityRule.scenario.onActivity {
+            it.onBackPressedDispatcher.onBackPressed()
+        }
 
-        assertTagExists("tasks_fab")
+        assertTagExists("top_level_tasks")
     }
 
     private fun assertTagExists(tag: String) {
@@ -45,4 +46,3 @@ class TaskCrudSmokeTest {
         assertTrue(composeRule.onAllNodesWithTag(tag).fetchSemanticsNodes().isNotEmpty())
     }
 }
-

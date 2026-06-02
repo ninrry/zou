@@ -163,6 +163,30 @@ class NoteRepositoryImpl @Inject constructor(
         )
     }
 
+    override suspend fun bulkPinNotes(noteIds: List<String>, isPinned: Boolean) {
+        if (noteIds.isEmpty()) return
+        val now = timeProvider.nowMillis()
+        noteDao.updatePinnedStatus(
+            noteIds = noteIds,
+            isPinned = isPinned,
+            pinnedAt = if (isPinned) now else null,
+            updatedAt = now,
+        )
+    }
+
+    override suspend fun bulkSoftDeleteNotes(noteIds: List<String>) {
+        if (noteIds.isEmpty()) return
+        val now = timeProvider.nowMillis()
+        noteDao.softDeleteNotes(noteIds = noteIds, deletedAt = now)
+        noteIds.forEach { noteId ->
+            mediaDao.softDeleteMediaByOwner(
+                ownerType = ownerType,
+                ownerId = noteId,
+                updatedAt = now,
+            )
+        }
+    }
+
     private suspend fun cleanupUnreferencedMedia(
         noteId: String,
         referencedMediaIds: Set<String>,
@@ -214,6 +238,8 @@ class NoteRepositoryImpl @Inject constructor(
             deletedAt = deletedAt,
             tags = tags,
             archived = archived,
+            isPinned = isPinned,
+            pinnedAt = pinnedAt,
         )
     }
 
@@ -241,6 +267,8 @@ class NoteRepositoryImpl @Inject constructor(
             deletedAt = deletedAt,
             tags = tags,
             archived = archived,
+            isPinned = isPinned,
+            pinnedAt = pinnedAt,
         )
     }
 
