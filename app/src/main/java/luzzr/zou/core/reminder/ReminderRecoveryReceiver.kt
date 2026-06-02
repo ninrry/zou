@@ -13,7 +13,18 @@ class ReminderRecoveryReceiver : BroadcastReceiver() {
     lateinit var reminderRecoveryCoordinator: ReminderRecoveryCoordinator
 
     override fun onReceive(context: Context, intent: Intent) {
+        if (intent.action !in supportedActions) return
         reminderRecoveryCoordinator.ensureHealthCheckScheduled()
         reminderRecoveryCoordinator.enqueueImmediateRecovery()
+    }
+
+    private companion object {
+        val supportedActions = setOf(
+            Intent.ACTION_BOOT_COMPLETED,
+            Intent.ACTION_DATE_CHANGED,
+            Intent.ACTION_MY_PACKAGE_REPLACED,
+            Intent.ACTION_TIME_CHANGED,
+            Intent.ACTION_TIMEZONE_CHANGED,
+        )
     }
 }

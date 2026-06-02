@@ -53,7 +53,11 @@ object XiaomiPowerKeeper {
         val batteryOptOk = pm.isIgnoringBatteryOptimizations(context.packageName)
 
         val am = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
-        val exactAlarmOk = am.canScheduleExactAlarms()
+        val exactAlarmOk = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            am.canScheduleExactAlarms()
+        } else {
+            true
+        }
 
         return OptimizeStatus(
             batteryOptOk = batteryOptOk,

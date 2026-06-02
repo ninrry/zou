@@ -1,15 +1,17 @@
 package luzzr.zou
 
 import android.app.Application
-import luzzr.zou.core.reminder.ReminderNotificationManager
-import luzzr.zou.core.reminder.ReminderRecoveryCoordinator
 import androidx.hilt.work.HiltWorkerFactory
 import androidx.work.Configuration
+import dagger.Lazy
+import dagger.hilt.android.HiltAndroidApp
+import luzzr.zou.core.reminder.ReminderNotificationManager
+import luzzr.zou.core.reminder.ReminderRecoveryCoordinator
 import luzzr.zou.di.ApplicationScope
 import luzzr.zou.domain.repository.NoteRepository
-import dagger.hilt.android.HiltAndroidApp
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @HiltAndroidApp
@@ -19,13 +21,13 @@ class ZouApplication : Application(), Configuration.Provider {
     lateinit var workerFactory: HiltWorkerFactory
 
     @Inject
-    lateinit var reminderRecoveryCoordinator: ReminderRecoveryCoordinator
+    lateinit var reminderRecoveryCoordinator: Lazy<ReminderRecoveryCoordinator>
 
     @Inject
     lateinit var reminderNotificationManager: ReminderNotificationManager
 
     @Inject
-    lateinit var noteRepository: NoteRepository
+    lateinit var noteRepository: Lazy<NoteRepository>
 
     @Inject
     @ApplicationScope
@@ -34,9 +36,10 @@ class ZouApplication : Application(), Configuration.Provider {
     override fun onCreate() {
         super.onCreate()
         reminderNotificationManager.ensureChannels()
-        reminderRecoveryCoordinator.ensureHealthCheckScheduled()
         applicationScope.launch {
-            runCatching { noteRepository.cleanupOrphanedMedia() }
+            delay(STARTUP_MAINTENANCE_DELAY_MILLIS)
+            runCatching { reminderRecoveryCoordinator.get().ensureHealthCheckScheduled() }
+            runCatching { noteRepository.get().cleanupOrphanedMedia() }
         }
     }
 
@@ -44,4 +47,8 @@ class ZouApplication : Application(), Configuration.Provider {
         get() = Configuration.Builder()
             .setWorkerFactory(workerFactory)
             .build()
+
+    private companion object {
+        const val STARTUP_MAINTENANCE_DELAY_MILLIS = 15_000L
+    }
 }

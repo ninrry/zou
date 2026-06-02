@@ -15,23 +15,53 @@ luzzr.zou
 - Release 构建 → 自动签名
 - Debug 构建 → 也使用同一密钥签名（确保 dev→release 无缝升级）
 
+## 工具链
+
+- JDK：21
+- Android Gradle Plugin：9.2.1
+- Gradle wrapper：9.4.1
+- Kotlin：2.3.21（AGP 9 已内建 Android Kotlin 支持，项目不再单独应用 `org.jetbrains.kotlin.android`）
+- compileSdk / targetSdk：37
+
 ## 构建命令
 
 ```bash
-# Debug APK（arm64-v8a，未压缩，含调试符号）
+# Debug APK（按 ABI split 输出，含调试符号）
 ./gradlew assembleDebug
 # → app/build/outputs/apk/debug/app-arm64-v8a-debug.apk
+# → app/build/outputs/apk/debug/app-x86_64-debug.apk
 
-# Release APK（arm64-v8a，R8 压缩 + 资源裁剪，已签名）
+# Release APK（按 ABI split 输出，R8 压缩 + 资源裁剪，已签名）
 ./gradlew assembleRelease
 # → app/build/outputs/apk/release/app-arm64-v8a-release.apk
+# → app/build/outputs/apk/release/app-x86_64-release.apk
 ```
 
 ## 分离打包（APK Splits）
 
-- ABI：仅 **arm64-v8a**（适配小米15 Pro 等主流设备）
+- ABI：**arm64-v8a + x86_64**（覆盖主流手机、ChromeOS 与模拟器安装场景）
 - 不生成 universal APK（避免体积膨胀）
 - 语言资源：仅保留 **zh（中文）+ en（英文）**
+
+## 质量门禁
+
+本地提交前优先运行：
+
+```bash
+./gradlew :app:testDebugUnitTest :app:lintDebug :app:assembleDebug --console=plain
+```
+
+连接模拟器或真机后运行：
+
+```bash
+./gradlew :app:connectedDebugAndroidTest --console=plain
+```
+
+性能冒烟：
+
+```powershell
+.\scripts\android-gfxinfo-smoke.ps1
+```
 
 ## 版本号
 
