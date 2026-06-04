@@ -111,7 +111,7 @@ app/src/main/java/luzzr/zou/
 # 1. 编译 Debug 开发包
 ./gradlew assembleDebug
 
-# 2. 编译终极优化混淆 Release 正式包 (包体大小约 5.23 MB)
+# 2. 编译终极优化混淆 Release 正式包 (单 ABI 包体大小约 4.77 MB)
 ./gradlew assembleRelease
 
 # 3. 光速推送安装 Debug 包到已连接的模拟器或真机
@@ -130,6 +130,7 @@ app/src/main/java/luzzr/zou/
 | **v0.3.3** | HyperOS   | 澎湃OS 深度兼容：加入 `USE_EXACT_ALARM`、4 类独立提醒通知频道、XiaomiPowerKeeper 省电检测。 |
 | **v0.3.4** | DateRange | 提醒起止时间过滤：限制待办与打卡提醒的有效区间，减少非必要打扰。                                   |
 | **v0.3.5** | AirFloat  | **高阶空气感透明悬浮控制栏 + 0.dp 全域组件阴影消噪 + 主 FAB 莫奈专属色平滑变色流转！视觉美学登峰造极。**     |
+| **v0.3.6** | Continuum | 统一全局动效与启动体验；新增笔记批量置顶和导出；强化数据一致性、备份恢复、提醒可靠性与自动化质量门。                  |
 
 ---
 
