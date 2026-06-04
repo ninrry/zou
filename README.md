@@ -1,145 +1,166 @@
-# Zou — 极致动效与莫奈配色的极简效率工具
+# Zou
 
-> **本地优先 · 莫奈色彩流转 · 高阶空气悬浮 · 极致物理动效**  
-> Zou 是一款使用 Android 原生 Kotlin 与 Jetpack Compose 倾力打造的极简个人效率工具。它完美聚合了**今日概览、待办任务、习惯追踪与 Markdown 笔记**四大核心模块，以微交互与动态色彩为灵魂，带来指尖流淌般的唯美交互体验。
+[![Android Quality](https://github.com/ninrry/zou/actions/workflows/android-quality.yml/badge.svg)](https://github.com/ninrry/zou/actions/workflows/android-quality.yml)
+[![Latest Release](https://img.shields.io/github/v/release/ninrry/zou)](https://github.com/ninrry/zou/releases/latest)
+[![Android 10+](https://img.shields.io/badge/Android-10%2B-3DDC84)](https://github.com/ninrry/zou/releases/latest)
 
----
+Zou 是一个本地优先的 Android 个人效率工具，用于管理待办、习惯和 Markdown 笔记。应用提供今日概览、提醒、回收站和本地备份，数据默认保存在设备上。
 
-## 🎨 现代视觉与高阶交互革命（最新升级）
+项目使用 Kotlin 与 Jetpack Compose 构建，最低支持 Android 10。
 
-Zou 拒绝千篇一律的刻板原生界面，在最新版本中，我们对整个视觉骨架与动力学进行了史诗级的重构：
+## 功能
 
-### 1. 全域组件“阴影消噪”极简美学
+- **今日概览**：集中查看当天待办、习惯进度和最近笔记。
+- **待办任务**：支持优先级、紧急标记、子任务、截止时间和重复提醒。
+- **习惯追踪**：支持步骤型与时长型打卡、执行频率、提醒窗口和连续记录。
+- **Markdown 笔记**：支持本地图片、置顶、批量操作和 Markdown 导出。
+- **提醒系统**：支持精确提醒、重复提醒，并在重启、时间或时区变化后恢复调度。
+- **数据管理**：支持软删除、回收站、ZIP 备份与恢复。
+- **界面与动效**：使用定制色彩和统一动效系统串联主要页面与状态变化。
 
-* **消灭阴影杂噪**：我们对核心卡片渲染组件 `GlassSurface.kt` 进行了底层重构，将全域卡片（今日进度面板、待办/习惯卡片、笔记卡片等）的 `shadowElevation` **全部降为 0.dp**。
-* **透亮磨砂质感**：彻底蒸发灰黑色模糊投影，只保留极其细腻的 `1.dp` 描边与微透明莫奈色面板，呈现出空气般纯净、扁平、透亮的纯正磨砂玻璃美学。
+Zou 当前不提供云同步、团队协作、Web 或 iOS 客户端。
 
-### 2. 高阶“空气感”固定悬浮控制栏
+## 下载与安装
 
-* **完美固定不抖动**：新建与编辑界面的“放弃”与“创建/下一步”胶囊控制栏，被绝对固定悬浮于最外层容器底部。在多步骤横向滑屏切换时，控制栏稳如磐石，仅表单卡片左右滑移，带来原生大厂级的视差安稳感。
-* **100% 透明下潜穿透**：彻底废除了生硬的大白块底座背景，背景完全透明。在上下拖拽表单时，文字卡片将以极富未来感的方式**直接从两个悬浮胶囊实体的下方、周围的缝隙里穿梭而过**。
+最新版本：**[v0.3.6](https://github.com/ninrry/zou/releases/latest)**
 
-### 3. 92.dp 智能防遮挡垫高安全盾
+| 安装包 | 适用设备 |
+| --- | --- |
+| [arm64-v8a APK](https://github.com/ninrry/zou/releases/download/v0.3.6/zou-v0.3.6-arm64-v8a.apk) | 大多数现代 Android 手机和平板 |
+| [x86_64 APK](https://github.com/ninrry/zou/releases/download/v0.3.6/zou-v0.3.6-x86_64.apk) | x86_64 模拟器和部分 ChromeOS 设备 |
+| [SHA-256 校验文件](https://github.com/ninrry/zou/releases/download/v0.3.6/SHA256SUMS.txt) | 校验下载文件完整性 |
 
-* **不阻挡最后一项**：为避免悬浮按钮永久遮挡底层设置，我们在滚动容器末尾精准计算并注入了 `92.dp` 高的避让垫高 Spacer。
-* **完美沉底效果**：当用户滑到最底端时，最后一项配置（如软删除按钮、提醒输入等）将无任何遮挡地清爽排列在悬浮胶囊的上方。此时按钮下方呈现大面积空白，使按钮看起来就像是妥帖安稳地躺在卡片底部的空白处一样自然。
+安装提醒：
 
-### 4. 主 FAB 莫奈专属色动态流转
+- Android 13 及以上版本需要授予通知权限，提醒功能才能正常显示通知。
+- 部分 Android 厂商系统会限制后台任务。若提醒不稳定，请允许精确闹钟、自启动或关闭相关省电限制。
+- Release APK 使用项目维护者的签名证书签名，可直接覆盖安装同签名的旧版本。
 
-* **高精 Material You 联动**：引入 `MonetColorTokens` 配色系统，实时监听底部主 Tab 页签的滑动。
-* **丝滑奶油般变色**：在「今日（蓝紫）、任务（暖橙）、习惯（青绿）、笔记（淡黄）」间切换时，中央大 FAB（加号按钮）的**外圈微光呼吸边框**、**微透莫奈填充底色**及**加号图标 tint 色**，会在 350ms 内以高度线性的 `EasingEmphasized` 物理阻尼曲线平滑渐变流转，水乳交融。
+## 技术栈
 
----
+- Kotlin
+- Jetpack Compose 与 Material 3
+- MVVM、UseCase、Repository
+- Hilt
+- Navigation Compose
+- Room 与 DataStore
+- Kotlin Coroutines 与 Flow
+- WorkManager 与 AlarmManager
+- kotlinx.serialization
+- Coil
 
-## ✨ 核心特性
+应用采用单模块、分层组织的结构。UI 状态由 ViewModel 暴露，业务操作通过 UseCase 和 Repository 访问本地数据与提醒调度。
 
-### 🗂 四大功能版图
+## 开发环境
 
-| 模块       | 精致体验                                 |
-| -------- | ------------------------------------ |
-| **今日概览** | 聚合当天待办与打卡习惯，Pill 型卡片进度展示，莫奈色气泡轮廓     |
-| **待办任务** | 支持三步优雅创建向导、子任务拓展、精确到分钟的到期提醒、优先级过滤    |
-| **习惯追踪** | 支持自定义细分步骤打卡、自定义高频间隔、多维度提醒时间窗口        |
-| **记事笔记** | 支持标准 Markdown 原生高精渲染、本地图片插入引用与路径安全映射 |
+- JDK 21
+- Android SDK 37
+- Android Studio 或兼容的 Gradle 开发环境
+- Windows、macOS 或 Linux
 
-### 🎬 六大满分物理动效路径
-
-- **Pill 弹簧入场** — 采用物理阻尼 0.30 弹簧系统，缩放 `0.80 -> 1.00` 弹性温润入场。
-- **FAB 同心圆镜像倒带** — 点击 FAB 新建时，呈现同心圆徐徐从小圆向全屏扩散的自然膨胀感，并与返回时的镜像收缩动效完美闭环。
-- **列表 Staggered 交错显现** — 智能列表入场，支持正向、反向、同时等多种瀑布流逐个显现。
-- **Tab 滚动切换视差** — 指标滑轨跳跃跨越机制，伴随 Tab 文字 4% 视差缩放与 2dp 水平惯性偏置。
-- **复选框弹簧 bounce 弹跳** — 点击打卡时，圆环缩小 30%，新状态如水珠弹跳般弹出。
-- **滑动删除阻尼回弹 (SwipeToDismiss)** — 列表滑动手势带动态物理阻尼感，支持松手快速撤销与平滑删除。
-
----
-
-## 🏗 技术栈与架构体系
-
-| 分层         | 技术栈与架构                                                          |
-| ---------- | --------------------------------------------------------------- |
-| **语言规范**   | Kotlin 2.1+ (100% 严格类型安全，完全消除 null 隐患)                          |
-| **UI 框架**  | Jetpack Compose (Material 3) + 纯声明式高度自定义 Canvas / 动效体系          |
-| **应用架构**   | MVVM + UseCase (Clean Architecture) + Repository 经典模式           |
-| **依赖注入**   | Hilt                                                            |
-| **类型安全导航** | Navigation Compose (基于 Kotlin Serialization 深度安全路由，无硬编码 String) |
-| **数据持久化**  | Room 数据库 (本地强力缓存) + DataStore 用户偏好设置                            |
-| **异步与流**   | Kotlin Coroutines (协程并发) + Flow (响应式数据响应流)                      |
-| **后台与提醒**  | WorkManager (自适应调度) + AlarmManager (精准毫秒级推送)                    |
-
----
-
-## 📁 目录结构
-
-```
-app/src/main/java/luzzr/zou/
-├── app/                    # 应用启动入口、Hilt 依赖配置、全局安全路由 (ZouNavHost)
-├── core/
-│   ├── designsystem/       # 主题色彩规范 (MonetColorTokens) 与全局设计系统 Tokens
-│   ├── hyperos/            # 澎湃OS 深度兼容适配层
-│   ├── markdown/           # Markdown 原生高精渲染引擎
-│   ├── reminder/           # AlarmManager 精准提醒通知调度核心
-│   ├── time/               # 契合效率工具的时间计算处理工具
-│   └── ui/                 # 核心交互通用控件与去阴影空气感组件库 (GlassSurface, ZouStepBottomBar)
-├── data/                   # Room 数据库模型实体、Repository 仓储实现与本地 JSON 备份恢复逻辑
-├── domain/                 # 领域层：纯净 Entity 数据模型、UseCase 商业逻辑封装
-└── feature/
-    ├── backup/             # 本地 JSON 安全备份与还原
-    ├── habits/             # 习惯追踪大模块
-    ├── notes/              # 记事笔记大模块 (含 Markdown 与本地图片管理)
-    ├── settings/           # 应用偏好设置
-    ├── tasks/              # 待办任务大模块
-    ├── today/              # 今日概览大模块
-    └── trash/              # 回收站 (软删除安全恢复区)
-```
-
----
-
-## 🚀 快速开始与构建部署
-
-### 开发环境要求
-
-* **Android Studio** Ladybug (2024.2.1) 或更新版本
-* **Java Development Kit (JDK)** 17 或更新版本
-* **Android SDK Platform** API Level 36 (最低支持 API Level 29 Android 10)
-* **推荐真机设备** Android 13+ (API 33+) 以在系统层面获得最完美的动态莫奈配色与物理触感反馈。
-
-### 构建与安装
-
-在项目根目录下通过 PowerShell 或者是 Bash 运行：
+克隆仓库：
 
 ```bash
-# 1. 编译 Debug 开发包
-./gradlew assembleDebug
-
-# 2. 编译终极优化混淆 Release 正式包 (单 ABI 包体大小约 4.77 MB)
-./gradlew assembleRelease
-
-# 3. 光速推送安装 Debug 包到已连接的模拟器或真机
-./gradlew installDebug
+git clone https://github.com/ninrry/zou.git
+cd zou
 ```
 
----
+常用命令：
 
-## 📦 版本历史与代号
+```bash
+# Debug APK
+./gradlew :app:assembleDebug
 
-| 版本         | 代号        | 重大视觉与特性变革                                                          |
-| ---------- | --------- | ------------------------------------------------------------------ |
-| **v0.1.0** | NoteFlow  | 初始版本。发布待办、习惯与 Markdown 笔记核心底色。                                     |
-| **v0.2.0** | Zou       | 统一重构为 Zou。引入全局设计系统与基础微交互动画。                                        |
-| **v0.3.0** | Polished  | 动效路径全域打磨，RadialExpansion 径向动画重大纠偏，Spring 物理系数精调。                   |
-| **v0.3.3** | HyperOS   | 澎湃OS 深度兼容：加入 `USE_EXACT_ALARM`、4 类独立提醒通知频道、XiaomiPowerKeeper 省电检测。 |
-| **v0.3.4** | DateRange | 提醒起止时间过滤：限制待办与打卡提醒的有效区间，减少非必要打扰。                                   |
-| **v0.3.5** | AirFloat  | **高阶空气感透明悬浮控制栏 + 0.dp 全域组件阴影消噪 + 主 FAB 莫奈专属色平滑变色流转！视觉美学登峰造极。**     |
-| **v0.3.6** | Continuum | 统一全局动效与启动体验；新增笔记批量置顶和导出；强化数据一致性、备份恢复、提醒可靠性与自动化质量门。                  |
+# 单元测试、Lint、Debug 构建和 Android 测试源码编译
+./gradlew :app:testDebugUnitTest :app:lintDebug :app:assembleDebug :app:compileDebugAndroidTestKotlin --console=plain
 
----
+# 连接模拟器或真机后运行仪器测试
+./gradlew :app:connectedDebugAndroidTest --console=plain
 
-## 📄 开源许可证
+# Release APK
+./gradlew :app:assembleRelease
+```
 
-本项目基于 **[MIT License](LICENSE)** 开源。
+Windows PowerShell 中将 `./gradlew` 替换为 `.\gradlew.bat`。
 
-Copyright © 2026 季札
+APK 按 ABI 分包生成：
 
----
+```text
+app/build/outputs/apk/debug/app-arm64-v8a-debug.apk
+app/build/outputs/apk/debug/app-x86_64-debug.apk
+app/build/outputs/apk/release/app-arm64-v8a-release.apk
+app/build/outputs/apk/release/app-x86_64-release.apk
+```
 
-<p align="center">Made with ❤️ by <a href="https://github.com/ninrry">ninrry</a></p>
+本地存在 `keystore.properties` 时，Release 构建会使用配置的密钥签名。贡献者通常使用 Debug 构建即可。
+
+## 项目结构
+
+```text
+app/src/main/java/luzzr/zou/
+├── app/        # 应用入口与导航
+├── core/       # 通用 UI、主题、提醒、Markdown、权限和平台适配
+├── data/       # Room、DataStore、备份、媒体与 Repository 实现
+├── domain/     # 领域模型、Repository 接口和 UseCase
+└── feature/    # today、tasks、habits、notes、settings、backup、trash
+```
+
+## 数据与权限
+
+Zou 的任务、习惯、笔记、设置和媒体文件默认保存在设备本地。应用不会自动上传数据。
+
+主要权限用于：
+
+- 显示通知
+- 调度精确提醒
+- 在设备重启或系统时间变化后恢复提醒
+- 提醒时振动、唤醒设备或显示提醒页面
+
+备份文件包含数据库数据、设置和相关媒体。请自行妥善保存导出的备份文件。
+
+## 质量与性能
+
+GitHub Actions 会在 `main` 和 Pull Request 上运行：
+
+- 单元测试
+- Android Lint
+- Debug 构建
+- Android 测试源码编译
+- Release 构建
+
+连接 Android 设备后，可运行性能冒烟脚本：
+
+```powershell
+.\scripts\android-gfxinfo-smoke.ps1
+```
+
+结果会写入 `scratch/performance/`。更多说明见 [性能验收手册](docs/performance-playbook.md)。
+
+## 文档
+
+- [产品需求](docs/prd.md)
+- [技术方案](docs/tech-spec.md)
+- [信息架构](docs/information-architecture.md)
+- [UI 设计规范](docs/ui-design-spec.md)
+- [构建规范](docs/build-conventions.md)
+- [性能验收手册](docs/performance-playbook.md)
+
+## 参与贡献
+
+欢迎通过 [Issues](https://github.com/ninrry/zou/issues) 报告问题或提出建议，也欢迎提交 Pull Request。
+
+提交代码前建议至少运行：
+
+```bash
+./gradlew :app:testDebugUnitTest :app:lintDebug :app:assembleDebug --console=plain
+```
+
+涉及导航、数据库、提醒或用户操作流程的改动，建议同时运行相关仪器测试。
+
+## 版本发布
+
+版本记录和安装包位于 [GitHub Releases](https://github.com/ninrry/zou/releases)。当前稳定版本为 `v0.3.6`。
+
+## 许可证
+
+当前仓库尚未包含许可证文件。在许可证明确前，请不要假定本项目代码可以用于再分发或商业用途。
