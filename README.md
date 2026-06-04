@@ -134,16 +134,12 @@ GitHub Actions 会在 `main` 和 Pull Request 上运行：
 .\scripts\android-gfxinfo-smoke.ps1
 ```
 
-结果会写入 `scratch/performance/`。更多说明见 [性能验收手册](docs/performance-playbook.md)。
+结果会写入 `scratch/performance/`。更多说明见 [开发与发布](docs/development.md)。
 
 ## 文档
 
-- [产品需求](docs/prd.md)
-- [技术方案](docs/tech-spec.md)
-- [信息架构](docs/information-architecture.md)
-- [UI 设计规范](docs/ui-design-spec.md)
-- [构建规范](docs/build-conventions.md)
-- [性能验收手册](docs/performance-playbook.md)
+- [架构说明](docs/architecture.md)
+- [开发与发布](docs/development.md)
 
 ## 参与贡献
 
