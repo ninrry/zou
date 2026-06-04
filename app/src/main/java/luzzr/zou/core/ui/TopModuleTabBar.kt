@@ -2,7 +2,6 @@ package luzzr.zou.core.ui
 
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -169,7 +168,7 @@ fun TopModuleTabBar(
                 val fabInteraction = rememberPressInteractionSource()
                 val fabRotation by animateFloatAsState(
                     targetValue = if (fabExpanded) 45f else 0f,
-                    animationSpec = tween(280, easing = MotionTokens.EasingEmphasized),
+                    animationSpec = motion.fabMenu,
                     label = "bottom_fab_rotation"
                 )
                 Box(
@@ -187,12 +186,12 @@ fun TopModuleTabBar(
 
                     val animatedFabAccentColor by animateColorAsState(
                         targetValue = monetPalette.accent,
-                        animationSpec = tween(350, easing = MotionTokens.EasingEmphasized),
+                        animationSpec = motion.colorShift,
                         label = "fab_monet_accent"
                     )
                     val animatedFabSoftColor by animateColorAsState(
                         targetValue = monetPalette.accentSoft,
-                        animationSpec = tween(350, easing = MotionTokens.EasingEmphasized),
+                        animationSpec = motion.colorShift,
                         label = "fab_monet_soft"
                     )
 

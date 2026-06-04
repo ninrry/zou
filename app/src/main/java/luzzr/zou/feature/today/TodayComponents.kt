@@ -2,11 +2,8 @@ package luzzr.zou.feature.today
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
-import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.spring
 import androidx.compose.runtime.getValue
-import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
@@ -66,8 +63,8 @@ import luzzr.zou.core.designsystem.theme.ZouTodayAccentSoft
 import luzzr.zou.core.ui.GlassLevel
 import luzzr.zou.core.ui.GlassSurface
 import luzzr.zou.core.ui.LocalRadialExpansionController
+import luzzr.zou.core.ui.LocalZouMotion
 import luzzr.zou.core.ui.ModuleFab
-import luzzr.zou.core.ui.MotionTokens
 import luzzr.zou.core.ui.noteFlowButtonColors
 import luzzr.zou.core.ui.LayoutTokens
 import luzzr.zou.core.ui.noteFlowOutlinedButtonColors
@@ -631,6 +628,7 @@ private fun TodayStatusPill(
 @Composable
 private fun TodayCompletionBar(summary: TodaySummaryUiModel) {
     val designTokens = ZouDesignTokens.colors
+    val motion = LocalZouMotion.current
     val progress = remember(summary) {
         val total = summary.pendingTaskCount + summary.dueHabitCount + summary.completedCount
         if (total == 0) 0f else summary.completedCount / total.toFloat()
@@ -638,7 +636,7 @@ private fun TodayCompletionBar(summary: TodaySummaryUiModel) {
     val clampedProgress = progress.coerceIn(0f, 1f)
     val animatedProgress by animateFloatAsState(
         targetValue = clampedProgress.coerceAtLeast(0.06f),
-        animationSpec = MotionTokens.SpringSmooth,
+        animationSpec = motion.tabSwitch,
         label = "today_progress_bar",
     )
     val completedPercent = (clampedProgress * 100).toInt()
@@ -723,4 +721,3 @@ private fun todaySummaryHeadline(summary: TodaySummaryUiModel): String {
 private fun todayActiveItemCount(summary: TodaySummaryUiModel): Int {
     return summary.pendingTaskCount + summary.dueHabitCount
 }
-

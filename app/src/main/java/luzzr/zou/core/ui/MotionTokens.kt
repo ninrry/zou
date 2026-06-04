@@ -22,6 +22,7 @@ data class ZouMotionSpec(
     val listEnterOffset: FiniteAnimationSpec<IntOffset>,
     val listExit: FiniteAnimationSpec<Float>,
     val listExitSize: FiniteAnimationSpec<IntSize>,
+    val listExitDelayMillis: Int,
     val pageEnter: FiniteAnimationSpec<Float>,
     val pageEnterOffset: FiniteAnimationSpec<IntOffset>,
     val pageExit: FiniteAnimationSpec<Float>,
@@ -67,6 +68,7 @@ data class ZouMotionSpec(
                 durationMillis = 260,
                 easing = MotionTokens.EasingStandard,
             ),
+            listExitDelayMillis = 260,
             pageEnter = tween(
                 durationMillis = 360,
                 easing = MotionTokens.EasingEmphasized,
@@ -93,7 +95,7 @@ data class ZouMotionSpec(
             ),
             fabReveal = tween(
                 durationMillis = 420,
-                easing = MotionTokens.EasingEmphasizedDecelerate,
+                easing = MotionTokens.EasingFabExpand,
             ),
             fabCollapse = tween(
                 durationMillis = 420,

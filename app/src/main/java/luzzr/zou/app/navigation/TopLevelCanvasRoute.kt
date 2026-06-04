@@ -8,8 +8,6 @@ import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
-import androidx.compose.animation.core.spring
-import androidx.compose.animation.core.Spring
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -61,6 +59,7 @@ import luzzr.zou.core.ui.MotionTokens
 import luzzr.zou.core.ui.TopModuleTabBar
 import luzzr.zou.core.ui.GlassLevel
 import luzzr.zou.core.ui.GlassSurface
+import luzzr.zou.core.ui.LocalZouMotion
 import luzzr.zou.core.ui.LocalRadialExpansionController
 import luzzr.zou.core.ui.noteFlowPressScale
 import luzzr.zou.core.ui.rememberPressInteractionSource
@@ -72,6 +71,7 @@ import luzzr.zou.feature.today.TodayRoute
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlin.math.absoluteValue
 import kotlin.math.min
@@ -149,6 +149,7 @@ fun TopLevelCanvasRoute(
     Box(
         modifier = Modifier
             .fillMaxSize()
+            .testTag(RootRoutes.TopLevelCanvas)
             .background(Color.Transparent)
             .drawWithCache {
                 val canvasGlow = Brush.radialGradient(
@@ -358,42 +359,38 @@ private fun StaggeredMenuAction(
     onClick: () -> Unit,
 ) {
     val interactionSource = rememberPressInteractionSource()
+    val motion = LocalZouMotion.current
+    var delayedVisible by remember { mutableStateOf(false) }
+
+    LaunchedEffect(visible, delayMillis) {
+        if (visible) {
+            if (delayMillis > 0) {
+                delay(delayMillis.toLong())
+            }
+            delayedVisible = true
+        } else {
+            delayedVisible = false
+        }
+    }
+
     AnimatedVisibility(
-        visible = visible,
+        visible = delayedVisible,
         enter = fadeIn(
-            animationSpec = spring(
-                dampingRatio = Spring.DampingRatioNoBouncy,
-                stiffness = 180f,
-            ),
+            animationSpec = motion.fabMenu,
         ) + slideInVertically(
-            animationSpec = spring(
-                dampingRatio = 0.76f, // 奶油级奶油温润阻尼，无摆动
-                stiffness = 160f,
-            ),
+            animationSpec = motion.fabMenuOffset,
             initialOffsetY = { it },
         ) + scaleIn(
-            animationSpec = spring(
-                dampingRatio = 0.76f,
-                stiffness = 180f,
-            ),
+            animationSpec = motion.fabMenu,
             initialScale = 0.80f,
         ),
         exit = fadeOut(
-            animationSpec = spring(
-                dampingRatio = Spring.DampingRatioNoBouncy,
-                stiffness = 180f,
-            ),
+            animationSpec = motion.fabMenu,
         ) + slideOutVertically(
-            animationSpec = spring(
-                dampingRatio = 0.76f,
-                stiffness = 160f,
-            ),
+            animationSpec = motion.fabMenuOffset,
             targetOffsetY = { it },
         ) + scaleOut(
-            animationSpec = spring(
-                dampingRatio = 0.76f,
-                stiffness = 180f,
-            ),
+            animationSpec = motion.fabMenu,
             targetScale = 0.80f,
         ),
     ) {

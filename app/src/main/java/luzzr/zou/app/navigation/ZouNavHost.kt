@@ -2,7 +2,6 @@ package luzzr.zou.app.navigation
 
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
-import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
@@ -25,7 +24,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
-import luzzr.zou.core.ui.MotionTokens
+import luzzr.zou.core.ui.LocalZouMotion
 import luzzr.zou.core.ui.RadialExpansionController
 import luzzr.zou.feature.habits.HabitDetailRoute
 import luzzr.zou.feature.habits.HabitEditorRoute
@@ -53,28 +52,20 @@ fun ZouNavHost(
     radialExpansionController: RadialExpansionController,
     modifier: Modifier = Modifier,
 ) {
+    val motion = LocalZouMotion.current
     NavHost(
         navController = navController,
         startDestination = RootRoutes.TopLevelCanvas,
         modifier = modifier,
         enterTransition = {
             fadeIn(
-                animationSpec = tween(
-                    durationMillis = MotionTokens.DurationDepthEnter,
-                    easing = MotionTokens.EasingEmphasized,
-                ),
+                animationSpec = motion.pageEnter,
             ) + slideInVertically(
-                animationSpec = tween(
-                    durationMillis = MotionTokens.DurationDepthEnter,
-                    easing = MotionTokens.EasingEmphasized,
-                ),
+                animationSpec = motion.pageEnterOffset,
                 initialOffsetY = { (it * 0.08f).toInt() },
             ) + scaleIn(
                 initialScale = 0.98f,
-                animationSpec = tween(
-                    durationMillis = MotionTokens.DurationDepthEnter,
-                    easing = MotionTokens.EasingEmphasized,
-                ),
+                animationSpec = motion.pageEnter,
             )
         },
         exitTransition = {
@@ -83,21 +74,12 @@ fun ZouNavHost(
                 ExitTransition.None
             } else {
                 fadeOut(
-                    animationSpec = tween(
-                        durationMillis = MotionTokens.DurationDepthExit,
-                        easing = MotionTokens.EasingStandard,
-                    ),
+                    animationSpec = motion.pageExit,
                 ) + scaleOut(
                     targetScale = 0.95f,
-                    animationSpec = tween(
-                        durationMillis = MotionTokens.DurationDepthExit,
-                        easing = MotionTokens.EasingStandard,
-                    ),
+                    animationSpec = motion.pageExit,
                 ) + slideOutVertically(
-                    animationSpec = tween(
-                        durationMillis = MotionTokens.DurationDepthExit,
-                        easing = MotionTokens.EasingStandard,
-                    ),
+                    animationSpec = motion.pageExitOffset,
                     targetOffsetY = { (it * 0.04f).toInt() },
                 )
             }
@@ -108,43 +90,25 @@ fun ZouNavHost(
                 EnterTransition.None
             } else {
                 fadeIn(
-                    animationSpec = tween(
-                        durationMillis = MotionTokens.DurationDepthEnter,
-                        easing = MotionTokens.EasingEmphasized,
-                    ),
+                    animationSpec = motion.pageEnter,
                 ) + slideInVertically(
-                    animationSpec = tween(
-                        durationMillis = MotionTokens.DurationDepthEnter,
-                        easing = MotionTokens.EasingEmphasized,
-                    ),
+                    animationSpec = motion.pageEnterOffset,
                     initialOffsetY = { -(it * 0.04f).toInt() },
                 ) + scaleIn(
                     initialScale = 0.985f,
-                    animationSpec = tween(
-                        durationMillis = MotionTokens.DurationDepthEnter,
-                        easing = MotionTokens.EasingEmphasized,
-                    ),
+                    animationSpec = motion.pageEnter,
                 )
             }
         },
         popExitTransition = {
             fadeOut(
-                animationSpec = tween(
-                    durationMillis = MotionTokens.DurationDepthExit,
-                    easing = MotionTokens.EasingEmphasized,
-                ),
+                animationSpec = motion.pageExit,
             ) + slideOutVertically(
-                animationSpec = tween(
-                    durationMillis = MotionTokens.DurationDepthExit,
-                    easing = MotionTokens.EasingEmphasized,
-                ),
+                animationSpec = motion.pageExitOffset,
                 targetOffsetY = { (it * 0.12f).toInt() },
             ) + scaleOut(
                 targetScale = 0.90f,
-                animationSpec = tween(
-                    durationMillis = MotionTokens.DurationDepthExit,
-                    easing = MotionTokens.EasingEmphasized,
-                ),
+                animationSpec = motion.pageExit,
             )
         },
     ) {
@@ -393,15 +357,13 @@ private fun FabRevealDestination(
     content: @Composable (onNavigateBack: () -> Unit) -> Unit,
 ) {
     val scope = rememberCoroutineScope()
+    val motion = LocalZouMotion.current
     val revealProgress = remember { Animatable(0f) }
 
     LaunchedEffect(Unit) {
         revealProgress.animateTo(
             targetValue = 1f,
-            animationSpec = tween(
-                durationMillis = MotionTokens.DurationFabRadial,
-                easing = MotionTokens.EasingFabExpand,
-            ),
+            animationSpec = motion.fabReveal,
         )
     }
 
@@ -409,10 +371,7 @@ private fun FabRevealDestination(
         scope.launch {
             revealProgress.animateTo(
                 targetValue = 0f,
-                animationSpec = tween(
-                    durationMillis = MotionTokens.DurationFabRadial,
-                    easing = MotionTokens.EasingAccelerate,
-                ),
+                animationSpec = motion.fabCollapse,
             )
             navController.navigateUp()
         }

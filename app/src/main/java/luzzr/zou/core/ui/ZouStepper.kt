@@ -2,7 +2,6 @@ package luzzr.zou.core.ui
 
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
@@ -35,6 +34,7 @@ fun ZouStepBar(
     modifier: Modifier = Modifier,
     onStepSelected: ((Int) -> Unit)? = null,
 ) {
+    val motion = LocalZouMotion.current
     Row(
         modifier = modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(LayoutTokens.Space8),
@@ -43,7 +43,7 @@ fun ZouStepBar(
             val selected = index == currentStep
             val selectionProgress by animateFloatAsState(
                 targetValue = if (selected) 1f else 0f,
-                animationSpec = MotionTokens.SpringSmooth,
+                animationSpec = motion.formStep,
                 label = "step_selection_progress_$index",
             )
             val textColor by animateColorAsState(
@@ -52,10 +52,7 @@ fun ZouStepBar(
                 } else {
                     MaterialTheme.colorScheme.onSurfaceVariant
                 },
-                animationSpec = tween(
-                    durationMillis = MotionTokens.DurationFormStep,
-                    easing = MotionTokens.EasingEmphasized,
-                ),
+                animationSpec = motion.colorShift,
                 label = "step_text_color_$index",
             )
             GlassSurface(

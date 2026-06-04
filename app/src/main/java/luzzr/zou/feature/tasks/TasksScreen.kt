@@ -2,7 +2,6 @@ package luzzr.zou.feature.tasks
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
@@ -57,8 +56,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.delay
 import luzzr.zou.core.designsystem.theme.ZouTaskAccent
 import luzzr.zou.core.ui.GlassSurface
+import luzzr.zou.core.ui.LocalZouMotion
 import luzzr.zou.core.ui.ModuleFab
-import luzzr.zou.core.ui.MotionTokens
 import luzzr.zou.core.ui.ZouEmptyStateCard
 import luzzr.zou.core.ui.ZouMetaChip
 import luzzr.zou.core.ui.ZouStaggeredReveal
@@ -105,6 +104,7 @@ fun TasksScreen(
     isRefreshing: Boolean = false,
     onRefresh: () -> Unit = {},
 ) {
+    val motion = LocalZouMotion.current
     var removingIds by remember { mutableStateOf(emptySet<String>()) }
     Scaffold(
         modifier = Modifier.testTag("tasks_screen"),
@@ -152,7 +152,7 @@ fun TasksScreen(
                                 SwipeToDismissBoxValue.EndToStart -> {
                                     removingIds = removingIds + task.id
                                     dismissState.reset()
-                                    delay(300)
+                                    delay(motion.listExitDelayMillis.toLong())
                                     onDeleteTask(task.id)
                                 }
                                 else -> Unit
@@ -160,8 +160,8 @@ fun TasksScreen(
                         }
                         AnimatedVisibility(
                             visible = task.id !in removingIds,
-                            exit = fadeOut(animationSpec = tween(300)) +
-                                    shrinkVertically(animationSpec = tween(300)),
+                            exit = fadeOut(animationSpec = motion.listExit) +
+                                shrinkVertically(animationSpec = motion.listExitSize),
                         ) {
                             SwipeToDismissBox(
                                 state = dismissState,
@@ -236,6 +236,7 @@ private fun TaskCard(
     modifier: Modifier = Modifier,
 ) {
     val interactionSource = rememberPressInteractionSource()
+    val motion = LocalZouMotion.current
     val hapticFeedback = LocalHapticFeedback.current
     // 动态色彩流转：当任务被勾选为“已完成”时，色彩平滑流变流转为烟灰色，未完成则呈饱满的任务亮色
     val currentAccentColor = if (item.isCompleted) {
@@ -287,7 +288,7 @@ private fun TaskCard(
                 val isCompleted = item.isCompleted
                 val checkAnimationProgress by animateFloatAsState(
                     targetValue = if (isCompleted) 1f else 0f,
-                    animationSpec = MotionTokens.SpringBouncy,
+                    animationSpec = motion.press,
                     label = "check_anim_progress",
                 )
                 val checkIconSize = 32.dp
