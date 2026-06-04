@@ -1,8 +1,10 @@
 package luzzr.zou.data.repository
 
+import androidx.room.withTransaction
 import luzzr.zou.core.markdown.MarkdownImageReferenceParser
 import luzzr.zou.core.markdown.MarkdownPreviewTextExtractor
 import luzzr.zou.core.time.TimeProvider
+import luzzr.zou.data.local.database.ZouDatabase
 import luzzr.zou.data.local.database.dao.MediaDao
 import luzzr.zou.data.local.database.dao.NoteDao
 import luzzr.zou.data.local.database.entity.MediaEntity
@@ -20,6 +22,7 @@ import kotlinx.coroutines.flow.map
 
 @Singleton
 class NoteRepositoryImpl @Inject constructor(
+    private val database: ZouDatabase,
     private val noteDao: NoteDao,
     private val mediaDao: MediaDao,
     private val timeProvider: TimeProvider,
@@ -64,50 +67,62 @@ class NoteRepositoryImpl @Inject constructor(
             createdAt = if (note.createdAt == 0L) now else note.createdAt,
             updatedAt = now,
         )
-        noteDao.upsertNote(normalizedNote.toEntity())
-        cleanupUnreferencedMedia(
-            noteId = normalizedNote.id,
-            referencedMediaIds = imageReferenceParser.extractMediaIds(normalizedContent),
-            updatedAt = now,
-        )
+        val removableMedia = database.withTransaction {
+            noteDao.upsertNote(normalizedNote.toEntity())
+            removeUnreferencedMedia(
+                noteId = normalizedNote.id,
+                referencedMediaIds = imageReferenceParser.extractMediaIds(normalizedContent),
+            )
+        }
+        deleteMediaFiles(removableMedia)
     }
 
     override suspend fun softDeleteNote(noteId: String) {
         val now = timeProvider.nowMillis()
-        noteDao.softDeleteNote(noteId = noteId, deletedAt = now)
-        mediaDao.softDeleteMediaByOwner(
-            ownerType = ownerType,
-            ownerId = noteId,
-            updatedAt = now,
-        )
+        database.withTransaction {
+            noteDao.softDeleteNote(noteId = noteId, deletedAt = now)
+            mediaDao.softDeleteMediaByOwner(
+                ownerType = ownerType,
+                ownerId = noteId,
+                updatedAt = now,
+            )
+        }
     }
 
     override suspend fun restoreNote(noteId: String) {
         val now = timeProvider.nowMillis()
-        noteDao.restoreNote(
-            noteId = noteId,
-            updatedAt = now,
-        )
-        mediaDao.restoreMediaByOwner(
-            ownerType = ownerType,
-            ownerId = noteId,
-            updatedAt = now,
-        )
+        database.withTransaction {
+            val note = noteDao.getNote(noteId) ?: return@withTransaction
+            noteDao.restoreNote(
+                noteId = noteId,
+                updatedAt = now,
+            )
+            val referencedMediaIds = imageReferenceParser.extractMediaIds(note.contentMarkdown)
+            if (referencedMediaIds.isNotEmpty()) {
+                mediaDao.restoreMediaByIdsForOwner(
+                    ownerType = ownerType,
+                    ownerId = noteId,
+                    mediaIds = referencedMediaIds.toList(),
+                    updatedAt = now,
+                )
+            }
+        }
     }
 
     override suspend fun hardDeleteNote(noteId: String) {
-        val media = mediaDao.getMediaForOwner(
-            ownerType = ownerType,
-            ownerId = noteId,
-        )
-        media.forEach { item ->
-            runCatching { noteImageStorage.deleteImage(item.localPath) }
+        val media = database.withTransaction {
+            val ownedMedia = mediaDao.getMediaForOwner(
+                ownerType = ownerType,
+                ownerId = noteId,
+            )
+            mediaDao.hardDeleteMediaByOwner(
+                ownerType = ownerType,
+                ownerId = noteId,
+            )
+            noteDao.hardDeleteNote(noteId)
+            ownedMedia
         }
-        mediaDao.hardDeleteMediaByOwner(
-            ownerType = ownerType,
-            ownerId = noteId,
-        )
-        noteDao.hardDeleteNote(noteId)
+        deleteMediaFiles(media)
     }
 
     override suspend fun importImage(
@@ -119,19 +134,27 @@ class NoteRepositoryImpl @Inject constructor(
             noteId = noteId,
             sourceUri = sourceUri,
         )
-        mediaDao.upsertMedia(
-            MediaEntity(
-                id = storedImage.mediaId,
-                ownerType = ownerType,
-                ownerId = noteId,
-                localPath = storedImage.localPath,
-                mimeType = storedImage.mimeType,
-                sizeBytes = storedImage.sizeBytes,
-                createdAt = now,
-                updatedAt = now,
-                isDeleted = false,
-            ),
-        )
+        var mediaPersisted = false
+        try {
+            mediaDao.upsertMedia(
+                MediaEntity(
+                    id = storedImage.mediaId,
+                    ownerType = ownerType,
+                    ownerId = noteId,
+                    localPath = storedImage.localPath,
+                    mimeType = storedImage.mimeType,
+                    sizeBytes = storedImage.sizeBytes,
+                    createdAt = now,
+                    updatedAt = now,
+                    isDeleted = false,
+                ),
+            )
+            mediaPersisted = true
+        } finally {
+            if (!mediaPersisted) {
+                runCatching { noteImageStorage.deleteImage(storedImage.localPath) }
+            }
+        }
         return InsertedNoteImage(
             mediaId = storedImage.mediaId,
             markdownReference = "![image](local://media/${storedImage.mediaId})",
@@ -141,11 +164,14 @@ class NoteRepositoryImpl @Inject constructor(
     }
 
     override suspend fun cleanupOrphanedMedia() {
-        val noteIds = noteDao.getAllNotes().mapTo(mutableSetOf()) { it.id }
-        val orphanedMedia = mediaDao.getAllMedia()
-            .filter { media -> media.ownerType == ownerType && media.ownerId !in noteIds }
-
-        hardDeleteMedia(orphanedMedia)
+        val orphanedMedia = database.withTransaction {
+            val noteIds = noteDao.getAllNotes().mapTo(mutableSetOf()) { it.id }
+            val orphaned = mediaDao.getAllMedia()
+                .filter { media -> media.ownerType == ownerType && media.ownerId !in noteIds }
+            deleteMediaRows(orphaned)
+            orphaned
+        }
+        deleteMediaFiles(orphanedMedia)
     }
 
     override suspend fun discardDraft(noteId: String) {
@@ -159,7 +185,6 @@ class NoteRepositoryImpl @Inject constructor(
         cleanupUnreferencedMedia(
             noteId = noteId,
             referencedMediaIds = referencedMediaIds,
-            updatedAt = timeProvider.nowMillis(),
         )
     }
 
@@ -177,51 +202,67 @@ class NoteRepositoryImpl @Inject constructor(
     override suspend fun bulkSoftDeleteNotes(noteIds: List<String>) {
         if (noteIds.isEmpty()) return
         val now = timeProvider.nowMillis()
-        noteDao.softDeleteNotes(noteIds = noteIds, deletedAt = now)
-        noteIds.forEach { noteId ->
-            mediaDao.softDeleteMediaByOwner(
-                ownerType = ownerType,
-                ownerId = noteId,
-                updatedAt = now,
-            )
+        database.withTransaction {
+            noteDao.softDeleteNotes(noteIds = noteIds, deletedAt = now)
+            noteIds.forEach { noteId ->
+                mediaDao.softDeleteMediaByOwner(
+                    ownerType = ownerType,
+                    ownerId = noteId,
+                    updatedAt = now,
+                )
+            }
         }
     }
 
     private suspend fun cleanupUnreferencedMedia(
         noteId: String,
         referencedMediaIds: Set<String>,
-        updatedAt: Long,
     ) {
+        val removableMedia = database.withTransaction {
+            removeUnreferencedMedia(
+                noteId = noteId,
+                referencedMediaIds = referencedMediaIds,
+            )
+        }
+        deleteMediaFiles(removableMedia)
+    }
+
+    private suspend fun removeUnreferencedMedia(
+        noteId: String,
+        referencedMediaIds: Set<String>,
+    ): List<MediaEntity> {
         val activeMedia = mediaDao.getActiveMediaForOwner(
             ownerType = ownerType,
             ownerId = noteId,
         )
         val removableMedia = activeMedia.filterNot { it.id in referencedMediaIds }
-        if (removableMedia.isEmpty()) return
+        if (removableMedia.isEmpty()) return emptyList()
 
-        mediaDao.softDeleteMediaByIds(
-            mediaIds = removableMedia.map { it.id },
-            updatedAt = updatedAt,
-        )
-        removableMedia.forEach { media ->
-            runCatching { noteImageStorage.deleteImage(media.localPath) }
-        }
+        deleteMediaRows(removableMedia)
+        return removableMedia
     }
 
     private suspend fun cleanupOrphanedMedia(noteId: String) {
-        val orphanedMedia = mediaDao.getMediaForOwner(
-            ownerType = ownerType,
-            ownerId = noteId,
-        )
-        hardDeleteMedia(orphanedMedia)
+        val orphanedMedia = database.withTransaction {
+            val orphaned = mediaDao.getMediaForOwner(
+                ownerType = ownerType,
+                ownerId = noteId,
+            )
+            deleteMediaRows(orphaned)
+            orphaned
+        }
+        deleteMediaFiles(orphanedMedia)
     }
 
-    private suspend fun hardDeleteMedia(mediaItems: List<MediaEntity>) {
-        if (mediaItems.isEmpty()) return
+    private suspend fun deleteMediaRows(mediaItems: List<MediaEntity>) {
+        mediaItems.forEach { media ->
+            mediaDao.hardDeleteMediaById(media.id)
+        }
+    }
 
+    private fun deleteMediaFiles(mediaItems: List<MediaEntity>) {
         mediaItems.forEach { media ->
             runCatching { noteImageStorage.deleteImage(media.localPath) }
-            mediaDao.hardDeleteMediaById(media.id)
         }
     }
 

@@ -1,9 +1,5 @@
 package luzzr.zou.feature.habits
 
-import android.Manifest
-import android.content.Context
-import android.content.pm.PackageManager
-import android.os.Build
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.BackHandler
@@ -54,10 +50,11 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import androidx.core.content.ContextCompat
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import luzzr.zou.core.designsystem.theme.ZouHabitAccent
+import luzzr.zou.core.permission.PostNotificationsPermission
+import luzzr.zou.core.permission.shouldRequestPostNotificationsPermission
 import luzzr.zou.core.ui.ZouDateTimeSheet
 import luzzr.zou.core.ui.ZouDateTimeSheetMode
 import luzzr.zou.core.ui.ZouEditorSection
@@ -110,8 +107,8 @@ fun HabitEditorRoute(
     val handleSave = {
         if (!viewModel.validateBeforeSave()) {
             Unit
-        } else if (uiState.hasReminderConfig && context.shouldRequestNotificationPermission()) {
-            permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+        } else if (uiState.hasReminderConfig && context.shouldRequestPostNotificationsPermission()) {
+            permissionLauncher.launch(PostNotificationsPermission)
         } else {
             viewModel.saveHabit(onSaved = onNavigateBack)
         }
@@ -860,11 +857,4 @@ private fun HabitEditorUiState.isDueToday(today: LocalDate): Boolean {
             monthlyDaysText.split(",").mapNotNull { it.trim().toIntOrNull() }.contains(today.dayOfMonth)
         }
     }
-}
-
-private fun Context.shouldRequestNotificationPermission(): Boolean {
-    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
-        return false
-    }
-    return ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED
 }

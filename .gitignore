@@ -9,6 +9,7 @@
 .cxx
 local.properties
 /app/build
+/app/build-*/
 *.apk
 *.aab
 *.jks
@@ -16,4 +17,3 @@ keystore.properties
 logs.txt
 scratch/
 .kotlin/
-

@@ -5,8 +5,10 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Matrix
-import android.media.ExifInterface
 import android.net.Uri
+import androidx.core.graphics.scale
+import androidx.core.net.toUri
+import androidx.exifinterface.media.ExifInterface
 import dagger.hilt.android.qualifiers.ApplicationContext
 import java.io.File
 import java.util.UUID
@@ -16,6 +18,7 @@ import kotlin.math.max
 import kotlin.math.roundToInt
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import luzzr.zou.core.coroutines.rethrowIfCancellation
 
 data class StoredNoteImage(
     val mediaId: String,
@@ -45,10 +48,11 @@ class LocalNoteImageStorage @Inject constructor(
         runCatching {
             importNormalizedImage(
                 noteId = noteId,
-                uri = Uri.parse(sourceUri),
+                uri = sourceUri.toUri(),
                 mediaId = UUID.randomUUID().toString(),
             )
         }.getOrElse { throwable ->
+            throwable.rethrowIfCancellation()
             when (throwable) {
                 is IllegalArgumentException -> throw throwable
                 else -> throw IllegalStateException(importFailureMessage, throwable)
@@ -214,7 +218,7 @@ class LocalNoteImageStorage @Inject constructor(
         if (bitmap.width == targetWidth && bitmap.height == targetHeight) {
             return bitmap
         }
-        return Bitmap.createScaledBitmap(bitmap, targetWidth, targetHeight, true)
+        return bitmap.scale(targetWidth, targetHeight)
     }
 
     private fun writeBitmapToFile(

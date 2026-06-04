@@ -7,6 +7,7 @@ import luzzr.zou.core.markdown.MarkdownImageReferenceParser
 import luzzr.zou.core.markdown.MarkdownPreviewTextExtractor
 import luzzr.zou.core.time.TimeProvider
 import luzzr.zou.data.local.database.ZouDatabase
+import luzzr.zou.data.local.database.entity.MediaEntity
 import luzzr.zou.data.local.media.NoteImageStorage
 import luzzr.zou.data.local.media.StoredNoteImage
 import luzzr.zou.domain.model.Note
@@ -17,6 +18,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -42,6 +44,7 @@ class NoteRepositoryImplTest {
             .build()
         fakeStorage = FakeNoteImageStorage()
         repository = NoteRepositoryImpl(
+            database = database,
             noteDao = database.noteDao(),
             mediaDao = database.mediaDao(),
             timeProvider = timeProvider,
@@ -82,7 +85,7 @@ class NoteRepositoryImplTest {
     }
 
     @Test
-    fun saveWithoutImageReferenceSoftDeletesRemovedMedia() = runBlocking {
+    fun saveWithoutImageReferencePermanentlyRemovesUnrecoverableMedia() = runBlocking {
         val noteId = UUID.randomUUID().toString()
         val inserted = repository.importImage(noteId, "content://image")
         repository.saveNote(
@@ -102,7 +105,7 @@ class NoteRepositoryImplTest {
         )
 
         val media = database.mediaDao().getMediaById("media-1")
-        assertTrue(media?.isDeleted == true)
+        assertNull(media)
         assertEquals(listOf("/virtual/media-1.jpg"), fakeStorage.deletedPaths)
     }
 
@@ -133,6 +136,101 @@ class NoteRepositoryImplTest {
     }
 
     @Test
+    fun restoreNoteDoesNotResurrectPreviouslyRemovedMedia() = runBlocking {
+        val noteId = UUID.randomUUID().toString()
+        val inserted = repository.importImage(noteId, "content://image")
+        repository.saveNote(
+            note(
+                id = noteId,
+                title = "With image",
+                contentMarkdown = inserted.markdownReference,
+            ),
+        )
+        repository.saveNote(note(id = noteId, title = "Without image", contentMarkdown = "Body"))
+        repository.softDeleteNote(noteId)
+
+        repository.restoreNote(noteId)
+
+        val restored = repository.getNote(noteId)
+        assertTrue(restored?.images?.isEmpty() == true)
+        assertNull(database.mediaDao().getMediaById("media-1"))
+    }
+
+    @Test
+    fun restoreMissingNoteDoesNotActivateOrphanedMedia() = runBlocking {
+        val missingNoteId = UUID.randomUUID().toString()
+        repository.importImage(missingNoteId, "content://image")
+        database.mediaDao().softDeleteMediaByOwner(
+            ownerType = "note",
+            ownerId = missingNoteId,
+            updatedAt = timeProvider.nowMillis(),
+        )
+
+        repository.restoreNote(missingNoteId)
+
+        assertNull(database.noteDao().getNote(missingNoteId))
+        assertTrue(database.mediaDao().getActiveMediaForOwner("note", missingNoteId).isEmpty())
+    }
+
+    @Test
+    fun restoreNoteOnlyActivatesMediaReferencedByMarkdown() = runBlocking {
+        val noteId = UUID.randomUUID().toString()
+        val inserted = repository.importImage(noteId, "content://image")
+        repository.saveNote(note(id = noteId, title = "Restore exact set", contentMarkdown = inserted.markdownReference))
+        database.mediaDao().upsertMedia(
+            MediaEntity(
+                id = "stale-media",
+                ownerType = "note",
+                ownerId = noteId,
+                localPath = "/virtual/stale-media.jpg",
+                mimeType = "image/jpeg",
+                sizeBytes = 42L,
+                createdAt = timeProvider.nowMillis(),
+                updatedAt = timeProvider.nowMillis(),
+                isDeleted = true,
+            ),
+        )
+        repository.softDeleteNote(noteId)
+
+        repository.restoreNote(noteId)
+
+        assertEquals(listOf("media-1"), repository.getNote(noteId)?.images?.map { it.mediaId })
+        assertTrue(database.mediaDao().getMediaById("stale-media")?.isDeleted == true)
+    }
+
+    @Test
+    fun restoreNoteCannotActivateReferencedMediaOwnedByAnotherNote() = runBlocking {
+        val noteId = UUID.randomUUID().toString()
+        val otherNoteId = UUID.randomUUID().toString()
+        repository.saveNote(
+            note(
+                id = noteId,
+                title = "Isolated restore",
+                contentMarkdown = "![image](local://media/foreign-media)",
+            ),
+        )
+        database.mediaDao().upsertMedia(
+            MediaEntity(
+                id = "foreign-media",
+                ownerType = "note",
+                ownerId = otherNoteId,
+                localPath = "/virtual/foreign-media.jpg",
+                mimeType = "image/jpeg",
+                sizeBytes = 42L,
+                createdAt = timeProvider.nowMillis(),
+                updatedAt = timeProvider.nowMillis(),
+                isDeleted = true,
+            ),
+        )
+        repository.softDeleteNote(noteId)
+
+        repository.restoreNote(noteId)
+
+        assertTrue(database.mediaDao().getMediaById("foreign-media")?.isDeleted == true)
+        assertTrue(repository.getNote(noteId)?.images?.isEmpty() == true)
+    }
+
+    @Test
     fun hardDeleteRemovesNoteAndDeletesFiles() = runBlocking {
         val noteId = UUID.randomUUID().toString()
         repository.importImage(noteId, "content://image")
@@ -143,6 +241,73 @@ class NoteRepositoryImplTest {
         assertTrue(database.noteDao().getNote(noteId) == null)
         assertTrue(database.mediaDao().getAllMedia().none { it.ownerId == noteId })
         assertEquals(setOf("/virtual/media-1.jpg"), fakeStorage.deletedPaths.toSet())
+    }
+
+    @Test
+    fun softDeleteRollsBackNoteWhenMediaUpdateFails() = runBlocking {
+        val noteId = UUID.randomUUID().toString()
+        val inserted = repository.importImage(noteId, "content://image")
+        repository.saveNote(note(id = noteId, title = "Keep consistent", contentMarkdown = inserted.markdownReference))
+        database.openHelper.writableDatabase.execSQL(
+            """
+            CREATE TRIGGER fail_media_soft_delete
+            BEFORE UPDATE OF isDeleted ON media
+            WHEN NEW.isDeleted = 1
+            BEGIN
+                SELECT RAISE(ABORT, 'forced media failure');
+            END
+            """.trimIndent(),
+        )
+
+        val failure = runCatching { repository.softDeleteNote(noteId) }.exceptionOrNull()
+
+        assertNotNull(failure)
+        assertEquals(noteId, database.noteDao().getActiveNote(noteId)?.id)
+        assertEquals(listOf("media-1"), database.mediaDao().getActiveMediaForOwner("note", noteId).map { it.id })
+    }
+
+    @Test
+    fun importImageDeletesWrittenFileWhenMediaInsertFails() = runBlocking {
+        database.openHelper.writableDatabase.execSQL(
+            """
+            CREATE TRIGGER fail_media_insert
+            BEFORE INSERT ON media
+            BEGIN
+                SELECT RAISE(ABORT, 'forced media insert failure');
+            END
+            """.trimIndent(),
+        )
+
+        val failure = runCatching {
+            repository.importImage(UUID.randomUUID().toString(), "content://image")
+        }.exceptionOrNull()
+
+        assertNotNull(failure)
+        assertEquals(listOf("/virtual/media-1.jpg"), fakeStorage.deletedPaths)
+        assertTrue(database.mediaDao().getAllMedia().isEmpty())
+    }
+
+    @Test
+    fun hardDeleteKeepsFilesWhenDatabaseDeleteFails() = runBlocking {
+        val noteId = UUID.randomUUID().toString()
+        val inserted = repository.importImage(noteId, "content://image")
+        repository.saveNote(note(id = noteId, title = "Keep on failure", contentMarkdown = inserted.markdownReference))
+        database.openHelper.writableDatabase.execSQL(
+            """
+            CREATE TRIGGER fail_note_delete
+            BEFORE DELETE ON notes
+            BEGIN
+                SELECT RAISE(ABORT, 'forced note delete failure');
+            END
+            """.trimIndent(),
+        )
+
+        val failure = runCatching { repository.hardDeleteNote(noteId) }.exceptionOrNull()
+
+        assertNotNull(failure)
+        assertEquals(noteId, database.noteDao().getNote(noteId)?.id)
+        assertEquals(listOf("media-1"), database.mediaDao().getMediaForOwner("note", noteId).map { it.id })
+        assertTrue(fakeStorage.deletedPaths.isEmpty())
     }
 
     @Test

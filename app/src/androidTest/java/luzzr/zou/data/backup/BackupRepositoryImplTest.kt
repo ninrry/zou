@@ -18,6 +18,7 @@ import java.util.zip.ZipFile
 import java.util.zip.ZipOutputStream
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Assert.assertEquals
@@ -32,6 +33,7 @@ class BackupRepositoryImplTest {
     private lateinit var database: ZouDatabase
     private lateinit var repository: BackupRepositoryImpl
     private lateinit var settingsRepository: FakeSettingsRepository
+    private lateinit var reminderScheduler: FakeReminderScheduler
     private lateinit var exportedZip: File
     private lateinit var importZip: File
 
@@ -43,6 +45,7 @@ class BackupRepositoryImplTest {
             ZouDatabase::class.java,
         ).allowMainThreadQueries().build()
         settingsRepository = FakeSettingsRepository()
+        reminderScheduler = FakeReminderScheduler()
         repository = BackupRepositoryImpl(
             context = context,
             database = database,
@@ -51,7 +54,7 @@ class BackupRepositoryImplTest {
             noteDao = database.noteDao(),
             mediaDao = database.mediaDao(),
             settingsRepository = settingsRepository,
-            reminderScheduler = FakeReminderScheduler(),
+            reminderScheduler = reminderScheduler,
             markdownImageReferenceParser = MarkdownImageReferenceParser(),
             timeProvider = FakeTimeProvider(),
         )
@@ -101,8 +104,82 @@ class BackupRepositoryImplTest {
         assertTrue(result.message.contains("版本"))
     }
 
+    @Test
+    fun importBackupKeepsCommittedDataAndWarnsWhenSettingsRestoreFails() = runBlocking {
+        writeValidImportBackup()
+        settingsRepository.failOnReplace = true
+
+        val result = repository.importBackup(Uri.fromFile(importZip).toString())
+
+        assertTrue(result.success)
+        assertTrue(result.warnings.any { it.contains("设置恢复失败") })
+        assertTrue(database.taskDao().getAllTaskEntities().any { it.id == IMPORTED_TASK_ID })
+    }
+
+    @Test
+    fun importBackupKeepsCommittedDataAndWarnsWhenReminderRescheduleFails() = runBlocking {
+        writeValidImportBackup()
+        reminderScheduler.failOnReschedule = true
+
+        val result = repository.importBackup(Uri.fromFile(importZip).toString())
+
+        assertTrue(result.success)
+        assertTrue(result.warnings.any { it.contains("提醒重排失败") })
+        assertTrue(database.taskDao().getAllTaskEntities().any { it.id == IMPORTED_TASK_ID })
+    }
+
+    @Test
+    fun importBackupPropagatesCancellationAfterDatabaseCommit() = runBlocking {
+        writeValidImportBackup()
+        settingsRepository.cancelOnReplace = true
+
+        val failure = runCatching {
+            repository.importBackup(Uri.fromFile(importZip).toString())
+        }.exceptionOrNull()
+
+        assertTrue(failure is CancellationException)
+        assertTrue(database.taskDao().getAllTaskEntities().any { it.id == IMPORTED_TASK_ID })
+        assertTrue(
+            !File(
+                InstrumentationRegistry.getInstrumentation().targetContext.cacheDir,
+                "backup_import_${FakeTimeProvider.NOW_MILLIS}",
+            ).exists(),
+        )
+    }
+
+    private fun writeValidImportBackup() {
+        ZipOutputStream(importZip.outputStream()).use { zip ->
+            zip.putNextEntry(ZipEntry("backup.json"))
+            zip.write(
+                """
+                {
+                  "version": 3,
+                  "exportedAt": 10,
+                  "tasks": [{
+                    "id": "$IMPORTED_TASK_ID",
+                    "title": "Imported task",
+                    "priority": "NORMAL",
+                    "isUrgent": false,
+                    "status": "ACTIVE",
+                    "completionRule": "MANUAL",
+                    "createdAt": 1,
+                    "updatedAt": 2
+                  }],
+                  "settings": {
+                    "defaultStartDestination": "tasks",
+                    "settingsUpdatedAt": 2
+                  }
+                }
+                """.trimIndent().toByteArray(Charsets.UTF_8),
+            )
+            zip.closeEntry()
+        }
+    }
+
     private class FakeSettingsRepository : SettingsRepository {
         private val state = MutableStateFlow(ReminderPreferences())
+        var failOnReplace = false
+        var cancelOnReplace = false
 
         override fun observeReminderPreferences(): Flow<ReminderPreferences> = state
 
@@ -115,11 +192,17 @@ class BackupRepositoryImplTest {
         }
 
         override suspend fun replaceReminderPreferences(preferences: ReminderPreferences) {
+            if (cancelOnReplace) {
+                throw CancellationException("settings write cancelled")
+            }
+            check(!failOnReplace) { "settings write failed" }
             state.value = preferences
         }
     }
 
     private class FakeReminderScheduler : ReminderScheduler {
+        var failOnReschedule = false
+
         override suspend fun scheduleTask(taskId: String) = Unit
 
         override suspend fun cancelTask(taskId: String) = Unit
@@ -128,12 +211,22 @@ class BackupRepositoryImplTest {
 
         override suspend fun cancelHabit(habitId: String) = Unit
 
-        override suspend fun rescheduleAllActiveReminders() = Unit
+        override suspend fun rescheduleAllActiveReminders() {
+            check(!failOnReschedule) { "reminder reschedule failed" }
+        }
     }
 
     private class FakeTimeProvider : TimeProvider {
-        override fun nowMillis(): Long = 1_763_000_000_000L
+        override fun nowMillis(): Long = NOW_MILLIS
 
         override fun zoneId(): ZoneId = ZoneId.of("Asia/Singapore")
+
+        companion object {
+            const val NOW_MILLIS = 1_763_000_000_000L
+        }
+    }
+
+    private companion object {
+        const val IMPORTED_TASK_ID = "imported-task"
     }
 }

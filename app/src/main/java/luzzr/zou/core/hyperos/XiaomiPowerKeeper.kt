@@ -1,5 +1,6 @@
 package luzzr.zou.core.hyperos
 
+import android.annotation.SuppressLint
 import android.app.AlarmManager
 import android.content.Context
 import android.content.Intent
@@ -7,6 +8,8 @@ import android.content.SharedPreferences
 import android.os.Build
 import android.os.PowerManager
 import android.provider.Settings
+import androidx.core.content.edit
+import androidx.core.net.toUri
 
 /**
  * HyperOS / MIUI 专属的工具方法集合。
@@ -74,19 +77,23 @@ object XiaomiPowerKeeper {
 
     /** 标记优化引导已完成 */
     fun markOptimizationDone(context: Context) {
-        prefs(context).edit().putBoolean(KEY_OPTIMIZATION_DONE, true).apply()
+        prefs(context).edit {
+            putBoolean(KEY_OPTIMIZATION_DONE, true)
+        }
     }
 
     /** 重置优化引导状态（调试用） */
     fun resetOptimization(context: Context) {
-        prefs(context).edit().remove(KEY_OPTIMIZATION_DONE).apply()
+        prefs(context).edit {
+            remove(KEY_OPTIMIZATION_DONE)
+        }
     }
 
     // ── 设置页跳转 ────────────────────────────────────────────
 
     fun openBatteryOptimizationSettings(context: Context) {
         val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
-            data = android.net.Uri.parse("package:${context.packageName}")
+            data = "package:${context.packageName}".toUri()
             flags = Intent.FLAG_ACTIVITY_NEW_TASK
         }
         context.startActivity(intent)
@@ -95,7 +102,7 @@ object XiaomiPowerKeeper {
     fun openAutoStartSettings(context: Context) {
         val intent = Intent().apply {
             action = "android.settings.APPLICATION_DETAILS_SETTINGS"
-            data = android.net.Uri.parse("package:${context.packageName}")
+            data = "package:${context.packageName}".toUri()
             flags = Intent.FLAG_ACTIVITY_NEW_TASK
         }
         context.startActivity(intent)
@@ -116,6 +123,7 @@ object XiaomiPowerKeeper {
         return context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
     }
 
+    @SuppressLint("PrivateApi")
     private fun getSystemProperty(key: String): String? {
         return try {
             val clazz = Class.forName("android.os.SystemProperties")

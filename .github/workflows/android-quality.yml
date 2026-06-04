@@ -1,10 +1,14 @@
 name: Android Quality
 
 on:
+  workflow_dispatch:
   pull_request:
   push:
     branches:
       - main
+
+permissions:
+  contents: read
 
 concurrency:
   group: android-quality-${{ github.ref }}
@@ -33,4 +37,25 @@ jobs:
         run: sdkmanager "platforms;android-37.0"
 
       - name: Run local quality gates
-        run: ./gradlew :app:testDebugUnitTest :app:lintDebug :app:assembleDebug :app:assembleRelease --console=plain
+        run: ./gradlew :app:testDebugUnitTest :app:lintDebug :app:assembleDebug :app:compileDebugAndroidTestKotlin :app:assembleRelease --console=plain
+
+      - name: Upload quality reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-quality-reports
+          path: |
+            app/build/reports/lint-results-debug.*
+            app/build/reports/tests/
+            app/build/test-results/
+          if-no-files-found: ignore
+          retention-days: 14
+
+      - name: Upload APKs
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: zou-apks
+          path: app/build/outputs/apk/**/*.apk
+          if-no-files-found: error
+          retention-days: 14

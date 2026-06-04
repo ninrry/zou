@@ -2,7 +2,9 @@ package luzzr.zou.data.backup
 
 import android.content.Context
 import android.net.Uri
+import androidx.core.net.toUri
 import androidx.room.withTransaction
+import luzzr.zou.core.coroutines.rethrowIfCancellation
 import luzzr.zou.core.markdown.MarkdownImageReferenceParser
 import luzzr.zou.core.reminder.ReminderScheduler
 import luzzr.zou.core.time.TimeProvider
@@ -54,7 +56,7 @@ class BackupRepositoryImpl @Inject constructor(
     }
 
     override suspend fun exportBackup(destinationUri: String): BackupOperationResult {
-        val uri = Uri.parse(destinationUri)
+        val uri = destinationUri.toUri()
         val outputStream = context.contentResolver.openOutputStream(uri)
             ?: return BackupOperationResult(false, "无法创建备份文件。")
         val exportedAt = timeProvider.nowMillis()
@@ -106,43 +108,54 @@ class BackupRepositoryImpl @Inject constructor(
     }
 
     override suspend fun importBackup(sourceUri: String): BackupOperationResult {
-        val uri = Uri.parse(sourceUri)
+        val uri = sourceUri.toUri()
         val tempDirectory = File(context.cacheDir, "backup_import_${timeProvider.nowMillis()}").apply { mkdirs() }
         val warnings = mutableListOf<String>()
 
-        return runCatching {
-            val payload = extractBackup(uri, tempDirectory)
-            if (payload.version > BACKUP_VERSION) {
-                return BackupOperationResult(false, "备份版本过新，当前仅支持导入 v$BACKUP_VERSION。")
-            }
-            if (payload.version < 1) {
-                return BackupOperationResult(false, "暂不支持导入该备份版本。")
-            }
+        return try {
+            runCatching {
+                val payload = extractBackup(uri, tempDirectory)
+                if (payload.version > BACKUP_VERSION) {
+                    return BackupOperationResult(false, "备份版本过新，当前仅支持导入 v$BACKUP_VERSION。")
+                }
+                if (payload.version < 1) {
+                    return BackupOperationResult(false, "暂不支持导入该备份版本。")
+                }
 
-            database.withTransaction {
-                mergeTasks(payload.tasks)
-                mergeSubTasks(payload.subTasks)
-                mergeHabits(payload.habits)
-                mergeHabitSteps(payload.habitSteps)
-                mergeHabitRecords(payload.habitRecords)
-                mergeNotes(payload.notes)
-                mergeMedia(payload.media, tempDirectory, warnings)
-                mergeSettings(payload.settings)
-            }
+                database.withTransaction {
+                    mergeTasks(payload.tasks)
+                    mergeSubTasks(payload.subTasks)
+                    mergeHabits(payload.habits)
+                    mergeHabitSteps(payload.habitSteps)
+                    mergeHabitRecords(payload.habitRecords)
+                    mergeNotes(payload.notes)
+                    mergeMedia(payload.media, tempDirectory, warnings)
+                }
 
-            reminderScheduler.rescheduleAllActiveReminders()
-            BackupOperationResult(
-                success = true,
-                message = "备份导入完成，已按 ID 和 updatedAt 合并。",
-                warnings = warnings,
-            )
-        }.getOrElse { throwable ->
-            BackupOperationResult(
-                success = false,
-                message = throwable.message ?: "备份导入失败。",
-                warnings = warnings,
-            )
-        }.also {
+                runCatching { mergeSettings(payload.settings) }
+                    .onFailure { throwable ->
+                        throwable.rethrowIfCancellation()
+                        warnings += "设置恢复失败：${throwable.message ?: "未知错误"}"
+                    }
+                runCatching { reminderScheduler.rescheduleAllActiveReminders() }
+                    .onFailure { throwable ->
+                        throwable.rethrowIfCancellation()
+                        warnings += "提醒重排失败：${throwable.message ?: "未知错误"}"
+                    }
+                BackupOperationResult(
+                    success = true,
+                    message = "备份导入完成，已按 ID 和 updatedAt 合并。",
+                    warnings = warnings,
+                )
+            }.getOrElse { throwable ->
+                throwable.rethrowIfCancellation()
+                BackupOperationResult(
+                    success = false,
+                    message = throwable.message ?: "备份导入失败。",
+                    warnings = warnings,
+                )
+            }
+        } finally {
             tempDirectory.deleteRecursively()
         }
     }

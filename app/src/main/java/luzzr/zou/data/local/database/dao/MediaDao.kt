@@ -79,12 +79,13 @@ interface MediaDao {
         """
         UPDATE media
         SET isDeleted = 0, updatedAt = :updatedAt
-        WHERE ownerType = :ownerType AND ownerId = :ownerId
+        WHERE ownerType = :ownerType AND ownerId = :ownerId AND id IN (:mediaIds)
         """,
     )
-    suspend fun restoreMediaByOwner(
+    suspend fun restoreMediaByIdsForOwner(
         ownerType: String,
         ownerId: String,
+        mediaIds: List<String>,
         updatedAt: Long,
     )
 

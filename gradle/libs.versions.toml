@@ -18,6 +18,8 @@ espresso = "3.7.0"
 material = "1.14.0"
 datastore = "1.2.1"
 coilCompose = "3.4.0"
+coreKtx = "1.19.0"
+exifInterface = "1.4.2"
 
 [libraries]
 androidx-activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "activityCompose" }
@@ -53,6 +55,8 @@ junit4 = { group = "junit", name = "junit", version.ref = "junit4" }
 kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "serializationJson" }
 kotlinx-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "coroutines" }
 coil-compose = { group = "io.coil-kt.coil3", name = "coil-compose", version.ref = "coilCompose" }
+androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
+androidx-exifinterface = { group = "androidx.exifinterface", name = "exifinterface", version.ref = "exifInterface" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

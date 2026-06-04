@@ -2,6 +2,7 @@
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import luzzr.zou.core.coroutines.rethrowIfCancellation
 import luzzr.zou.domain.repository.BackupOperationResult
 import luzzr.zou.domain.usecase.ExportBackupUseCase
 import luzzr.zou.domain.usecase.ImportBackupUseCase
@@ -47,6 +48,7 @@ class BackupRestoreViewModel @Inject constructor(
             val result = runCatching {
                 block()
             }.getOrElse { throwable ->
+                throwable.rethrowIfCancellation()
                 BackupOperationResult(
                     success = false,
                     message = throwable.message ?: "备份操作失败，请重试。",

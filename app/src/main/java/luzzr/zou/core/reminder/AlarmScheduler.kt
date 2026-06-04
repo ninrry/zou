@@ -1,5 +1,6 @@
 package luzzr.zou.core.reminder
 
+import android.annotation.SuppressLint
 import android.app.AlarmManager
 import android.app.PendingIntent
 import android.content.Context
@@ -15,6 +16,7 @@ class AlarmScheduler @Inject constructor(
 ) {
     private val alarmManager = context.getSystemService(AlarmManager::class.java)
 
+    @SuppressLint("MissingPermission")
     fun scheduleAlarm(
         taskId: String,
         habitId: String?,
@@ -35,6 +37,7 @@ class AlarmScheduler @Inject constructor(
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
         )
 
+        // Exact scheduling is guarded at runtime; devices without access keep a reliable inexact fallback.
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             if (alarmManager.canScheduleExactAlarms()) {
                 alarmManager.setExactAndAllowWhileIdle(

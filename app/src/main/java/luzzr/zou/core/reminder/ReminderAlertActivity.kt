@@ -154,9 +154,7 @@ class ReminderAlertActivity : ComponentActivity() {
             ?: RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
         ringtone?.stop()
         ringtone = RingtoneManager.getRingtone(this, alarmUri)?.apply {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-                isLooping = true
-            }
+            isLooping = true
             audioAttributes = AudioAttributes.Builder()
                 .setUsage(AudioAttributes.USAGE_ALARM)
                 .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
@@ -166,14 +164,9 @@ class ReminderAlertActivity : ComponentActivity() {
 
         vibrator?.cancel()
         vibrator = resolveVibrator().also { targetVibrator ->
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                targetVibrator.vibrate(
-                    VibrationEffect.createWaveform(longArrayOf(0, 400, 200, 400, 200, 600), 0),
-                )
-            } else {
-                @Suppress("DEPRECATION")
-                targetVibrator.vibrate(longArrayOf(0, 400, 200, 400, 200, 600), 0)
-            }
+            targetVibrator.vibrate(
+                VibrationEffect.createWaveform(longArrayOf(0, 400, 200, 400, 200, 600), 0),
+            )
         }
     }
 

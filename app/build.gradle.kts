@@ -100,6 +100,8 @@ android {
     lint {
         checkReleaseBuilds = true
         abortOnError = true
+        // Version drift is reviewed through Dependabot PRs; lint remains a code-correctness gate.
+        disable += setOf("AndroidGradlePluginVersion", "GradleDependency")
     }
 
 
@@ -133,6 +135,7 @@ dependencies {
     androidTestImplementation(platform(libs.androidx.compose.bom))
 
     implementation(libs.androidx.activity.compose)
+    implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.compose.foundation)
     implementation(libs.androidx.compose.material.icons.extended)
     implementation(libs.androidx.compose.material3)
@@ -145,6 +148,7 @@ dependencies {
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.datastore.preferences)
+    implementation(libs.androidx.exifinterface)
     implementation(libs.coil.compose)
     implementation(libs.androidx.room.ktx)
     implementation(libs.androidx.room.runtime)
@@ -173,12 +177,16 @@ dependencies {
 tasks.withType<Test>().configureEach {
     val runId = (project.findProperty("testRunId") as String?)
         ?: "auto-${System.currentTimeMillis()}-${UUID.randomUUID().toString().take(8)}"
+    val testTempDirectory = layout.buildDirectory.dir("tmp/$name/$runId")
     maxParallelForks = 1
     binaryResultsDirectory.set(layout.buildDirectory.dir("test-results/$name/binary-$runId"))
     reports.junitXml.outputLocation.set(layout.buildDirectory.dir("test-results/$name/xml-$runId"))
     reports.html.outputLocation.set(layout.buildDirectory.dir("reports/tests/$name-$runId"))
     systemProperty("junit.jupiter.execution.parallel.enabled", "false")
     jvmArgs(
-        "-Djava.io.tmpdir=${layout.buildDirectory.dir("tmp/$name/$runId").get().asFile.absolutePath}",
+        "-Djava.io.tmpdir=${testTempDirectory.get().asFile.absolutePath}",
     )
+    doFirst {
+        testTempDirectory.get().asFile.mkdirs()
+    }
 }
